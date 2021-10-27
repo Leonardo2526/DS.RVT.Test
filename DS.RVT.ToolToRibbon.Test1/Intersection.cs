@@ -2,6 +2,7 @@
 using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,6 +19,12 @@ namespace DS.RVT.ToolToRibbon.Test1
             Element element = doc.GetElement(reference);
             GeometryElement geomElement = element.get_Geometry(new Options());
 
+            // Get all element ids which are current selected by users
+            ICollection<ElementId> selectedIds = new List<ElementId>
+            {
+                element.Id
+            };
+
             Solid solid = null;
             foreach (GeometryObject geomObj in geomElement)
             {
@@ -31,6 +38,11 @@ namespace DS.RVT.ToolToRibbon.Test1
 
             ElementIntersectsSolidFilter intersectionFilter = new ElementIntersectsSolidFilter(solid);
             collector.WherePasses(intersectionFilter); // Apply intersection filter to find matches
+            
+
+            // Use the selection to instantiate an exclusion filter
+            ExclusionFilter exclusionFilter = new ExclusionFilter(selectedIds);
+            collector.WherePasses(exclusionFilter);
 
             IList<Element> elements = collector.ToElements();
 
