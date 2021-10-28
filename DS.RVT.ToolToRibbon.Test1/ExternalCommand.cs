@@ -16,10 +16,8 @@ namespace DS.RVT.ToolToRibbon.Test1
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            Intersection intersection = new Intersection();
-            intersection.FindIntersections(uidoc, doc);
-
-            TaskDialog.Show("Revit", "Done!");
+            Intersection intersection = new Intersection(uidoc, doc);
+            intersection.FindIntersections();
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }

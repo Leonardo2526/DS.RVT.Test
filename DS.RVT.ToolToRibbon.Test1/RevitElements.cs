@@ -7,7 +7,17 @@ namespace DS.RVT.ToolToRibbon.Test1
 {
     class RevitElements
     {
-        public void CreateModelLine(Document doc, XYZ startPoint, XYZ endPoint)
+        readonly UIDocument Uidoc;
+        readonly Document Doc;
+
+        public RevitElements(UIDocument uidoc, Document doc)
+        {
+            Uidoc = uidoc;
+            Doc = doc;
+        }
+
+
+        public void CreateModelLine(XYZ startPoint, XYZ endPoint)
         {            
             Line geomLine = Line.CreateBound(startPoint, endPoint);
 
@@ -17,17 +27,17 @@ namespace DS.RVT.ToolToRibbon.Test1
             XYZ p3 = p2 + XYZ.BasisZ;
             Plane geomPlane = Plane.CreateByThreePoints(p1, p2, p3);
 
-            using (Transaction transNew = new Transaction(doc, "CreateModelLine"))
+            using (Transaction transNew = new Transaction(Doc, "CreateModelLine"))
             {
                 try
                 {
                     transNew.Start();
 
                     // Create a sketch plane in current document
-                    SketchPlane sketch = SketchPlane.Create(doc, geomPlane);
+                    SketchPlane sketch = SketchPlane.Create(Doc, geomPlane);
 
                     // Create a ModelLine element using the created geometry line and sketch plane
-                    ModelLine line = doc.Create.NewModelCurve(geomLine, sketch) as ModelLine;
+                    ModelLine line = Doc.Create.NewModelCurve(geomLine, sketch) as ModelLine;
                 }
 
                 catch (Exception e)
@@ -40,7 +50,7 @@ namespace DS.RVT.ToolToRibbon.Test1
             }
         }
 
-        XYZ GetPointInFeets(XYZ entryPoint)
+        public XYZ GetPointInFeets(XYZ entryPoint)
         {
             double XF = UnitUtils.Convert(entryPoint.X / 1000,
                                            DisplayUnitType.DUT_METERS,
@@ -56,5 +66,7 @@ namespace DS.RVT.ToolToRibbon.Test1
 
             return outPoint;
         }
+        
+
     }
 }
