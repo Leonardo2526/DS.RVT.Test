@@ -24,19 +24,22 @@ namespace DS.RVT.ToolToRibbon.Test1
         {
             // Find intersections between elements and a selected element
             Reference reference = Uidoc.Selection.PickObject(ObjectType.Element, "Select element that will be checked for intersection with all elements");
-            Element element = Doc.GetElement(reference);
+            Element elementA = Doc.GetElement(reference);
 
-            Solid solidA = GetSolid(element);
+            Solid solidA = GetSolid(elementA);
 
             // Get all element ids which are current selected by users
             ICollection<ElementId> selectedIds = new List<ElementId>
             {
-                element.Id
+                elementA.Id
             };
 
             FilteredElementCollector collector = new FilteredElementCollector(Doc);
 
             collector.OfClass(typeof(Pipe));
+
+            Pipe pipe = collector.FirstElement() as Pipe;
+            double pipeSize = pipe.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER).AsDouble();
 
             ElementIntersectsSolidFilter intersectionFilter = new ElementIntersectsSolidFilter(solidA);
             collector.WherePasses(intersectionFilter); // Apply intersection filter to find matches
@@ -51,15 +54,18 @@ namespace DS.RVT.ToolToRibbon.Test1
             string IDS = "";
             string names = "";
 
-            foreach (Element e in elements)
+            foreach (Element elementB in elements)
             {
-                ElementsEditor elementsEditor = new ElementsEditor(Uidoc, Doc);
-                elementsEditor.MoveElement(e);
 
-                IDS += "\n" + e.Id.ToString();
-                names += "\n" + e.Category.Name;
+                ElementsEditor elementsEditor = new ElementsEditor(Uidoc, Doc);
+
+                XYZ centerPointElementA = elementsEditor.GetCenterPoint(elementA);
+                elementsEditor.MoveElement(elementB, centerPointElementA, pipeSize);
+
+                IDS += "\n" + elementB.Id.ToString();
+                names += "\n" + elementB.Category.Name;
                 
-                Solid solidB = GetSolid(e);
+                Solid solidB = GetSolid(elementB);
                 GetIntersectionLines(solidA, solidB);
             }
 
