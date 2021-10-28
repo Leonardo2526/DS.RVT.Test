@@ -19,10 +19,12 @@ namespace DS.RVT.ToolToRibbon.Test1
             Intersection intersection = new Intersection();
             intersection.FindIntersections(uidoc, doc);
 
+            TaskDialog.Show("Revit", "Done!");
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }
-      
+       
 
+      
     }
 }
