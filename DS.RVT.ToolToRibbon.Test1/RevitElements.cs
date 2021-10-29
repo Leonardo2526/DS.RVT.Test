@@ -59,62 +59,68 @@ namespace DS.RVT.ToolToRibbon.Test1
             double radians;
             double result;
 
-            double offsetXF;
-            double offsetYF;
-            double offsetZF;
+            double offsetF;
 
             double offsetX = 0;
             double offsetY = 0;
             double offsetZ =0 ;
 
+            
             double fullOffsetX = 0;
             double fullOffsetY =0 ;
             double fullOffsetZ =0 ;
 
-
-            if (Math.Round(startPointB.X, 3) == Math.Round(endPointB.X, 3))
-            {
-                offsetX = offset;
-                offsetY = 0;
-                offsetZ = 0;
-            }
-            else
-            {
-                double A = (endPointB.Y - startPointB.Y) / (endPointB.X - startPointB.X);
-
-                radians = Math.Atan(A);
-                alfa = radians * (180 / Math.PI);
-                beta = 90 - alfa;
-
-                offsetX = offset * Math.Sin(beta);
-                offsetY = offset * Math.Cos(beta);
-                offsetZ = 0;
-            }
-
-                offsetXF = UnitUtils.Convert(offsetX / 1000,
-                                      DisplayUnitType.DUT_METERS,
-                                      DisplayUnitType.DUT_DECIMAL_FEET);
-                offsetYF = UnitUtils.Convert(offsetY / 1000,
-                                      DisplayUnitType.DUT_METERS,
-                                      DisplayUnitType.DUT_DECIMAL_FEET);
-                offsetZF = UnitUtils.Convert(offsetZ / 1000,
-                                      DisplayUnitType.DUT_METERS,
-                                      DisplayUnitType.DUT_DECIMAL_FEET);
             //Get pipes sizes
             Pipe pipeA = ElementA as Pipe;
             double pipeSizeA = pipeA.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER).AsDouble();
             Pipe pipeB = ElementB as Pipe;
             double pipeSizeB = pipeB.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER).AsDouble();
 
-            //Get full offset of element B from element A
-            fullOffsetX = (pipeSizeA + pipeSizeB) / 2 +
-             (centerPointElementA.X - centerPointElementB.X) + offsetXF;
-                fullOffsetY = (pipeSizeA + pipeSizeB) / 2 +
-             (centerPointElementA.Y - centerPointElementB.Y) + offsetYF;
-                fullOffsetZ = (pipeSizeA + pipeSizeB) / 2 +
-             (centerPointElementA.Z - centerPointElementB.Z) + offsetZF;
+            offsetF = UnitUtils.Convert(offset / 1000,
+                                   DisplayUnitType.DUT_METERS,
+                                   DisplayUnitType.DUT_DECIMAL_FEET);
 
-            XYZ XYZoffset = new XYZ(fullOffsetX, 0, 0);
+           
+
+            if (Math.Round(startPointB.X, 3) == Math.Round(endPointB.X, 3))
+            {
+               
+                fullOffsetX = (pipeSizeA + pipeSizeB) / 2 +
+             (centerPointElementA.X - centerPointElementB.X) + offsetF;
+            }
+            else if (Math.Round(startPointB.Y, 3) == Math.Round(endPointB.Y, 3))
+            {
+                fullOffsetY = (pipeSizeA + pipeSizeB) / 2 +
+             (centerPointElementA.Y - centerPointElementB.Y) + offsetF;
+            }
+            else
+            {
+                double A = (endPointB.Y - startPointB.Y) / (endPointB.X - startPointB.X);
+
+                alfa = Math.Atan(A); 
+                double angle = alfa * (180 / Math.PI);
+                beta = 90 * (Math.PI / 180) - alfa;
+                angle = beta * (180 / Math.PI);
+
+                offsetZ = 0;
+                double AX = Math.Cos(beta);
+                double AY = Math.Sin(beta);
+
+                double H = centerPointElementB.Y + A * (centerPointElementA.X - centerPointElementB.X);
+
+                double deltaCenter = (centerPointElementA.Y - H) * Math.Cos(alfa);
+
+                double fullOffset = ((pipeSizeA + pipeSizeB) / 2 - deltaCenter + offsetF);
+                //(centerPointElementA.X - centerPointElementB.X) / AX
+                //Get full offset of element B from element A
+                fullOffsetX = fullOffset * AX;
+                fullOffsetY = - fullOffset * AY;
+                fullOffsetZ = 0;
+            }
+
+               
+
+            XYZ XYZoffset = new XYZ(fullOffsetX, fullOffsetY, fullOffsetZ);
 
             return XYZoffset;
         }
