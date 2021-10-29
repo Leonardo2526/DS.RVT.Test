@@ -117,7 +117,6 @@ namespace DS.RVT.ToolToRibbon.Test1
                 fullOffsetY = - fullOffset * AY;
                 fullOffsetZ = 0;
             }
-
                
 
             XYZ XYZoffset = new XYZ(fullOffsetX, fullOffsetY, fullOffsetZ);

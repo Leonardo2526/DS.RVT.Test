@@ -50,22 +50,26 @@ namespace DS.RVT.ToolToRibbon.Test1
 
             IList<Element> elements = collector.ToElements();
 
+            string elCount = "";
             string IDS = "";
             string names = "";
 
+            RevitElements revitElements = new RevitElements(Uidoc, Doc);
             foreach (Element elementB in elements)
             {
-                RevitElements revitElements = new RevitElements(Uidoc, Doc);
-                revitElements.MoveElement(elementA, elementB);
+                if (CheckElementForMove(elementA, elementB) == true)
+                {
+                    revitElements.MoveElement(elementA, elementB);
 
-                IDS += "\n" + elementB.Id.ToString();
-                names += "\n" + elementB.Category.Name;              
+                    IDS += "\n" + elementB.Id.ToString();
+                    names += "\n" + elementB.Category.Name;
+                    elCount += 1;
+                }        
             }
 
-            TaskDialog.Show("Revit", collector.Count() +
+            TaskDialog.Show("Revit", elCount +
                     " element intersect with the next elements \n (" + names + " id:" + IDS + ")");
         }
-
         private Solid GetSolid(Element element)
         {
             GeometryElement geomElement = element.get_Geometry(new Options());
@@ -95,5 +99,29 @@ namespace DS.RVT.ToolToRibbon.Test1
             }
         }
 
+        bool CheckElementForMove(Element elementA, Element elementB)
+        {
+            bool elementForMove = false;
+
+            RevitElements revitElements = new RevitElements(Uidoc, Doc);
+            revitElements.GetPoints(elementA, out XYZ startPointA, out XYZ endPointA, out XYZ centerPointA);
+            revitElements.GetPoints(elementB, out XYZ startPointB, out XYZ endPointB, out XYZ centerPointB);
+
+            double tgA = (endPointA.Y - startPointA.Y) / (endPointA.X - startPointA.X);
+            double tgB = (endPointB.Y - startPointB.Y) / (endPointB.X - startPointB.X);
+
+            double radA = Math.Atan(tgA);
+            double angleA = radA * (180 / Math.PI);
+
+            double radB = Math.Atan(tgB);
+            double angleB = radB * (180 / Math.PI);
+
+            double deltaAndle = Math.Abs(angleA - angleB);
+
+            if (deltaAndle < 15 | (180 - deltaAndle) < 15)
+                elementForMove = true;
+
+            return elementForMove;
+        }
     }
 }
