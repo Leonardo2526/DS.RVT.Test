@@ -8,21 +8,21 @@ using System.Linq;
 
 namespace DS.RVT.ToolToRibbon.Test1
 {
-    class Intersection
+    class Collilsion
     {
         readonly UIDocument Uidoc;
         readonly Document Doc;
 
-        public Intersection(UIDocument uidoc, Document doc)
+        public Collilsion(UIDocument uidoc, Document doc)
         {
             Uidoc = uidoc;
             Doc = doc;
         }
 
-        public void FindIntersections()
-        // Find intersections between elements and a selected element by solid
+        public void FindCollisions()
+        // Find collisions between elements and a selected element by solid
         {
-            // Find intersections between elements and a selected element
+            // Find collisions between elements and a selected element
             Reference reference = Uidoc.Selection.PickObject(ObjectType.Element, "Select element that will be checked for intersection with all elements");
             Element elementA = Doc.GetElement(reference);
 
@@ -38,7 +38,7 @@ namespace DS.RVT.ToolToRibbon.Test1
 
             collector.OfClass(typeof(Pipe));
 
-            Pipe pipe = collector.FirstElement() as Pipe;
+            Pipe pipe = elementA as Pipe;
             double pipeSize = pipe.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER).AsDouble();
 
             ElementIntersectsSolidFilter intersectionFilter = new ElementIntersectsSolidFilter(solidA);
@@ -56,25 +56,18 @@ namespace DS.RVT.ToolToRibbon.Test1
 
             foreach (Element elementB in elements)
             {
-
-                ElementsEditor elementsEditor = new ElementsEditor(Uidoc, Doc);
-
-                XYZ centerPointElementA = elementsEditor.GetCenterPoint(elementA);
-                elementsEditor.MoveElement(elementB, centerPointElementA, pipeSize);
+                RevitElements revitElements = new RevitElements(Uidoc, Doc);
+                
+                XYZ centerPointElementA = revitElements.GetCenterPoint(elementA);
+                revitElements.MoveElement(elementB, centerPointElementA, pipeSize);
 
                 IDS += "\n" + elementB.Id.ToString();
-                names += "\n" + elementB.Category.Name;
-                
-                Solid solidB = GetSolid(elementB);
-                GetIntersectionLines(solidA, solidB);
+                names += "\n" + elementB.Category.Name;              
             }
 
             TaskDialog.Show("Revit", collector.Count() +
                     " element intersect with the next elements \n (" + names + " id:" + IDS + ")");
         }
-
-       
-
 
         private Solid GetSolid(Element element)
         {
@@ -91,10 +84,9 @@ namespace DS.RVT.ToolToRibbon.Test1
         }
 
 
-        private void GetIntersectionLines(Solid solidA, Solid solidB)
+        private void GetCollisionLines(Solid solidA, Solid solidB)
         {
             Solid intersection = BooleanOperationsUtils.ExecuteBooleanOperation(solidA, solidB, BooleanOperationsType.Intersect);
-            double volumeOfIntersection = intersection.Volume;
 
             foreach (Edge edge in intersection.Edges)
             {
