@@ -38,8 +38,7 @@ namespace DS.RVT.ToolToRibbon.Test1
 
             collector.OfClass(typeof(Pipe));
 
-            Pipe pipe = elementA as Pipe;
-            double pipeSize = pipe.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER).AsDouble();
+           
 
             ElementIntersectsSolidFilter intersectionFilter = new ElementIntersectsSolidFilter(solidA);
             collector.WherePasses(intersectionFilter); // Apply intersection filter to find matches
@@ -57,9 +56,7 @@ namespace DS.RVT.ToolToRibbon.Test1
             foreach (Element elementB in elements)
             {
                 RevitElements revitElements = new RevitElements(Uidoc, Doc);
-                
-                XYZ centerPointElementA = revitElements.GetCenterPoint(elementA);
-                revitElements.MoveElement(elementB, centerPointElementA, pipeSize);
+                revitElements.MoveElement(elementA, elementB);
 
                 IDS += "\n" + elementB.Id.ToString();
                 names += "\n" + elementB.Category.Name;              

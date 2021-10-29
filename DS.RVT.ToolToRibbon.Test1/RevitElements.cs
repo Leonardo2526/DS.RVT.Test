@@ -19,25 +19,12 @@ namespace DS.RVT.ToolToRibbon.Test1
             Doc = doc;
         }
 
-        public void MoveElement(Element elementB, XYZ centerPointElementA, double pipeSizeA)
-        {
-            XYZ centerPointElementB = GetCenterPoint(elementB);
+        public void MoveElement(Element elementA, Element elementB)
+        { 
+            double offset = 100;
 
-            Pipe pipe = elementB as Pipe;
-            double pipeSizeB = pipe.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER).AsDouble();
+            XYZ newVector = GetOffset(elementA, elementB, offset);
 
-            //revitElements.CreateModelLine(startPoint, endPoint);           
-            double offsetX = 100;
-            double offsetXF = UnitUtils.Convert(offsetX / 1000,
-                                   DisplayUnitType.DUT_METERS,
-                                   DisplayUnitType.DUT_DECIMAL_FEET);
-            double fullOffset = (pipeSizeA + pipeSizeB) / 2 +
-                (centerPointElementA.X - centerPointElementB.X) + offsetXF;
-
-            //XYZ newPlace = new XYZ(centerPointElementB.X + fullOffset, centerPointElementB.Y, centerPointElementB.Z);
-            //revitElements.CreateModelLine(centerPointElementB, newPlace);
-
-            XYZ newVector = new XYZ(fullOffset, 0, 0);
             MoveElementTransaction(elementB, newVector);
         }
 
@@ -61,27 +48,79 @@ namespace DS.RVT.ToolToRibbon.Test1
             }
         }
 
-        XYZ GetNewVecrot(XYZ startPoint, XYZ endPoint)
+        XYZ GetOffset(Element ElementA, Element ElementB, double offset)
         {
-            XYZ newVector = new XYZ();
-            double Xa;
-            double Ya;
+            GetPoints(ElementA, out XYZ startPointA, out XYZ endPointA, out XYZ centerPointElementA);
+            GetPoints(ElementB, out XYZ startPointB, out XYZ endPointB, out XYZ centerPointElementB);
 
-            if (startPoint.X == endPoint.X)
+            double alfa;
+            double beta;
+
+            double radians;
+            double result;
+
+            double offsetXF;
+            double offsetYF;
+            double offsetZF;
+
+            double offsetX = 0;
+            double offsetY = 0;
+            double offsetZ =0 ;
+
+            double fullOffsetX = 0;
+            double fullOffsetY =0 ;
+            double fullOffsetZ =0 ;
+
+
+            if (Math.Round(startPointB.X, 3) == Math.Round(endPointB.X, 3))
             {
-                Xa = startPoint.X;
+                offsetX = offset;
+                offsetY = 0;
+                offsetZ = 0;
+            }
+            else
+            {
+                double A = (endPointB.Y - startPointB.Y) / (endPointB.X - startPointB.X);
 
-                double A = (startPoint.Y - endPoint.Y) / (startPoint.X - endPoint.X);
-                double b = endPoint.Y - (A * endPoint.X);
-                Ya = A * Xa + b;
+                radians = Math.Atan(A);
+                alfa = radians * (180 / Math.PI);
+                beta = 90 - alfa;
+
+                offsetX = offset * Math.Sin(beta);
+                offsetY = offset * Math.Cos(beta);
+                offsetZ = 0;
             }
 
+                offsetXF = UnitUtils.Convert(offsetX / 1000,
+                                      DisplayUnitType.DUT_METERS,
+                                      DisplayUnitType.DUT_DECIMAL_FEET);
+                offsetYF = UnitUtils.Convert(offsetY / 1000,
+                                      DisplayUnitType.DUT_METERS,
+                                      DisplayUnitType.DUT_DECIMAL_FEET);
+                offsetZF = UnitUtils.Convert(offsetZ / 1000,
+                                      DisplayUnitType.DUT_METERS,
+                                      DisplayUnitType.DUT_DECIMAL_FEET);
+            //Get pipes sizes
+            Pipe pipeA = ElementA as Pipe;
+            double pipeSizeA = pipeA.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER).AsDouble();
+            Pipe pipeB = ElementB as Pipe;
+            double pipeSizeB = pipeB.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER).AsDouble();
 
-            return newVector;
+            //Get full offset of element B from element A
+            fullOffsetX = (pipeSizeA + pipeSizeB) / 2 +
+             (centerPointElementA.X - centerPointElementB.X) + offsetXF;
+                fullOffsetY = (pipeSizeA + pipeSizeB) / 2 +
+             (centerPointElementA.Y - centerPointElementB.Y) + offsetYF;
+                fullOffsetZ = (pipeSizeA + pipeSizeB) / 2 +
+             (centerPointElementA.Z - centerPointElementB.Z) + offsetZF;
+
+            XYZ XYZoffset = new XYZ(fullOffsetX, 0, 0);
+
+            return XYZoffset;
         }
 
 
-        public XYZ GetCenterPoint(Element element)
+        public void GetPoints(Element element, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint)
         {
             //get the current location           
             LocationCurve lc = element.Location as LocationCurve;
@@ -89,13 +128,12 @@ namespace DS.RVT.ToolToRibbon.Test1
             c.GetEndPoint(0);
             c.GetEndPoint(1);
 
-            XYZ startPoint = c.GetEndPoint(0);
-            XYZ endPoint = c.GetEndPoint(1);
-            XYZ centerPoint = new XYZ((startPoint.X + endPoint.X) / 2,
+            startPoint = c.GetEndPoint(0);
+            endPoint = c.GetEndPoint(1);
+            centerPoint = new XYZ((startPoint.X + endPoint.X) / 2,
                 (startPoint.Y + endPoint.Y) / 2,
                 (startPoint.Z + endPoint.Z) / 2);
 
-            return centerPoint;
         }
 
 
