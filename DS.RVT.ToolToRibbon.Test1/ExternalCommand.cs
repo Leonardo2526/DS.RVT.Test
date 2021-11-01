@@ -12,11 +12,11 @@ namespace DS.RVT.ToolToRibbon.Test1
            ref string message, ElementSet elements)
         {
             UIApplication uiapp = commandData.Application;
-
+          
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
-
-            Collilsion intersection = new Collilsion(uidoc, doc);
+           
+            Collilsion intersection = new Collilsion(uiapp, uidoc, doc);
             intersection.FindCollisions();
 
             return Autodesk.Revit.UI.Result.Succeeded;

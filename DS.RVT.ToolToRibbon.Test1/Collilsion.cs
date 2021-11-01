@@ -12,9 +12,11 @@ namespace DS.RVT.ToolToRibbon.Test1
     {
         readonly UIDocument Uidoc;
         readonly Document Doc;
+        readonly UIApplication Uiapp;
 
-        public Collilsion(UIDocument uidoc, Document doc)
+        public Collilsion(UIApplication uiapp, UIDocument uidoc, Document doc)
         {
+            Uiapp = uiapp;
             Uidoc = uidoc;
             Doc = doc;
         }
@@ -59,6 +61,9 @@ namespace DS.RVT.ToolToRibbon.Test1
             {
                 if (CheckElementForMove(elementA, elementB) == true)
                 {
+                    DocEvent docEvent = new DocEvent(Uiapp);
+                    docEvent.RegisterEvent();
+
                     revitElements.MoveElement(elementA, elementB);
 
                     IDS += "\n" + elementB.Id.ToString();
