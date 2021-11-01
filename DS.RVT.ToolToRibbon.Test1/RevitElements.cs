@@ -19,7 +19,7 @@ namespace DS.RVT.ToolToRibbon.Test1
             Doc = doc;
         }
 
-        public void ModifyElements(Element elementA, Element elementB, ElementIntersectsSolidFilter intersectionFilter)
+        public void ModifyElements(Element elementA, Element elementB, BoundingBoxIntersectsFilter bbfilter)
         // Find collisions between elements and a selected element by solid
         {
             double offset = 100;
@@ -32,7 +32,7 @@ namespace DS.RVT.ToolToRibbon.Test1
 
             CreateTransaction(elementB.Id, newVector);
 
-            newVector = CheckModifiesElements(elementA, elementB, docEvent.modifiedElementsIds, intersectionFilter, offset);
+            newVector = CheckModifiesElements(elementA, elementB, docEvent.modifiedElementsIds, bbfilter, offset);
             if (newVector != null)
                 CreateTransaction(elementB.Id, newVector);
 
@@ -61,10 +61,10 @@ namespace DS.RVT.ToolToRibbon.Test1
 
 
         public XYZ CheckModifiesElements(Element elementA, Element elementB,
-            ICollection<ElementId> modifiedElementsIds, ElementIntersectsSolidFilter intersectionFilter, double offset)
+            ICollection<ElementId> modifiedElementsIds, BoundingBoxIntersectsFilter bbfilter, double offset)
         {
             FilteredElementCollector collector = new FilteredElementCollector(Doc, modifiedElementsIds);
-            collector.WherePasses(intersectionFilter);
+            collector.WherePasses(bbfilter);
 
             //Get all moved elements with solidA intersection
             IList<Element> newIntersectedElements = collector.ToElements();
@@ -86,16 +86,7 @@ namespace DS.RVT.ToolToRibbon.Test1
 
             double alfa;
             double beta;
-
-            double radians;
-            double result;
-
             double offsetF;
-
-            double offsetX = 0;
-            double offsetY = 0;
-            double offsetZ = 0;
-
 
             double fullOffsetX = 0;
             double fullOffsetY = 0;
@@ -134,8 +125,7 @@ namespace DS.RVT.ToolToRibbon.Test1
                 double angle = alfa * (180 / Math.PI);
                 beta = 90 * (Math.PI / 180) - alfa;
                 angle = beta * (180 / Math.PI);
-
-                offsetZ = 0;
+             
                 double AX = Math.Cos(beta);
                 double AY = Math.Sin(beta);
 

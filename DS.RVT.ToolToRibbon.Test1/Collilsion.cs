@@ -40,8 +40,11 @@ namespace DS.RVT.ToolToRibbon.Test1
 
             collector.OfClass(typeof(Pipe));
 
-            ElementIntersectsSolidFilter intersectionFilter = new ElementIntersectsSolidFilter(solidA);
-            collector.WherePasses(intersectionFilter); // Apply intersection filter to find matches
+            //GetFilter(solidA);
+
+            BoundingBoxIntersectsFilter bbfilter = GetFilter(elementA, solidA);
+            //ElementIntersectsSolidFilter intersectionFilter = new ElementIntersectsSolidFilter(solidA);
+            collector.WherePasses(bbfilter); // Apply intersection filter to find matches
 
 
             // Use the selection to instantiate an exclusion filter
@@ -59,7 +62,7 @@ namespace DS.RVT.ToolToRibbon.Test1
                 if (CheckElementForMove(elementA, elementB) == true)
                 {
                     RevitElements revitElements = new RevitElements(Uiapp, Uidoc, Doc);
-                    revitElements.ModifyElements(elementA,  elementB, intersectionFilter);
+                    //revitElements.ModifyElements(elementA,  elementB, bbfilter);
 
                     IDS += "\n" + elementB.Id.ToString();
                     names += "\n" + elementB.Category.Name;
@@ -129,6 +132,69 @@ namespace DS.RVT.ToolToRibbon.Test1
                 elementForMove = true;
 
             return elementForMove;
+        }
+
+
+        BoundingBoxIntersectsFilter GetFilter(Element elementA, Solid solidA)
+        {
+            BoundingBoxXYZ bb = solidA.GetBoundingBox();
+
+            // Find the bounding box from the selected 
+            // object and convert to outline.
+            //BoundingBoxXYZ bb = element.get_BoundingBox(doc.ActiveView);
+
+            Transform trf = bb.Transform;
+
+            XYZ maxInModelCoords = trf.OfPoint(bb.Max);
+            XYZ minInModelCoords = trf.OfPoint(bb.Min);
+
+            double offset = 0;
+            double offsetF = UnitUtils.Convert(offset / 1000,
+                                   DisplayUnitType.DUT_METERS,
+                                   DisplayUnitType.DUT_DECIMAL_FEET);
+            RevitElements revitElements = new RevitElements(Uiapp, Uidoc, Doc);
+            revitElements.GetPoints(elementA, out XYZ startPointA, out XYZ endPointA, out XYZ centerPointElementA);
+
+            double AX = 1;
+            double AY = 1;
+
+            if (Math.Round(startPointA.X, 3) != Math.Round(endPointA.X, 3) | 
+                Math.Round(startPointA.Y, 3) != Math.Round(endPointA.Y, 3))
+            {
+                double A = (endPointA.Y - startPointA.Y) / (endPointA.X - startPointA.X);
+
+                double alfa;
+                double beta;
+
+                alfa = Math.Atan(A);
+                double angle = alfa * (180 / Math.PI);
+                beta = 90 * (Math.PI / 180) - alfa;
+                angle = beta * (180 / Math.PI);
+
+                AX = Math.Cos(beta);
+                AY = Math.Sin(beta);
+            }
+         
+
+            XYZ solidMax = new XYZ(maxInModelCoords.X + offsetF * AX, maxInModelCoords.Y + offsetF * AY, maxInModelCoords.Z );
+            XYZ solidMin = new XYZ(minInModelCoords.X - offsetF * AX, minInModelCoords.Y - offsetF * AY, minInModelCoords.Z );
+
+            revitElements.CreateModelLine(solidMin, solidMax);
+
+            XYZ solidMax1 = new XYZ(minInModelCoords.X + offsetF * AX, maxInModelCoords.Y + offsetF * AY, maxInModelCoords.Z);
+            XYZ solidMin1 = new XYZ(maxInModelCoords.X - offsetF * AX, minInModelCoords.Y - offsetF * AY, minInModelCoords.Z);
+            revitElements.CreateModelLine(solidMin1, solidMax1);
+
+            Outline outline = new Outline(solidMin, solidMax);
+            //Outline outline = new Outline(bb.Min, bb.Max);
+
+            // Create a BoundingBoxIntersectsFilter to 
+            // find everything intersecting the bounding 
+            // box of the selected element.
+
+            BoundingBoxIntersectsFilter bbfilter = new BoundingBoxIntersectsFilter(outline);
+
+            return bbfilter;
         }
     }
 }
