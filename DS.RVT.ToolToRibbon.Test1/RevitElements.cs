@@ -30,21 +30,20 @@ namespace DS.RVT.ToolToRibbon.Test1
             DocEvent docEvent = new DocEvent(Uiapp);
             docEvent.RegisterEvent();
 
+            CreateTransaction(elementB.Id, newVector);
 
-            string transactionName = "trans1";
-            InitiateTransaction(transactionName, elementB.Id, newVector, elementA, elementB, intersectionFilter, docEvent, offset);
-
+            newVector = CheckModifiesElements(elementA, elementB, docEvent.modifiedElementsIds, intersectionFilter, offset);
+            if (newVector != null)
+                CreateTransaction(elementB.Id, newVector);
 
             // remove the event.
             Uiapp.Application.DocumentChanged -= docEvent.application_DocumentChanged;
         }
 
-        void InitiateTransaction(string transactionName, ElementId elementBId, XYZ newVector,
-            Element elementA, Element elementB, ElementIntersectsSolidFilter intersectionFilter, DocEvent docEvent, double offset)
+        void CreateTransaction(ElementId elementBId, XYZ newVector)
         {
-            using (Transaction transNew = new Transaction(Doc, transactionName))
+            using (Transaction transNew = new Transaction(Doc, "newTransaction"))
             {
-
                 try
                 {
                     transNew.Start();
@@ -57,30 +56,6 @@ namespace DS.RVT.ToolToRibbon.Test1
                     TaskDialog.Show("Revit", e.ToString());
                 }
                 transNew.Commit();
-            }
-
-            newVector = CheckModifiesElements(elementA, elementB,
-        docEvent.modifiedElementsIds, intersectionFilter, offset);
-
-            if (newVector != null)
-            {
-                using (Transaction transNew1 = new Transaction(Doc, transactionName))
-                {
-
-                    try
-                    {
-                        transNew1.Start();
-                        ElementTransformUtils.MoveElement(Doc, elementBId, newVector);
-                    }
-
-                    catch (Exception e)
-                    {
-                        transNew1.RollBack();
-                        TaskDialog.Show("Revit", e.ToString());
-                    }
-                    transNew1.Commit();
-                }
-
             }
         }
 
