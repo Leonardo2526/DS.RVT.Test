@@ -1,10 +1,8 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DS.RVT.ToolToRibbon.Test1
 {
@@ -12,30 +10,45 @@ namespace DS.RVT.ToolToRibbon.Test1
     {
         readonly UIDocument Uidoc;
         readonly Document Doc;
+        readonly UIApplication Uiapp;
 
-        public RevitElements(UIDocument uidoc, Document doc)
+        public RevitElements(UIApplication uiapp, UIDocument uidoc, Document doc)
         {
+            Uiapp = uiapp;
             Uidoc = uidoc;
             Doc = doc;
         }
 
-        public void MoveElement(Element elementA, Element elementB)
-        { 
+        public void ModifyElements(Element elementA, Element elementB, ElementIntersectsSolidFilter intersectionFilter)
+        // Find collisions between elements and a selected element by solid
+        {
             double offset = 100;
 
-            XYZ newVector = GetOffset(elementA, elementB, offset);
+            //Try to move elementB in default position
+            XYZ newVector = GetOffset(elementA, elementB, offset, false);
 
-            MoveElementTransaction(elementB, newVector);
+            DocEvent docEvent = new DocEvent(Uiapp);
+            docEvent.RegisterEvent();
+
+
+            string transactionName = "trans1";
+            InitiateTransaction(transactionName, elementB.Id, newVector, elementA, elementB, intersectionFilter, docEvent, offset);
+
+
+            // remove the event.
+            Uiapp.Application.DocumentChanged -= docEvent.application_DocumentChanged;
         }
 
-        public void MoveElementTransaction(Element ElementB, XYZ newVector)
+        void InitiateTransaction(string transactionName, ElementId elementBId, XYZ newVector,
+            Element elementA, Element elementB, ElementIntersectsSolidFilter intersectionFilter, DocEvent docEvent, double offset)
         {
-            using (Transaction transNew = new Transaction(Doc, "MoveElement"))
+            using (Transaction transNew = new Transaction(Doc, transactionName))
             {
+
                 try
                 {
                     transNew.Start();
-                    ElementTransformUtils.MoveElement(Doc, ElementB.Id, newVector);
+                    ElementTransformUtils.MoveElement(Doc, elementBId, newVector);
                 }
 
                 catch (Exception e)
@@ -43,12 +56,55 @@ namespace DS.RVT.ToolToRibbon.Test1
                     transNew.RollBack();
                     TaskDialog.Show("Revit", e.ToString());
                 }
-
                 transNew.Commit();
+            }
+
+            newVector = CheckModifiesElements(elementA, elementB,
+        docEvent.modifiedElementsIds, intersectionFilter, offset);
+
+            if (newVector != null)
+            {
+                using (Transaction transNew1 = new Transaction(Doc, transactionName))
+                {
+
+                    try
+                    {
+                        transNew1.Start();
+                        ElementTransformUtils.MoveElement(Doc, elementBId, newVector);
+                    }
+
+                    catch (Exception e)
+                    {
+                        transNew1.RollBack();
+                        TaskDialog.Show("Revit", e.ToString());
+                    }
+                    transNew1.Commit();
+                }
+
             }
         }
 
-        XYZ GetOffset(Element ElementA, Element ElementB, double offset)
+
+        public XYZ CheckModifiesElements(Element elementA, Element elementB,
+            ICollection<ElementId> modifiedElementsIds, ElementIntersectsSolidFilter intersectionFilter, double offset)
+        {
+            FilteredElementCollector collector = new FilteredElementCollector(Doc, modifiedElementsIds);
+            collector.WherePasses(intersectionFilter);
+
+            //Get all moved elements with solidA intersection
+            IList<Element> newIntersectedElements = collector.ToElements();
+
+            //Check modified elements
+            if (newIntersectedElements.Count > 0)
+            {
+                return GetOffset(elementA, elementB, offset, true);
+            }
+
+            else
+                return null;
+        }
+
+        public XYZ GetOffset(Element ElementA, Element ElementB, double offset, bool changeDirection)
         {
             GetPoints(ElementA, out XYZ startPointA, out XYZ endPointA, out XYZ centerPointElementA);
             GetPoints(ElementB, out XYZ startPointB, out XYZ endPointB, out XYZ centerPointElementB);
@@ -63,12 +119,12 @@ namespace DS.RVT.ToolToRibbon.Test1
 
             double offsetX = 0;
             double offsetY = 0;
-            double offsetZ =0 ;
+            double offsetZ = 0;
 
-            
+
             double fullOffsetX = 0;
-            double fullOffsetY =0 ;
-            double fullOffsetZ =0 ;
+            double fullOffsetY = 0;
+            double fullOffsetZ = 0;
 
             //Get pipes sizes
             Pipe pipeA = ElementA as Pipe;
@@ -79,25 +135,27 @@ namespace DS.RVT.ToolToRibbon.Test1
             offsetF = UnitUtils.Convert(offset / 1000,
                                    DisplayUnitType.DUT_METERS,
                                    DisplayUnitType.DUT_DECIMAL_FEET);
-
-           
+            //check correct direction
+            int K = 1;
+            if (changeDirection == true)
+                K = -1;
 
             if (Math.Round(startPointB.X, 3) == Math.Round(endPointB.X, 3))
             {
-               
+
                 fullOffsetX = (pipeSizeA + pipeSizeB) / 2 +
-             (centerPointElementA.X - centerPointElementB.X) + offsetF;
+             K * (centerPointElementA.X - centerPointElementB.X) + offsetF;
             }
             else if (Math.Round(startPointB.Y, 3) == Math.Round(endPointB.Y, 3))
             {
                 fullOffsetY = (pipeSizeA + pipeSizeB) / 2 +
-             (centerPointElementA.Y - centerPointElementB.Y) + offsetF;
+             K * (centerPointElementA.Y - centerPointElementB.Y) + offsetF;
             }
             else
             {
                 double A = (endPointB.Y - startPointB.Y) / (endPointB.X - startPointB.X);
 
-                alfa = Math.Atan(A); 
+                alfa = Math.Atan(A);
                 double angle = alfa * (180 / Math.PI);
                 beta = 90 * (Math.PI / 180) - alfa;
                 angle = beta * (180 / Math.PI);
@@ -110,16 +168,17 @@ namespace DS.RVT.ToolToRibbon.Test1
 
                 double deltaCenter = (centerPointElementA.Y - H) * Math.Cos(alfa);
 
-                double fullOffset = ((pipeSizeA + pipeSizeB) / 2 - deltaCenter + offsetF);
-                //(centerPointElementA.X - centerPointElementB.X) / AX
-                //Get full offset of element B from element A
-                fullOffsetX = fullOffset * AX;
-                fullOffsetY = - fullOffset * AY;
-                fullOffsetZ = 0;
-            }
-               
+                double fullOffset = ((pipeSizeA + pipeSizeB) / 2 - K * deltaCenter + offsetF);
 
-            XYZ XYZoffset = new XYZ(fullOffsetX, fullOffsetY, fullOffsetZ);
+                //Get full offset of element B from element A              
+                fullOffsetX = fullOffset * AX;
+                fullOffsetY = -fullOffset * AY;
+                fullOffsetZ = 0;
+
+            }
+
+
+            XYZ XYZoffset = new XYZ(K * fullOffsetX, K * fullOffsetY, K * fullOffsetZ);
 
             return XYZoffset;
         }
@@ -143,7 +202,7 @@ namespace DS.RVT.ToolToRibbon.Test1
 
 
         public void CreateModelLine(XYZ startPoint, XYZ endPoint)
-        {            
+        {
             Line geomLine = Line.CreateBound(startPoint, endPoint);
 
             // Create a geometry plane in Revit application
@@ -191,7 +250,7 @@ namespace DS.RVT.ToolToRibbon.Test1
 
             return outPoint;
         }
-        
+
 
     }
 }

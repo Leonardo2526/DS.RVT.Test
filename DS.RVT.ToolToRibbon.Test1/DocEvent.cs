@@ -14,6 +14,8 @@ namespace DS.RVT.ToolToRibbon.Test1
 
         readonly UIApplication Uiapp;
 
+        public ICollection<ElementId> modifiedElementsIds = new List<ElementId>();
+
         public DocEvent(UIApplication uiapp)
         {
             Uiapp = uiapp;
@@ -21,21 +23,19 @@ namespace DS.RVT.ToolToRibbon.Test1
 
         public void RegisterEvent()
         {
-            TaskDialog.Show("Revit", "DMU mode activated!");
-
             try
             {
                 // Register event. 
                 Uiapp.Application.DocumentChanged += new EventHandler<
     Autodesk.Revit.DB.Events.DocumentChangedEventArgs>(application_DocumentChanged);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-               
+                TaskDialog.Show("Exception", ex.ToString());
             }
         }
 
-        private void application_DocumentChanged(object sender, DocumentChangedEventArgs e)
+        public void application_DocumentChanged(object sender, DocumentChangedEventArgs e)
         {
             Document Doc = e.GetDocument();
 
@@ -47,10 +47,11 @@ namespace DS.RVT.ToolToRibbon.Test1
             string IDS = "";
             foreach (ElementId elID in colElID)
             {
+                modifiedElementsIds.Add(elID);
                 IDS += "\n" + elID.ToString();
             }
 
-            TaskDialog.Show("Revit", IDS);
+            //TaskDialog.Show("Revit", "Modified elements IDs: \n" + IDS);
 
         }
 

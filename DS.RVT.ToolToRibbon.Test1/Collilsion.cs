@@ -40,8 +40,6 @@ namespace DS.RVT.ToolToRibbon.Test1
 
             collector.OfClass(typeof(Pipe));
 
-           
-
             ElementIntersectsSolidFilter intersectionFilter = new ElementIntersectsSolidFilter(solidA);
             collector.WherePasses(intersectionFilter); // Apply intersection filter to find matches
 
@@ -56,15 +54,12 @@ namespace DS.RVT.ToolToRibbon.Test1
             string IDS = "";
             string names = "";
 
-            RevitElements revitElements = new RevitElements(Uidoc, Doc);
             foreach (Element elementB in elements)
             {
                 if (CheckElementForMove(elementA, elementB) == true)
                 {
-                    DocEvent docEvent = new DocEvent(Uiapp);
-                    docEvent.RegisterEvent();
-
-                    revitElements.MoveElement(elementA, elementB);
+                    RevitElements revitElements = new RevitElements(Uiapp, Uidoc, Doc);
+                    revitElements.ModifyElements(elementA,  elementB, intersectionFilter);
 
                     IDS += "\n" + elementB.Id.ToString();
                     names += "\n" + elementB.Category.Name;
@@ -72,9 +67,16 @@ namespace DS.RVT.ToolToRibbon.Test1
                 }        
             }
 
-            TaskDialog.Show("Revit", elCount +
-                    " element intersect with the next elements \n (" + names + " id:" + IDS + ")");
+
+            //TaskDialog.Show("Revit", elCount +
+            //" element intersect with the next elements \n (" + names + " id:" + IDS + ")");
         }
+
+        
+  
+       
+
+
         private Solid GetSolid(Element element)
         {
             GeometryElement geomElement = element.get_Geometry(new Options());
@@ -99,7 +101,7 @@ namespace DS.RVT.ToolToRibbon.Test1
                 XYZ startPoint = edge.Tessellate()[0];
                 XYZ endPoint = edge.Tessellate()[1];
 
-                RevitElements revitElements = new RevitElements(Uidoc, Doc);
+                RevitElements revitElements = new RevitElements(Uiapp, Uidoc, Doc);
                 revitElements.CreateModelLine(startPoint, endPoint);
             }
         }
@@ -108,7 +110,7 @@ namespace DS.RVT.ToolToRibbon.Test1
         {
             bool elementForMove = false;
 
-            RevitElements revitElements = new RevitElements(Uidoc, Doc);
+            RevitElements revitElements = new RevitElements(Uiapp, Uidoc, Doc);
             revitElements.GetPoints(elementA, out XYZ startPointA, out XYZ endPointA, out XYZ centerPointA);
             revitElements.GetPoints(elementB, out XYZ startPointB, out XYZ endPointB, out XYZ centerPointB);
 
