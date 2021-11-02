@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DS.RVT.ToolToRibbon.Test1
+namespace DS.RVT.AutoPipesCoordinarion
 {
     class Collision
     {

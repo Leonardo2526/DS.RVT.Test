@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 
 
-namespace DS.RVT.ToolToRibbon.Test1
+namespace DS.RVT.AutoPipesCoordinarion
 {
     class DocEvent
     {

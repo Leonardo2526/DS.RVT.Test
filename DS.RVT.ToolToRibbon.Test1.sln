@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.ToolToRibbon.Test1", "DS.RVT.ToolToRibbon.Test1\DS.RVT.ToolToRibbon.Test1.csproj", "{3423357B-A177-4697-B2BF-A720176B6135}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.AutoPipesCoordinarion", "DS.RVT.ToolToRibbon.Test1\DS.RVT.AutoPipesCoordinarion.csproj", "{3423357B-A177-4697-B2BF-A720176B6135}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.Pipe", "DS.RVT.Pipe\DS.RVT.Pipe.csproj", "{77B9B926-E8A4-4B99-82C3-ACD72A79C7B7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.PipeTest", "DS.RVT.Pipe\DS.RVT.PipeTest.csproj", "{77B9B926-E8A4-4B99-82C3-ACD72A79C7B7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
