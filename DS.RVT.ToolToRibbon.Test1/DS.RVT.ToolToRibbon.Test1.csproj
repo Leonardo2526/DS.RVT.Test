@@ -56,7 +56,7 @@
     <Compile Include="DocEvent.cs" />
     <Compile Include="RevitElements.cs" />
     <Compile Include="ExternalCommand.cs" />
-    <Compile Include="Collilsion.cs" />
+    <Compile Include="Collision.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
