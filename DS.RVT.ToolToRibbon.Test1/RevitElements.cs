@@ -19,7 +19,7 @@ namespace DS.RVT.ToolToRibbon.Test1
             Doc = doc;
         }
 
-        public void ModifyElements(Element elementA, Element elementB, BoundingBoxIntersectsFilter bbfilter)
+        public void ModifyElements(Element elementA, Element elementB, ElementIntersectsSolidFilter intersectionFilter)
         // Find collisions between elements and a selected element by solid
         {
             double offset = 100;
@@ -32,7 +32,7 @@ namespace DS.RVT.ToolToRibbon.Test1
 
             CreateTransaction(elementB.Id, newVector);
 
-            newVector = CheckModifiesElements(elementA, elementB, docEvent.modifiedElementsIds, bbfilter, offset);
+            newVector = CheckModifiesElements(elementA, elementB, docEvent.modifiedElementsIds, intersectionFilter, offset);
             if (newVector != null)
                 CreateTransaction(elementB.Id, newVector);
 
@@ -61,10 +61,10 @@ namespace DS.RVT.ToolToRibbon.Test1
 
 
         public XYZ CheckModifiesElements(Element elementA, Element elementB,
-            ICollection<ElementId> modifiedElementsIds, BoundingBoxIntersectsFilter bbfilter, double offset)
+            ICollection<ElementId> modifiedElementsIds, ElementIntersectsSolidFilter intersectionFilter, double offset)
         {
             FilteredElementCollector collector = new FilteredElementCollector(Doc, modifiedElementsIds);
-            collector.WherePasses(bbfilter);
+            collector.WherePasses(intersectionFilter);
 
             //Get all moved elements with solidA intersection
             IList<Element> newIntersectedElements = collector.ToElements();

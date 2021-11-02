@@ -28,7 +28,36 @@ namespace DS.RVT.ToolToRibbon.Test1
             Reference reference = Uidoc.Selection.PickObject(ObjectType.Element, "Select element that will be checked for intersection with all elements");
             Element elementA = Doc.GetElement(reference);
 
+
             Solid solidA = GetSolid(elementA);
+
+            //---------------------
+
+            RevitElements revitElements = new RevitElements(Uiapp, Uidoc, Doc);
+            revitElements.GetPoints(elementA, out XYZ startPointA, out XYZ endPointA, out XYZ centerPointElementA);
+
+            Transform transform = Transform.CreateTranslation(new XYZ(centerPointElementA.X, centerPointElementA.Y, centerPointElementA.Z)).ScaleBasis(2);
+            Solid sclSolid = SolidUtils.CreateTransformed(solidA, transform);
+
+            BoundingBoxXYZ bb = sclSolid.GetBoundingBox();
+            Transform trf = bb.Transform;
+
+            XYZ maxInModelCoords = trf.OfPoint(bb.Max);
+            XYZ minInModelCoords = trf.OfPoint(bb.Min);
+
+            double offset = 0;
+            double offsetF = UnitUtils.Convert(offset / 1000,
+                                   DisplayUnitType.DUT_METERS,
+                                   DisplayUnitType.DUT_DECIMAL_FEET);          
+            XYZ solidMax = new XYZ(maxInModelCoords.X , maxInModelCoords.Y,  maxInModelCoords.Z);
+            XYZ solidMin = new XYZ(minInModelCoords.X , minInModelCoords.Y , minInModelCoords.Z);
+
+            revitElements.CreateModelLine(solidMin, solidMax);
+
+
+            //---------------------
+
+
 
             // Get all element ids which are current selected by users
             ICollection<ElementId> selectedIds = new List<ElementId>
@@ -38,13 +67,10 @@ namespace DS.RVT.ToolToRibbon.Test1
 
             FilteredElementCollector collector = new FilteredElementCollector(Doc);
 
-            collector.OfClass(typeof(Pipe));
-
-            //GetFilter(solidA);
-
-            BoundingBoxIntersectsFilter bbfilter = GetFilter(elementA, solidA);
-            //ElementIntersectsSolidFilter intersectionFilter = new ElementIntersectsSolidFilter(solidA);
-            collector.WherePasses(bbfilter); // Apply intersection filter to find matches
+            collector.OfClass(typeof(Pipe));            
+          
+            ElementIntersectsSolidFilter intersectionFilter = new ElementIntersectsSolidFilter(sclSolid);
+            collector.WherePasses(intersectionFilter); // Apply intersection filter to find matches
 
 
             // Use the selection to instantiate an exclusion filter
@@ -61,8 +87,8 @@ namespace DS.RVT.ToolToRibbon.Test1
             {
                 if (CheckElementForMove(elementA, elementB) == true)
                 {
-                    RevitElements revitElements = new RevitElements(Uiapp, Uidoc, Doc);
-                    //revitElements.ModifyElements(elementA,  elementB, bbfilter);
+                    //RevitElements revitElements = new RevitElements(Uiapp, Uidoc, Doc);
+                    revitElements.ModifyElements(elementA,  elementB, intersectionFilter);
 
                     IDS += "\n" + elementB.Id.ToString();
                     names += "\n" + elementB.Category.Name;
@@ -74,11 +100,6 @@ namespace DS.RVT.ToolToRibbon.Test1
             //TaskDialog.Show("Revit", elCount +
             //" element intersect with the next elements \n (" + names + " id:" + IDS + ")");
         }
-
-        
-  
-       
-
 
         private Solid GetSolid(Element element)
         {
