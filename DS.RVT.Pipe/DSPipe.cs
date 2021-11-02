@@ -13,7 +13,7 @@ namespace DS.RVT.PipeTest
         readonly UIDocument Uidoc;
         readonly Document Doc;
         readonly UIApplication Uiapp;
-         
+
         public DSPipe(UIApplication uiapp, UIDocument uidoc, Document doc)
         {
             Uiapp = uiapp;
@@ -26,26 +26,28 @@ namespace DS.RVT.PipeTest
         PipeType pipeType;
         Level level;
 
+        ElementId MEPTypeElementId;
+        ElementId PipeTypeElementId;
+
         public void CreatePipeSystem()
         {
-            GetSystems();
+            GetNewSystem();
             CreateTransaction();
         }
 
 
-        void GetSystems()
+
+        void GetNewSystem()
         {
-            // Extract all pipe system types
-            mepSystemType = new FilteredElementCollector(Doc)
-        .OfClass(typeof(MEPSystemType)).Cast<MEPSystemType>()
-        .FirstOrDefault(sysType => sysType.SystemClassification == MEPSystemClassification.DomesticColdWater);
+            // Find collisions between elements and a selected element
+            Reference reference = Uidoc.Selection.PickObject(ObjectType.Element, "Select element that will be checked for intersection with all elements");
+            Element elementA = Doc.GetElement(reference);
 
-            //Pipe Type (Standard, ChilledWater)
-            pipeType = new FilteredElementCollector(Doc)
-                .OfClass(typeof(PipeType))
-                .Cast<PipeType>()
-                .FirstOrDefault();
+            //Get pipes sizes
+            Pipe pipeA = elementA as Pipe;
 
+            MEPTypeElementId = pipeA.MEPSystem.GetTypeId();
+            PipeTypeElementId = pipeA.GetTypeId();          
 
             //Level
             level = new FilteredElementCollector(Doc)
@@ -77,41 +79,39 @@ namespace DS.RVT.PipeTest
 
         void CreatePipe()
         {
-            Pipe pipe = null;
-            if (null != pipeType)
-            {
+            double pipeLength = 1000;
+            double pipeLengthF = UnitUtils.Convert(pipeLength / 1000,
+                                        DisplayUnitType.DUT_METERS,
+                                        DisplayUnitType.DUT_DECIMAL_FEET);
 
-                // create pipe between 2 points
-                XYZ p1 = new XYZ(0, 0, 0);
-                XYZ p2 = new XYZ(10, 0, 0);
+            // create pipe between 2 points
+            XYZ p1 = new XYZ(0, 0, 0);
+            XYZ p2 = new XYZ(pipeLengthF, 0, 0);
 
-                pipe = Pipe.Create(Doc, mepSystemType.Id, pipeType.Id, level.Id, p1, p2);
-                ChangePipeSize(pipe);
-
-                List<Connector> connectors = GetConnectors(pipe);
-                var connectorList = connectors.OrderBy(x => x.Origin.X).ToList();
-
-                List<XYZ> connectorlocations = GetConnectorsXYZ(pipe);  
-                var connectorLocationsList = connectorlocations.OrderBy(x => x.X).ToList();
-
-                double off = 109.5;
-                double offF = UnitUtils.Convert(off / 1000,
-                                            DisplayUnitType.DUT_METERS,
-                                            DisplayUnitType.DUT_DECIMAL_FEET);
-
-                XYZ p3 = new XYZ(connectorLocationsList[1].X + offF, connectorLocationsList[1].Y + offF, connectorLocationsList[1].Z);
-                XYZ p4 = new XYZ(connectorLocationsList[1].X + offF, connectorLocationsList[1].Y + offF + 10, connectorLocationsList[1].Z);
+            Pipe pipe = Pipe.Create(Doc, MEPTypeElementId, PipeTypeElementId, level.Id, p1, p2);
+            ChangePipeSize(pipe);
 
 
-                Pipe pipe1 = null;
-                pipe1 = Pipe.Create(Doc, mepSystemType.Id, pipeType.Id, level.Id, p3, p4);
-                ChangePipeSize(pipe1);
 
-                List<Connector> connectors1 = GetConnectors(pipe1);
-                var connector1List = connectors1.OrderBy(x => x.Origin.Y).ToList();
 
-                Doc.Create.NewElbowFitting(connectorList[1], connector1List[0]); 
-            }
+            List<Connector> connectors = GetConnectors(pipe);
+            var connectorList = connectors.OrderBy(x => x.Origin.X).ToList();
+
+            List<XYZ> connectorlocations = GetConnectorsXYZ(pipe);
+            var connectorLocationsList = connectorlocations.OrderBy(x => x.X).ToList();
+
+            XYZ p3 = new XYZ(connectorLocationsList[1].X, connectorLocationsList[1].Y, connectorLocationsList[1].Z);
+            XYZ p4 = new XYZ(connectorLocationsList[1].X, connectorLocationsList[1].Y + pipeLengthF, connectorLocationsList[1].Z);
+
+            Pipe pipe1 = null;
+            pipe1 = Pipe.Create(Doc, MEPTypeElementId, PipeTypeElementId, level.Id, p3, p4);
+            ChangePipeSize(pipe1);
+
+            List<Connector> connectors1 = GetConnectors(pipe1);
+            var connector1List = connectors1.OrderBy(x => x.Origin.Y).ToList();
+
+            Doc.Create.NewElbowFitting(connectorList[1], connector1List[0]);
+
         }
 
         public List<Connector> GetConnectors(Element element)
@@ -202,7 +202,7 @@ namespace DS.RVT.PipeTest
         {
             Parameter parameter = pipe.get_Parameter(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM);
 
-            double diam = 200;
+            double diam = 100;
             double diamF = UnitUtils.Convert(diam / 1000,
                                         DisplayUnitType.DUT_METERS,
                                         DisplayUnitType.DUT_DECIMAL_FEET);
@@ -212,6 +212,6 @@ namespace DS.RVT.PipeTest
             pipe.Document.Regenerate();
         }
 
-      
+
     }
 }
