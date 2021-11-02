@@ -18,7 +18,9 @@ namespace DS.RVT.PipeTest
             Document doc = uiapp.ActiveUIDocument.Document;
 
             DSPipe pipe = new DSPipe(uiapp, uidoc, doc);
-            pipe.CreatePipeSystem();
+            //pipe.CreatePipeSystem();
+            //pipe.DeleteElement();
+            pipe.SplitElement();
 
 
             TaskDialog.Show("Revit", "Pipe created!");

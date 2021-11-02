@@ -31,13 +31,71 @@ namespace DS.RVT.PipeTest
 
         public void CreatePipeSystem()
         {
-            GetNewSystem();
+            GetPipeSystemTypes();
             CreateTransaction();
         }
 
+        public void DeleteElement()
+        {
+            // Find collisions between elements and a selected element
+            Reference reference = Uidoc.Selection.PickObject(ObjectType.Element, "Select element that will be checked for intersection with all elements");
+            Element elementA = Doc.GetElement(reference);
+
+            ICollection<ElementId> selectedIds = new List<ElementId>
+            {
+                elementA.Id
+            };
+
+            using (Transaction transNew = new Transaction(Doc, "newTransaction"))
+            {
+                try
+                {
+                    transNew.Start();
+                    Doc.Delete(selectedIds);
+                }
+
+                catch (Exception e)
+                {
+                    transNew.RollBack();
+                    TaskDialog.Show("Revit", e.ToString());
+                }
+                transNew.Commit();
+            }
 
 
-        void GetNewSystem()
+        }
+
+
+       public void SplitElement()
+        {
+            // Find collisions between elements and a selected element
+            Reference reference = Uidoc.Selection.PickObject(ObjectType.Element, "Select element that will be checked for intersection with all elements");
+            Element elementA = Doc.GetElement(reference);
+
+            //Get pipes sizes
+            Pipe pipeA = elementA as Pipe;
+            GetPoints(elementA, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint);
+
+            using (Transaction transNew = new Transaction(Doc, "newTransaction"))
+            {
+                try
+                {
+                    transNew.Start();
+                    ElementId newPipeId = PlumbingUtils.BreakCurve(Doc, pipeA.Id, centerPoint);
+                    Element newPipe = Doc.GetElement(newPipeId);
+                }
+
+                catch (Exception e)
+                {
+                    transNew.RollBack();
+                    TaskDialog.Show("Revit", e.ToString());
+                }
+                transNew.Commit();
+            }
+        }
+
+
+        void GetPipeSystemTypes()
         {
             // Find collisions between elements and a selected element
             Reference reference = Uidoc.Selection.PickObject(ObjectType.Element, "Select element that will be checked for intersection with all elements");
@@ -90,8 +148,7 @@ namespace DS.RVT.PipeTest
 
             Pipe pipe = Pipe.Create(Doc, MEPTypeElementId, PipeTypeElementId, level.Id, p1, p2);
             ChangePipeSize(pipe);
-
-
+           
 
 
             List<Connector> connectors = GetConnectors(pipe);
@@ -101,7 +158,7 @@ namespace DS.RVT.PipeTest
             var connectorLocationsList = connectorlocations.OrderBy(x => x.X).ToList();
 
             XYZ p3 = new XYZ(connectorLocationsList[1].X, connectorLocationsList[1].Y, connectorLocationsList[1].Z);
-            XYZ p4 = new XYZ(connectorLocationsList[1].X, connectorLocationsList[1].Y + pipeLengthF, connectorLocationsList[1].Z);
+            XYZ p4 = new XYZ(connectorLocationsList[1].X + pipeLengthF, connectorLocationsList[1].Y + pipeLengthF, connectorLocationsList[1].Z + pipeLengthF);
 
             Pipe pipe1 = null;
             pipe1 = Pipe.Create(Doc, MEPTypeElementId, PipeTypeElementId, level.Id, p3, p4);
@@ -212,6 +269,21 @@ namespace DS.RVT.PipeTest
             pipe.Document.Regenerate();
         }
 
+        void GetPoints(Element element, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint)
+        {
+            //get the current location           
+            LocationCurve lc = element.Location as LocationCurve;
+            Curve c = lc.Curve;
+            c.GetEndPoint(0);
+            c.GetEndPoint(1);
+
+            startPoint = c.GetEndPoint(0);
+            endPoint = c.GetEndPoint(1);
+            centerPoint = new XYZ((startPoint.X + endPoint.X) / 2,
+                (startPoint.Y + endPoint.Y) / 2,
+                (startPoint.Z + endPoint.Z) / 2);
+
+        }
 
     }
 }
