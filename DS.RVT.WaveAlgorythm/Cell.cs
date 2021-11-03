@@ -30,7 +30,7 @@ namespace DS.RVT.WaveAlgorythm
                                   DisplayUnitType.DUT_DECIMAL_FEET);
 
             XYZ corner1 = new XYZ(0, 0, 0);
-            XYZ corner2 = new XYZ(areaSizeF, areaSizeF, 0);
+            XYZ corner2 = new XYZ(areaSizeF, areaSizeF, areaSizeF);
 
             double cellSize = 100;
             double cellSizeF = UnitUtils.Convert(cellSize / 1000,
@@ -38,18 +38,20 @@ namespace DS.RVT.WaveAlgorythm
                                   DisplayUnitType.DUT_DECIMAL_FEET);
 
             List<XYZ> cellsCoordinates = new List<XYZ>();
-
-            for (double Y = 0; Y <= corner2.Y; Y += cellSizeF)
+            for (double Z = 0; Z <= corner2.Z; Z += cellSizeF)
             {
-                for (double X = 0; X <= corner2.X; X += cellSizeF)
+                for (double Y = 0; Y <= corner2.Y; Y += cellSizeF)
                 {
-                    XYZ centralPoint = new XYZ(X, Y, 0);
-                    Family family = new Family();
-                    family.CreateCell(Doc, centralPoint);
-                    //Cell cell = new Cell(App, Uiapp, Doc, Uidoc);
-                    //cell.CreateCellBorders(centralPoint, cellSizeF);
-                }
+                    for (double X = 0; X <= corner2.X; X += cellSizeF)
+                    {
+                        XYZ centralPoint = new XYZ(X, Y, Z);
+                        Family family = new Family(App, Uiapp, Doc, Uidoc);
+                        family.CreateCell(centralPoint);
+                        //Cell cell = new Cell(App, Uiapp, Doc, Uidoc);
+                        //cell.CreateCellBorders(centralPoint, cellSizeF);
+                    }
 
+                }
             }
         }
 
@@ -95,9 +97,7 @@ namespace DS.RVT.WaveAlgorythm
             cellCorners[0].C7 = new XYZ(centerPoint.X + cellSizeF / 2, centerPoint.Y + cellSizeF / 2, centerPoint.Z - cellSizeF / 2);
             cellCorners[0].C8 = new XYZ(centerPoint.X + cellSizeF / 2, centerPoint.Y - cellSizeF / 2, centerPoint.Z - cellSizeF / 2);
 
-            BoudingBox boudingBox = new BoudingBox(App, Uiapp, Doc, Uidoc);
-            boudingBox.FindCollision(cellCorners[0].C5, cellCorners[0].C3); 
-
+          
 
             return cellCorners;
         }
