@@ -19,22 +19,33 @@ namespace DS.RVT.AutoPipesCoordinarion
             Doc = doc;
         }
 
-        public void ModifyElements(Element elementA, Element elementB, ElementIntersectsSolidFilter intersectionFilter)
+        public void ModifyElements(Element elementA, Element elementB)
         // Find collisions between elements and a selected element by solid
         {
             double offset = 100;
 
-            //Try to move elementB in default position
-            XYZ newVector = GetOffset(elementA, elementB, offset, false);
-
             DocEvent docEvent = new DocEvent(Uiapp);
             docEvent.RegisterEvent();
 
+            //Try to move elementB in default position
+            XYZ newVector = GetOffset(elementA, elementB, offset, false);
             CreateTransaction(elementB.Id, newVector);
 
-            newVector = CheckModifiesElements(elementA, elementB, docEvent.modifiedElementsIds, intersectionFilter, offset);
-            if (newVector != null)
+            Collision collision = new Collision(Uiapp, Uidoc, Doc);
+            if (collision.CheckCollisionsWithModifiedElements(docEvent.modifiedElementsIds) == true)
+            {
+                //Try to move elementB in another position
+                newVector = GetOffset(elementA, elementB, offset, true);
                 CreateTransaction(elementB.Id, newVector);
+            }
+
+            if (collision.CheckCollisionsWithModifiedElements(docEvent.modifiedElementsIds) == true)
+            {
+                //Try to move elementB in another position
+                newVector = GetOffset(elementA, elementB, offset = 500, true);
+                CreateTransaction(elementB.Id, newVector);
+            }
+
 
             // remove the event.
             Uiapp.Application.DocumentChanged -= docEvent.application_DocumentChanged;
@@ -78,6 +89,9 @@ namespace DS.RVT.AutoPipesCoordinarion
             else
                 return null;
         }
+
+
+
 
         public XYZ GetOffset(Element ElementA, Element ElementB, double offset, bool changeDirection)
         {
@@ -125,7 +139,7 @@ namespace DS.RVT.AutoPipesCoordinarion
                 double angle = alfa * (180 / Math.PI);
                 beta = 90 * (Math.PI / 180) - alfa;
                 angle = beta * (180 / Math.PI);
-             
+
                 double AX = Math.Cos(beta);
                 double AY = Math.Sin(beta);
 

@@ -36,8 +36,8 @@ namespace DS.RVT.AutoPipesCoordinarion
                 elementA.Id
             };
 
+            //Get all pipes in document
             FilteredElementCollector collector = new FilteredElementCollector(Doc);
-
             collector.OfClass(typeof(Pipe));            
           
             ElementIntersectsSolidFilter intersectionFilter = new ElementIntersectsSolidFilter(solidA);
@@ -61,7 +61,7 @@ namespace DS.RVT.AutoPipesCoordinarion
                 if (CheckElementForMove(elementA, elementB) == true)
                 {
                     //RevitElements revitElements = new RevitElements(Uiapp, Uidoc, Doc);
-                    revitElements.ModifyElements(elementA,  elementB, intersectionFilter);
+                    revitElements.ModifyElements(elementA,  elementB);
 
                     IDS += "\n" + elementB.Id.ToString();
                     names += "\n" + elementB.Category.Name;
@@ -126,6 +126,42 @@ namespace DS.RVT.AutoPipesCoordinarion
                 elementForMove = true;
 
             return elementForMove;
+        }
+
+
+
+        public bool CheckCollisionsWithModifiedElements(ICollection<ElementId> modifiedElementsIds)
+        {
+            //Get all modified pipes
+            FilteredElementCollector modifiedPipes = new FilteredElementCollector(Doc, modifiedElementsIds);
+            ElementClassFilter elementFilter = new ElementClassFilter(typeof(Pipe));
+            modifiedPipes.WherePasses(elementFilter);
+            IList<Element> modifiedElements = modifiedPipes.ToElements();
+
+            //Get all pipes in document
+            FilteredElementCollector allDocPipes = new FilteredElementCollector(Doc);
+            allDocPipes.OfClass(typeof(Pipe));
+
+            //Exclude modified pipes
+            ExclusionFilter exclusionFilter = new ExclusionFilter(modifiedElementsIds);
+            allDocPipes.WherePasses(exclusionFilter);          
+
+            foreach (Element me in modifiedElements)
+            {
+                Solid solidME = GetSolid(me);
+                ElementIntersectsSolidFilter intersectionFilterME = new ElementIntersectsSolidFilter(solidME);
+
+                //Get pipes with collisions
+                allDocPipes.WherePasses(intersectionFilterME);
+                IList<Element> collisionElements = allDocPipes.ToElements();
+
+                if (collisionElements.Count > 0)
+                {
+                    return true;
+                }
+            }
+
+                return false;
         }
 
     }
