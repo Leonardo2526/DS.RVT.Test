@@ -13,6 +13,10 @@ namespace DS.RVT.WaveAlgorythm
         public XYZ C2 { get; set; }
         public XYZ C3 { get; set; }
         public XYZ C4 { get; set; }
+        public XYZ C5 { get; set; }
+        public XYZ C6 { get; set; }
+        public XYZ C7 { get; set; }
+        public XYZ C8 { get; set; }
 
 
     }

@@ -30,7 +30,7 @@ namespace DS.RVT.WaveAlgorythm
                                   DisplayUnitType.DUT_DECIMAL_FEET);
 
             XYZ corner1 = new XYZ(0, 0, 0);
-            XYZ corner2 = new XYZ(areaSizeF, areaSizeF, areaSizeF);
+            XYZ corner2 = new XYZ(areaSizeF, areaSizeF, 0);
 
             double cellSize = 100;
             double cellSizeF = UnitUtils.Convert(cellSize / 1000,
@@ -43,9 +43,11 @@ namespace DS.RVT.WaveAlgorythm
             {
                 for (double X = 0; X <= corner2.X; X += cellSizeF)
                 {
-                    Cell cell = new Cell(App, Uiapp, Doc, Uidoc);
                     XYZ centralPoint = new XYZ(X, Y, 0);
-                    cell.CreateCellBorders(centralPoint, cellSizeF);
+                    Family family = new Family();
+                    family.CreateCell(Doc, centralPoint);
+                    //Cell cell = new Cell(App, Uiapp, Doc, Uidoc);
+                    //cell.CreateCellBorders(centralPoint, cellSizeF);
                 }
 
             }
@@ -88,10 +90,19 @@ namespace DS.RVT.WaveAlgorythm
             cellCorners[0].C3 = new XYZ(centerPoint.X + cellSizeF / 2, centerPoint.Y + cellSizeF / 2, centerPoint.Z + cellSizeF / 2);
             cellCorners[0].C4 = new XYZ(centerPoint.X + cellSizeF / 2, centerPoint.Y - cellSizeF / 2, centerPoint.Z + cellSizeF / 2);
 
+            cellCorners[0].C5 = new XYZ(centerPoint.X - cellSizeF / 2, centerPoint.Y - cellSizeF / 2, centerPoint.Z - cellSizeF / 2);
+            cellCorners[0].C6 = new XYZ(centerPoint.X - cellSizeF / 2, centerPoint.Y + cellSizeF / 2, centerPoint.Z - cellSizeF / 2);
+            cellCorners[0].C7 = new XYZ(centerPoint.X + cellSizeF / 2, centerPoint.Y + cellSizeF / 2, centerPoint.Z - cellSizeF / 2);
+            cellCorners[0].C8 = new XYZ(centerPoint.X + cellSizeF / 2, centerPoint.Y - cellSizeF / 2, centerPoint.Z - cellSizeF / 2);
+
+            BoudingBox boudingBox = new BoudingBox(App, Uiapp, Doc, Uidoc);
+            boudingBox.FindCollision(cellCorners[0].C5, cellCorners[0].C3); 
+
+
             return cellCorners;
         }
 
-        void CreateModelLine(XYZ startPoint, XYZ endPoint)
+        public void CreateModelLine(XYZ startPoint, XYZ endPoint)
         {
             Line geomLine = Line.CreateBound(startPoint, endPoint);
 

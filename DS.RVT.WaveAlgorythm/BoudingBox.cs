@@ -24,12 +24,12 @@ namespace DS.RVT.WaveAlgorythm
         }
 
 
-        void FindCollision(XYZ centerPoint)
+        public void FindCollision(XYZ corner1, XYZ corner2)
         {
             
 
             // Create a Outline, uses a minimum and maximum XYZ point to initialize the outline. 
-            Outline myOutLn = new Outline(new XYZ(0, 0, 0), new XYZ(10, 10, 10));
+            Outline myOutLn = new Outline(corner1, corner2);
 
             // Create a BoundingBoxIntersects filter with this Outline
             BoundingBoxIntersectsFilter filter = new BoundingBoxIntersectsFilter(myOutLn);
@@ -39,24 +39,35 @@ namespace DS.RVT.WaveAlgorythm
             FilteredElementCollector collector = new FilteredElementCollector(Doc);
             collector.OfClass(typeof(Pipe));
 
-            collector.WherePasses(filter); // Apply intersection filter to find matches
+            collector.WherePasses(filter);
 
             IList<Element> elements = collector.ToElements();
 
-            string elCount = "";
-            string IDS = "";
-            string names = "";
-
-            foreach (Element elementB in elements)
+            if (elements.Count >0)
             {
+                string elCount = "";
+                string IDS = "";
+                string names = "";
+
+                Cell cell = new Cell(App, Uiapp, Doc, Uidoc);
+                cell.CreateModelLine(corner1, corner2);
+
+                /*
+                foreach (Element elementB in elements)
+                {
                     IDS += "\n" + elementB.Id.ToString();
                     names += "\n" + elementB.Category.Name;
-                    elCount += 1;                
+                    elCount += 1;
+                }
+
+
+                TaskDialog.Show("Revit", elCount +
+                " element intersect with the next elements \n (" + names + " id:" + IDS + ")");
+                */
             }
 
 
-            TaskDialog.Show("Revit", elCount +
-            " element intersect with the next elements \n (" + names + " id:" + IDS + ")");
+          
 
         }
 

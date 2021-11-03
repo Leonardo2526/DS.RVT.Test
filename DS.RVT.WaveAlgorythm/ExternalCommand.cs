@@ -21,9 +21,7 @@ namespace DS.RVT.WaveAlgorythm
             Cell cell = new Cell(app, uiapp, doc, uidoc);
             cell.GetCells();
 
-            //BoudingBox boudingBox = new BoudingBox(app, uiapp, doc, uidoc);
-            //boudingBox.FindCollision();
-
+            
          
 
             TaskDialog.Show("Revit", "Done!");
