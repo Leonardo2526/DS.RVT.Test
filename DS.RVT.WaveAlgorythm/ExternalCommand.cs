@@ -13,12 +13,15 @@ namespace DS.RVT.WaveAlgorythm
         {
 
             UIApplication uiapp = commandData.Application;
-            Autodesk.Revit.ApplicationServices.Application application = uiapp.Application;
+            Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
 
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            TaskDialog.Show("Revit", "Hello Wave");
+            Cell cell = new Cell(app, uiapp, doc, uidoc);
+            cell.CreateSingleLine();
+
+            TaskDialog.Show("Revit", "Done!");
             return Autodesk.Revit.UI.Result.Succeeded;
         } 
     }
