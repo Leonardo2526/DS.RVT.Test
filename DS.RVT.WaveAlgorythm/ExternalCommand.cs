@@ -19,7 +19,12 @@ namespace DS.RVT.WaveAlgorythm
             Document doc = uiapp.ActiveUIDocument.Document;
 
             Cell cell = new Cell(app, uiapp, doc, uidoc);
-            cell.CreateSingleLine();
+            cell.GetCells();
+
+            //BoudingBox boudingBox = new BoudingBox(app, uiapp, doc, uidoc);
+            //boudingBox.FindCollision();
+
+         
 
             TaskDialog.Show("Revit", "Done!");
             return Autodesk.Revit.UI.Result.Succeeded;
