@@ -24,6 +24,9 @@ namespace DS.RVT.WaveAlgorythm
             Uidoc = uidoc;
         }
 
+        public List<FamilyInstance> familyInstances = new List<FamilyInstance>();
+        public ICollection<ElementId> cellElementsIds = new List<ElementId>();
+
         public void CreateCell(XYZ location)
         {
 
@@ -37,29 +40,11 @@ namespace DS.RVT.WaveAlgorythm
 
             FamilySymbol gotSymbol = collector.FirstElement() as FamilySymbol;
             FamilyInstance instance = null;
-            
-                using (Transaction transNew = new Transaction(Doc, "newTransaction"))
-                {
-                    try
-                    {
-                        transNew.Start();
+
                         instance = Doc.Create.NewFamilyInstance(location, gotSymbol,
-                                                                                    level, StructuralType.NonStructural);
-                 
-                }
-
-                    catch (Exception e)
-                    {
-                        transNew.RollBack();
-                        TaskDialog.Show("Revit", e.ToString());
-                    }
-                    transNew.Commit();
-                }
-
-            Collision collision = new Collision(App, Uiapp, Doc, Uidoc);
-            collision.FindCollision(gotSymbol, instance);
-
-
+                            level, StructuralType.NonStructural);
+            familyInstances.Add(instance);
+            cellElementsIds.Add(instance.Id);
         }
     }
 }

@@ -3,6 +3,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DS.RVT.WaveAlgorythm
 {
@@ -30,35 +31,113 @@ namespace DS.RVT.WaveAlgorythm
                                   DisplayUnitType.DUT_DECIMAL_FEET);
 
             XYZ corner1 = new XYZ(0, 0, 0);
-            XYZ corner2 = new XYZ(areaSizeF, areaSizeF, areaSizeF);
+            XYZ corner2 = new XYZ(areaSizeF, areaSizeF, 0);
 
             double cellSize = 100;
             double cellSizeF = UnitUtils.Convert(cellSize / 1000,
                                   DisplayUnitType.DUT_METERS,
                                   DisplayUnitType.DUT_DECIMAL_FEET);
 
-            List<XYZ> cellsCoordinates = new List<XYZ>();
-            for (double Z = 0; Z <= corner2.Z; Z += cellSizeF)
+            List<Family> families = new List<Family>();
+            Family family = new Family(App, Uiapp, Doc, Uidoc);
+            
+
+            using (Transaction transNew = new Transaction(Doc, "newTransaction"))
             {
-                for (double Y = 0; Y <= corner2.Y; Y += cellSizeF)
+                try
                 {
-                    for (double X = 0; X <= corner2.X; X += cellSizeF)
+                    transNew.Start();
+                    for (double Z = 0; Z <= corner2.Z; Z += cellSizeF)
                     {
-                        XYZ centralPoint = new XYZ(X, Y, Z);
-                        Family family = new Family(App, Uiapp, Doc, Uidoc);
-                        family.CreateCell(centralPoint);
-                        //Cell cell = new Cell(App, Uiapp, Doc, Uidoc);
-                        //cell.CreateCellBorders(centralPoint, cellSizeF);
+                        for (double Y = 0; Y <= corner2.Y; Y += cellSizeF)
+                        {
+                            for (double X = 0; X <= corner2.X; X += cellSizeF)
+                            {
+                                XYZ centralPoint = new XYZ(X, Y, Z);
+                                families.Add(family);
+                                family.CreateCell(centralPoint);
+                                
+                            }
+
+                        }
                     }
 
                 }
+
+                catch (Exception e)
+                {
+                    transNew.RollBack();
+                    TaskDialog.Show("Revit", e.ToString());
+                }
+                transNew.Commit();
+            }            
+
+            //Search for collisions between created cells and model elements
+            Collision collision = new Collision(App, Uiapp, Doc, Uidoc);
+
+            //List for cells XYZ which collide with other model elements
+            List<XYZ> forbiddenLocations = new List<XYZ>();
+
+            //Get filters
+            Outline outline = new Outline(corner1, corner2);
+            BoundingBoxIntersectsFilter boundingBoxIntersectsFilter = new BoundingBoxIntersectsFilter(outline);
+            ExclusionFilter exclusionFilter = new ExclusionFilter(family.cellElementsIds);
+
+            //Open transaction for collisions find
+            using (Transaction transNew = new Transaction(Doc, "newTransaction"))
+            {
+                try
+                {
+                    transNew.Start();
+                  
+                    foreach (FamilyInstance familyInstance in family.familyInstances)
+                    {
+                        XYZ point = collision.FindCollision(familyInstance, boundingBoxIntersectsFilter, exclusionFilter);
+                        if (point != null)
+                        {
+                            OverwriteGraphic(familyInstance);
+                            forbiddenLocations.Add(point);
+                        }
+
+                    }
+                }
+
+                catch (Exception e)
+                {
+                    transNew.RollBack();
+                    TaskDialog.Show("Revit", e.ToString());
+                }
+                transNew.Commit();
             }
+          
+
+            //TaskDialog.Show("Revit", forbiddenLocations.Count.ToString()); ;
         }
 
+        void OverwriteGraphic(FamilyInstance instance)
+        {
+            Color color = new Color(255, 0, 0);
+            OverrideGraphicSettings pGraphics = new OverrideGraphicSettings();
+            pGraphics.SetProjectionLineColor(color);
+
+            /*
+            var patternCollector = new FilteredElementCollector(Doc);
+            patternCollector.OfClass(typeof(FillPatternElement));
+            FillPatternElement solidFillPattern = patternCollector.ToElements().Cast<FillPatternElement>().First(a => a.GetFillPattern().IsSolidFill);
+
+
+            pGraphics.SetSurfaceForegroundPatternId(solidFillPattern.Id);
+            pGraphics.SetSurfaceBackgroundPatternColor(color);
+            */
+
+                    Doc.ActiveView.SetElementOverrides(instance.Id, pGraphics);
+         
+
+        }
 
         void CreateCellBorders(XYZ centralPoint, double cellSizeF)
         {
-            
+
 
             List<CellCorners> cellCorners = new List<CellCorners>();
 
@@ -82,7 +161,7 @@ namespace DS.RVT.WaveAlgorythm
 
         List<CellCorners> GetCellCorners(XYZ centerPoint, double cellSizeF)
         {
-                List<CellCorners> cellCorners = new List<CellCorners>()
+            List<CellCorners> cellCorners = new List<CellCorners>()
             {
                 new CellCorners {},
             };
@@ -97,7 +176,7 @@ namespace DS.RVT.WaveAlgorythm
             cellCorners[0].C7 = new XYZ(centerPoint.X + cellSizeF / 2, centerPoint.Y + cellSizeF / 2, centerPoint.Z - cellSizeF / 2);
             cellCorners[0].C8 = new XYZ(centerPoint.X + cellSizeF / 2, centerPoint.Y - cellSizeF / 2, centerPoint.Z - cellSizeF / 2);
 
-          
+
 
             return cellCorners;
         }

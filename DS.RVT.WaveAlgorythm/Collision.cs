@@ -24,75 +24,31 @@ namespace DS.RVT.WaveAlgorythm
         }
 
 
-        public void FindCollision(FamilySymbol gotSymbol, FamilyInstance instance)
+        public XYZ FindCollision(FamilyInstance instance, BoundingBoxIntersectsFilter boundingBoxIntersectsFilter, 
+            ExclusionFilter exclusionFilter)
         {
-            //Solid solidCell = GetSolid(instance);
-            ElementIntersectsElementFilter elementIntersectsElementFilter = new ElementIntersectsElementFilter(instance);
-            //ElementIntersectsSolidFilter intersectionFilter = new ElementIntersectsSolidFilter(solidCell);
-            //FamilyInstanceFilter familyInstanceFilter = new FamilyInstanceFilter(Doc, gotSymbol.Id);
+            ElementIntersectsElementFilter elementIntersectsElementFilter = 
+                new ElementIntersectsElementFilter(instance);
 
-
-            //Get all pipes in document
+            //Get collector with filtered elements
             FilteredElementCollector collector = new FilteredElementCollector(Doc);
-            //collector.OfClass(typeof(Pipe));
-            collector.WherePasses(elementIntersectsElementFilter); // Apply intersection filter to find matches
+            collector.WherePasses(boundingBoxIntersectsFilter);
+            collector.WherePasses(elementIntersectsElementFilter);
+            collector.WherePasses(exclusionFilter);
 
             IList<Element> elements = collector.ToElements();
 
-            if (elements.Count >0)
+            XYZ point = null;
+            if (elements.Count > 0)
             {
-                string elCount = "";
-                string IDS = "";
-                string names = "";               
-
-                Color color = new Color(255, 0, 0); // RGB
-
-
-                var patternCollector = new FilteredElementCollector(Doc);
-                patternCollector.OfClass(typeof(FillPatternElement));
-                FillPatternElement solidFillPattern = patternCollector.ToElements().Cast<FillPatternElement>().First(a => a.GetFillPattern().IsSolidFill);
-
-                OverrideGraphicSettings pGraphics = new OverrideGraphicSettings();
-
-                pGraphics.SetSurfaceForegroundPatternId(solidFillPattern.Id);
-                pGraphics.SetSurfaceBackgroundPatternColor(color);
-                //pGraphics.SetProjectionLineColor(color);
-
-
-                using (Transaction transNew = new Transaction(Doc, "newTransaction"))
-                {
-                    try
-                    {
-                        transNew.Start();
-                        Doc.ActiveView.SetElementOverrides(instance.Id, pGraphics);
-                    }
-
-                    catch (Exception e)
-                    {
-                        transNew.RollBack();
-                        TaskDialog.Show("Revit", e.ToString());
-                    }
-                    transNew.Commit();
-                }
-               
-                /*
-                foreach (Element elementB in elements)
-                {
-                    IDS += "\n" + elementB.Id.ToString();
-                    names += "\n" + elementB.Category.Name;
-                    elCount += 1;
-                }
-
-
-                TaskDialog.Show("Revit", elCount +
-                " element intersect with the next elements \n (" + names + " id:" + IDS + ")");
-                */
+                LocationPoint locationPopint = instance.Location as LocationPoint;
+                point = new XYZ(locationPopint.Point.X, locationPopint.Point.Y, locationPopint.Point.Z);
             }
 
-
-          
-
+            return point;
         }
+
+       
 
 
         private Solid GetSolid(FamilyInstance instance)
