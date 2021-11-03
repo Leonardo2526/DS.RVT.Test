@@ -33,15 +33,15 @@ namespace DS.RVT.WaveAlgorythm
             XYZ corner1 = new XYZ(0, 0, 0);
             XYZ corner2 = new XYZ(areaSizeF, areaSizeF, 0);
 
-            double cellSize = 100;
+            double cellSize = 50;
             double cellSizeF = UnitUtils.Convert(cellSize / 1000,
                                   DisplayUnitType.DUT_METERS,
                                   DisplayUnitType.DUT_DECIMAL_FEET);
 
             List<Family> families = new List<Family>();
             Family family = new Family(App, Uiapp, Doc, Uidoc);
-            
 
+            //Open transaction cells creation
             using (Transaction transNew = new Transaction(Doc, "newTransaction"))
             {
                 try
@@ -82,36 +82,19 @@ namespace DS.RVT.WaveAlgorythm
             Outline outline = new Outline(corner1, corner2);
             BoundingBoxIntersectsFilter boundingBoxIntersectsFilter = new BoundingBoxIntersectsFilter(outline);
             ExclusionFilter exclusionFilter = new ExclusionFilter(family.cellElementsIds);
-
-            //Open transaction for collisions find
-            using (Transaction transNew = new Transaction(Doc, "newTransaction"))
+           
+            foreach (FamilyInstance familyInstance in family.familyInstances)
             {
-                try
+                XYZ point = collision.FindCollision(familyInstance, boundingBoxIntersectsFilter, exclusionFilter);
+                if (point != null)
                 {
-                    transNew.Start();
-                  
-                    foreach (FamilyInstance familyInstance in family.familyInstances)
-                    {
-                        XYZ point = collision.FindCollision(familyInstance, boundingBoxIntersectsFilter, exclusionFilter);
-                        if (point != null)
-                        {
-                            OverwriteGraphic(familyInstance);
-                            forbiddenLocations.Add(point);
-                        }
-
-                    }
+                    //OverwriteGraphic(familyInstance);
+                    forbiddenLocations.Add(point);
                 }
 
-                catch (Exception e)
-                {
-                    transNew.RollBack();
-                    TaskDialog.Show("Revit", e.ToString());
-                }
-                transNew.Commit();
             }
-          
 
-            //TaskDialog.Show("Revit", forbiddenLocations.Count.ToString()); ;
+            //TaskDialog.Show("Revit", forbiddenLocations.Count.ToString();
         }
 
         void OverwriteGraphic(FamilyInstance instance)
@@ -129,9 +112,22 @@ namespace DS.RVT.WaveAlgorythm
             pGraphics.SetSurfaceForegroundPatternId(solidFillPattern.Id);
             pGraphics.SetSurfaceBackgroundPatternColor(color);
             */
-
+            using (Transaction transNew = new Transaction(Doc, "newTransaction"))
+            {
+                try
+                {
+                    transNew.Start();
                     Doc.ActiveView.SetElementOverrides(instance.Id, pGraphics);
-         
+                }
+
+                catch (Exception e)
+                {
+                    transNew.RollBack();
+                    TaskDialog.Show("Revit", e.ToString());
+                }
+                transNew.Commit();
+
+            }
 
         }
 
