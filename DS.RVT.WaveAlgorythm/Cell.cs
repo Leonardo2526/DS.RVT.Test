@@ -77,18 +77,16 @@ namespace DS.RVT.WaveAlgorythm
 
             //List for cells XYZ which collide with other model elements
             List<XYZ> forbiddenLocations = new List<XYZ>();
-
-            //Get filters
-            Outline outline = new Outline(corner1, corner2);
-            BoundingBoxIntersectsFilter boundingBoxIntersectsFilter = new BoundingBoxIntersectsFilter(outline);
+         
             ExclusionFilter exclusionFilter = new ExclusionFilter(family.cellElementsIds);
            
+            //find collisions between each cell and other model elements by filters
             foreach (FamilyInstance familyInstance in family.familyInstances)
             {
-                XYZ point = collision.FindCollision(familyInstance, boundingBoxIntersectsFilter, exclusionFilter);
+                XYZ point = collision.FindCollision(familyInstance, exclusionFilter);
                 if (point != null)
                 {
-                    //OverwriteGraphic(familyInstance);
+                    OverwriteGraphic(familyInstance);
                     forbiddenLocations.Add(point);
                 }
 

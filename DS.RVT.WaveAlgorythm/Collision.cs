@@ -24,22 +24,19 @@ namespace DS.RVT.WaveAlgorythm
         }
 
 
-        public XYZ FindCollision(FamilyInstance instance, BoundingBoxIntersectsFilter boundingBoxIntersectsFilter, 
-            ExclusionFilter exclusionFilter)
+        public XYZ FindCollision(FamilyInstance instance, ExclusionFilter exclusionFilter)
         {
             ElementIntersectsElementFilter elementIntersectsElementFilter = 
                 new ElementIntersectsElementFilter(instance);
 
             //Get collector with filtered elements
             FilteredElementCollector collector = new FilteredElementCollector(Doc);
-            collector.WherePasses(boundingBoxIntersectsFilter);
-            collector.WherePasses(elementIntersectsElementFilter);
             collector.WherePasses(exclusionFilter);
-
-            IList<Element> elements = collector.ToElements();
+            collector.WherePasses(elementIntersectsElementFilter);
+           
 
             XYZ point = null;
-            if (elements.Count > 0)
+            if (collector.Count()> 0)
             {
                 LocationPoint locationPopint = instance.Location as LocationPoint;
                 point = new XYZ(locationPopint.Point.X, locationPopint.Point.Y, locationPopint.Point.Z);
