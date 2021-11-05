@@ -3,25 +3,16 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DS.RVT.WaveAlgorythm
 {
     class WaveAlgorythm
     {
-        public static double Width { get; set; }
-        public static double Height { get; set; }
-        double cellSizeF { get; set; }
-        List<XYZ> cellsLocations { get; set; }
-        List<XYZ> impassableCellsLocations { get; set; }
-        XYZ startPoint { get; set; }
-        XYZ endPoint { get; set; }
-
-
         const int WALL = -1;
         const int BLANK = -2;
         int len;
 
+        //list of path coordinates
         int[] px;
         int[] py;
 
@@ -34,13 +25,30 @@ namespace DS.RVT.WaveAlgorythm
         readonly UIApplication Uiapp;
         readonly Document Doc;
         readonly UIDocument Uidoc;
+        readonly List<XYZ> ICLocations;
+        readonly XYZ StartPoint;
+        readonly XYZ EndPoint;
+        readonly double Width;
+        readonly double Height;
+        readonly double CellSize;
+        readonly Cell CellClass;
 
-        public WaveAlgorythm(Application app, UIApplication uiapp, Document doc, UIDocument uidoc)
+        public WaveAlgorythm(Application app, UIApplication uiapp, Document doc, UIDocument uidoc,
+            List<XYZ> impassableCellsLocations, XYZ startPoint, XYZ endPoint,
+            double width, double height, double cellSize, Cell cellClass)
         {
             App = app;
             Uiapp = uiapp;
             Doc = doc;
             Uidoc = uidoc;
+
+            ICLocations = impassableCellsLocations;
+            StartPoint = startPoint;
+            EndPoint = endPoint;
+            Width = width;
+            Height = height;
+            CellSize = cellSize;
+            CellClass = cellClass;
         }
 
 
@@ -53,22 +61,27 @@ namespace DS.RVT.WaveAlgorythm
 
         void ConvertToPlane()
         {
-            ax = (int)Math.Round((startPoint.X / cellSizeF),0);
-            ay = (int)Math.Round(startPoint.Y / cellSizeF);
-            bx = (int)Math.Round(endPoint.X / cellSizeF);
-            by = (int)Math.Round(endPoint.Y / cellSizeF);
+            ax = (int)Math.Round((StartPoint.X / CellSize), 0);
+            ay = (int)Math.Round(StartPoint.Y / CellSize);
+            bx = (int)Math.Round(EndPoint.X / CellSize);
+            by = (int)Math.Round(EndPoint.Y / CellSize);
 
-            W = (int)Math.Round(Width / cellSizeF);
-            H = (int)Math.Round(Height / cellSizeF);
+            W = (int)Math.Round(Width / CellSize);
+            H = (int)Math.Round(Height / CellSize);
 
             //координаты ячеек пути
             px = new int[W * H];
             py = new int[W * H];
 
-            foreach (XYZ xyz in impassableCellsLocations)
+            double CellSizeF = UnitUtils.Convert(CellSize / 1000,
+                                  DisplayUnitType.DUT_METERS,
+                                  DisplayUnitType.DUT_DECIMAL_FEET);
+
+
+            foreach (XYZ xyz in ICLocations)
             {
-                int X = (int)Math.Round(xyz.X / cellSizeF);
-                int Y = (int)Math.Round(xyz.X / cellSizeF);
+                int X = (int)Math.Round(xyz.X / CellSizeF);
+                int Y = (int)Math.Round(xyz.Y / CellSizeF);
                 icLocX.Add(X);
                 icLocY.Add(Y);
             }
@@ -76,18 +89,8 @@ namespace DS.RVT.WaveAlgorythm
 
         bool lee()
         {
-            Cell cell = new Cell(App, Uiapp, Doc, Uidoc);
-        
-
-
-            //list of path coordinates
-            //List<XYZ> pathXYZ = new List<XYZ>();
-
-
             //рабочее поле
             int[,] grid = new int[W, H];
-
-
 
             // смещения, соответствующие соседям ячейки справа, снизу, слева и сверху
             List<int> dx = new List<int>
@@ -106,12 +109,90 @@ namespace DS.RVT.WaveAlgorythm
                 1
             };
 
-            int d, x, y, k;
+
+            int x = 0;
+            int y = 0;
+            int d = 0;
+            int k;
+
+            //if (grid[ay, ax] == WALL || grid[by, bx] == WALL) return false;  // ячейка (ax, ay) или (bx, by) - стена          
+
+
+            Color color;
+
+            for (y = ay; y < H; y++)
+            {
+                for (x = ax; x < W; x++)
+                {
+                   
+                    for (k = 0; k < 4; ++k)                    // проходим по всем непомеченным соседям
+                    {
+                        int iy = y + dy[k], ix = x + dx[k];
+                        if (iy >= 0 && iy < H && ix >= 0 && ix < W)
+                        {
+                            if (grid[ix, iy] == 0)
+                            {
+                                d = x + y + 1;
+                                    grid[ix, iy] = d;      // распространяем волну
+
+                                bool emptyCell = IsCellEmpty(ix, iy);
+                                if (emptyCell == true)
+                                {
+                                    bool even = IsEven(d);
+                                    if (even == true)
+                                    {
+                                        color = new Color(0, 0, 255);
+                                    }
+                                    else
+                                        color = new Color(0, 255, 0);
+                                    CellClass.OverwriteCell(ix, iy, color);
+                                    //Uidoc.RefreshActiveView();
+                                }
+                            }
+                        }
+                    }
+                }
+                if (y == by && x == bx)
+                    break;
+            }
+
+            grid[ax, ay] = 0;
+
+            TaskDialog.Show("Revit", d.ToString());
+
+            return true;
+        }
+
+        bool leeold()
+        {
+            //рабочее поле
+            int[,] grid = new int[W, H];
+
+            // смещения, соответствующие соседям ячейки справа, снизу, слева и сверху
+            List<int> dx = new List<int>
+            {
+                1,
+                0,
+                -1,
+                0
+            };
+
+            List<int> dy = new List<int>
+            {
+                0,
+                -1,
+                0,
+                1
+            };
+
+
+            int x = 0;
+            int y = 0;
+            int d, k;
+
             bool stop;
 
-            if (grid[ay, ax] == WALL || grid[by, bx] == WALL) return false;  // ячейка (ax, ay) или (bx, by) - стена
-
-          
+            //if (grid[ay, ax] == WALL || grid[by, bx] == WALL) return false;  // ячейка (ax, ay) или (bx, by) - стена          
 
             // распространение волны
             d = 0;
@@ -119,12 +200,11 @@ namespace DS.RVT.WaveAlgorythm
             {
                 // предполагаем, что все свободные клетки уже помечены
                 stop = true;
-
-                //reset color
                 Color color;
-                if (IsEven(d) == true)
+                bool even = IsEven(d);
+                if (even == true)
                 {
-                    color = new Color(255, 0, 0);
+                    color = new Color(0, 0, 255);
                 }
                 else
                     color = new Color(0, 255, 0);
@@ -140,21 +220,26 @@ namespace DS.RVT.WaveAlgorythm
                                 int iy = y + dy[k], ix = x + dx[k];
                                 if (iy >= 0 && iy < H && ix >= 0 && ix < W)
                                 {
-                                    if (IsCellEmpty(ix, iy) == true)
+                                    bool emptyCell = IsCellEmpty(ix, iy);
+                                    if (emptyCell == true)
                                     {
                                         stop = false;              // найдены непомеченные клетки
                                         grid[iy, ix] = d + 1;      // распространяем волну
-                                        cell.OverwriteCell(ix, iy, color);
+                                        CellClass.OverwriteCell(ix, iy, color);
+                                        //Uidoc.RefreshActiveView();
                                     }
-                                    
+
                                 }
                             }
                         }
+                        d++;
                     }
-                    d++;
                 }
-            } while (!stop && grid[by, bx] == BLANK);
 
+            } while (!stop && y != by && x != bx);
+
+            //} while (!stop && grid[by, bx] == BLANK);
+            /*
             if (grid[by, bx] == BLANK) return false;  // путь не найден
 
             // восстановление пути
@@ -182,28 +267,19 @@ namespace DS.RVT.WaveAlgorythm
             px[0] = ax;
             py[0] = ay;                    // теперь px[0..len] и py[0..len] - координаты ячеек пути
 
-
+            */
             return true;
         }
 
 
         bool IsCellEmpty(int ix, int iy)
         {
-            foreach (int x in icLocX)
+            for (int i = 0; i< icLocX.Count; i++)
             {
-                if (x == ix)
-                {
-                    foreach (int y in icLocY)
-                    {
-                        if (y == iy)
-                        {
-                            return false;
-                        }
-
-                    }
-                }
-
+                if (icLocX[i] == ix && icLocY[i] == iy)
+                    return false;
             }
+           
             return true;
         }
 

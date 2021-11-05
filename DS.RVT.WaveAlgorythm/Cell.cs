@@ -22,24 +22,30 @@ namespace DS.RVT.WaveAlgorythm
             Uidoc = uidoc;
         }
 
-        double cellSize = 50;
+        public double CellSize { get; set; }
+        public double AreaSize { get; set; }
 
+        double cellSizeF;
 
-        public List<FamilyInstance> cells = new List<FamilyInstance>();
-        public ICollection<ElementId> cellsIds = new List<ElementId>();
+        List<FamilyInstance> cells = new List<FamilyInstance>();
+        ICollection<ElementId> cellsIds = new List<ElementId>();
+
+        //List for cells XYZ which collide with other model elements
+        List<XYZ> ICLocations = new List<XYZ>();
 
         public void GetCells()
         {
-            double areaSize = 1000;
-            double areaSizeF = UnitUtils.Convert(areaSize / 1000,
+            ICLocations = new List<XYZ>();
+            AreaSize = 1000;
+            double areaSizeF = UnitUtils.Convert(AreaSize / 1000,
                                   DisplayUnitType.DUT_METERS,
                                   DisplayUnitType.DUT_DECIMAL_FEET);
 
             XYZ corner1 = new XYZ(0, 0, 0);
             XYZ corner2 = new XYZ(areaSizeF, areaSizeF, 0);
 
-            
-            double cellSizeF = UnitUtils.Convert(cellSize / 1000,
+            CellSize = 50;
+            cellSizeF = UnitUtils.Convert(CellSize / 1000,
                                   DisplayUnitType.DUT_METERS,
                                   DisplayUnitType.DUT_DECIMAL_FEET);
 
@@ -83,22 +89,15 @@ namespace DS.RVT.WaveAlgorythm
 
             cells = family.familyInstances;
             cellsIds = family.cellElementsIds;
-
-            WaveAlgorythm waveAlgorythm = new WaveAlgorythm(App, Uiapp, Doc, Uidoc);
-            waveAlgorythm.FindPath();
-
-            //FindCollisions();
-            //TaskDialog.Show("Revit", forbiddenLocations.Count.ToString();
         }
 
-        void FindCollisions()
+        public List<XYZ> FindCollisions()
+        //Search for collisions between created cells and model elements
         {
-            //Search for collisions between created cells and model elements
+            List<XYZ> ICLocations = new List<XYZ>();
+            
             Collision collision = new Collision(App, Uiapp, Doc, Uidoc);
-
-            //List for cells XYZ which collide with other model elements
-            List<XYZ> impassableCellsLocations = new List<XYZ>();
-
+           
             ExclusionFilter exclusionFilter = new ExclusionFilter(cellsIds);
 
             Color color = new Color(255, 0, 0);
@@ -110,11 +109,12 @@ namespace DS.RVT.WaveAlgorythm
                 if (point != null)
                 {
                     OverwriteGraphic(familyInstance, color);
-                    impassableCellsLocations.Add(point);
+                    ICLocations.Add(point);
                 }
 
             }
 
+            return ICLocations;
 
         }
 
@@ -123,7 +123,7 @@ namespace DS.RVT.WaveAlgorythm
             OverrideGraphicSettings pGraphics = new OverrideGraphicSettings();
             pGraphics.SetProjectionLineColor(color);
 
-            /*
+            
             var patternCollector = new FilteredElementCollector(Doc);
             patternCollector.OfClass(typeof(FillPatternElement));
             FillPatternElement solidFillPattern = patternCollector.ToElements().Cast<FillPatternElement>().First(a => a.GetFillPattern().IsSolidFill);
@@ -131,7 +131,7 @@ namespace DS.RVT.WaveAlgorythm
 
             pGraphics.SetSurfaceForegroundPatternId(solidFillPattern.Id);
             pGraphics.SetSurfaceBackgroundPatternColor(color);
-            */
+            
             using (Transaction transNew = new Transaction(Doc, "newTransaction"))
             {
                 try
@@ -146,16 +146,13 @@ namespace DS.RVT.WaveAlgorythm
                     TaskDialog.Show("Revit", e.ToString());
                 }
                 transNew.Commit();
-
             }
 
         }
 
         public void OverwriteCell(int x, int y, Color color)
         {
-           
-
-            XYZ centerPoint = new XYZ(x * cellSize, y * cellSize, 0);
+            XYZ centerPoint = new XYZ(x * cellSizeF, y * cellSizeF, 0);
 
             BoundingBoxContainsPointFilter boundingBoxContainsPointFilter = new BoundingBoxContainsPointFilter(centerPoint);
 
