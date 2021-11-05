@@ -22,6 +22,11 @@ namespace DS.RVT.WaveAlgorythm
             Uidoc = uidoc;
         }
 
+        double cellSize = 50;
+
+
+        public List<FamilyInstance> cells = new List<FamilyInstance>();
+        public ICollection<ElementId> cellsIds = new List<ElementId>();
 
         public void GetCells()
         {
@@ -33,13 +38,16 @@ namespace DS.RVT.WaveAlgorythm
             XYZ corner1 = new XYZ(0, 0, 0);
             XYZ corner2 = new XYZ(areaSizeF, areaSizeF, 0);
 
-            double cellSize = 50;
+            
             double cellSizeF = UnitUtils.Convert(cellSize / 1000,
                                   DisplayUnitType.DUT_METERS,
                                   DisplayUnitType.DUT_DECIMAL_FEET);
 
             List<Family> families = new List<Family>();
             Family family = new Family(App, Uiapp, Doc, Uidoc);
+
+            //List for cells XYZ
+            List<XYZ> cellsLocations = new List<XYZ>();
 
             //Open transaction cells creation
             using (Transaction transNew = new Transaction(Doc, "newTransaction"))
@@ -54,6 +62,7 @@ namespace DS.RVT.WaveAlgorythm
                             for (double X = 0; X <= corner2.X; X += cellSizeF)
                             {
                                 XYZ centralPoint = new XYZ(X, Y, Z);
+                                cellsLocations.Add(centralPoint);
                                 families.Add(family);
                                 family.CreateCell(centralPoint);
                                 
@@ -70,34 +79,47 @@ namespace DS.RVT.WaveAlgorythm
                     TaskDialog.Show("Revit", e.ToString());
                 }
                 transNew.Commit();
-            }            
+            }
 
+            cells = family.familyInstances;
+            cellsIds = family.cellElementsIds;
+
+            WaveAlgorythm waveAlgorythm = new WaveAlgorythm(App, Uiapp, Doc, Uidoc);
+            waveAlgorythm.FindPath();
+
+            //FindCollisions();
+            //TaskDialog.Show("Revit", forbiddenLocations.Count.ToString();
+        }
+
+        void FindCollisions()
+        {
             //Search for collisions between created cells and model elements
             Collision collision = new Collision(App, Uiapp, Doc, Uidoc);
 
             //List for cells XYZ which collide with other model elements
-            List<XYZ> forbiddenLocations = new List<XYZ>();
-         
-            ExclusionFilter exclusionFilter = new ExclusionFilter(family.cellElementsIds);
-           
+            List<XYZ> impassableCellsLocations = new List<XYZ>();
+
+            ExclusionFilter exclusionFilter = new ExclusionFilter(cellsIds);
+
+            Color color = new Color(255, 0, 0);
+
             //find collisions between each cell and other model elements by filters
-            foreach (FamilyInstance familyInstance in family.familyInstances)
+            foreach (FamilyInstance familyInstance in cells)
             {
                 XYZ point = collision.FindCollision(familyInstance, exclusionFilter);
                 if (point != null)
                 {
-                    OverwriteGraphic(familyInstance);
-                    forbiddenLocations.Add(point);
+                    OverwriteGraphic(familyInstance, color);
+                    impassableCellsLocations.Add(point);
                 }
 
             }
 
-            //TaskDialog.Show("Revit", forbiddenLocations.Count.ToString();
+
         }
 
-        void OverwriteGraphic(FamilyInstance instance)
+        void OverwriteGraphic(FamilyInstance instance, Color color)
         {
-            Color color = new Color(255, 0, 0);
             OverrideGraphicSettings pGraphics = new OverrideGraphicSettings();
             pGraphics.SetProjectionLineColor(color);
 
@@ -125,6 +147,24 @@ namespace DS.RVT.WaveAlgorythm
                 }
                 transNew.Commit();
 
+            }
+
+        }
+
+        public void OverwriteCell(int x, int y, Color color)
+        {
+           
+
+            XYZ centerPoint = new XYZ(x * cellSize, y * cellSize, 0);
+
+            BoundingBoxContainsPointFilter boundingBoxContainsPointFilter = new BoundingBoxContainsPointFilter(centerPoint);
+
+            FilteredElementCollector cellsCollector = new FilteredElementCollector(Doc, cellsIds);
+            IList<Element> cellsElements = cellsCollector.WherePasses(boundingBoxContainsPointFilter).ToElements();
+
+            foreach (FamilyInstance familyInstance in cellsElements)
+            {
+                    OverwriteGraphic(familyInstance, color);
             }
 
         }
