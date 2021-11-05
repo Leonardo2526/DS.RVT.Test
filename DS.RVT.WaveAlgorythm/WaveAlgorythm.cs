@@ -56,7 +56,12 @@ namespace DS.RVT.WaveAlgorythm
         public void FindPath()
         {
             ConvertToPlane();
-            lee();
+            bool pathFind = lee();
+
+            if (pathFind != true)
+            {
+                TaskDialog.Show("Revit", "Путь не найден!");
+            }
         }
 
         void ConvertToPlane()
@@ -90,7 +95,7 @@ namespace DS.RVT.WaveAlgorythm
         bool lee()
         {
             //рабочее поле
-            int[,] grid = new int[W, H];
+            int[,] grid = new int[W, H];          
 
             // смещения, соответствующие соседям ячейки справа, снизу, слева и сверху
             List<int> dx = new List<int>
@@ -109,19 +114,25 @@ namespace DS.RVT.WaveAlgorythm
                 1
             };
 
-            List<XYZ> freeCells = new List<XYZ>();
-
             int x = 0;
             int y = 0;
             int d = 0;
             int k;
 
-            Color color;
+            Color color;          
 
             for (y = ay; y < H; y++)
             {
+                if (y == by - 1)
+                    break;
                 for (x = ax; x < W; x++)
                 {
+                    if (x == bx)
+                        break;
+
+                    bool emptyCell = IsCellEmpty(x, y);
+                    if (emptyCell == false)
+                        continue;
 
                     for (k = 0; k < 4; ++k)                    // проходим по всем непомеченным соседям
                     {
@@ -130,39 +141,87 @@ namespace DS.RVT.WaveAlgorythm
                         {
                             if (grid[ix, iy] == 0)
                             {
-                                d = x + y + 1;
-                                grid[ix, iy] = d;      // распространяем волну
 
-                                bool emptyCell = IsCellEmpty(ix, iy);
+                                emptyCell = IsCellEmpty(ix, iy);
                                 if (emptyCell == true)
                                 {
-                                    XYZ xYZ = new XYZ(ix, iy, 0);
-                                    freeCells.Add(xYZ);
+                                    d = x + y + 1;
+                                    // распространяем волну
+                                    grid[ix, iy] = d;
 
+                                    byte c = (byte)(d * 5);
 
-                                    bool even = IsEven(d);
-                                    if (even == true)
-                                    {
-                                        color = new Color(0, 0, 255);
-                                    }
-                                    else
-                                        color = new Color(0, 255, 0);
+                                    color = new Color(0, c, 0);
                                     CellClass.OverwriteCell(ix, iy, color);
-                                    //Uidoc.RefreshActiveView();                                    
                                 }
                             }
                         }
                     }
                 }
-                if (y == by && x == bx)
-                    break;
             }
 
             grid[ax, ay] = 0;
 
-            //TaskDialog.Show("Revit", freeCells.Count().ToString());
 
-            return true;
+
+
+            // восстановление пути
+            len = grid[bx - 1, by - 1];            // длина кратчайшего пути из (ax, ay) в (bx, by)
+            x = bx - 1;
+            y = by - 1;
+            d = len;
+            color = new Color(0, 0, 255);
+            CellClass.OverwriteCell(x, y, color);
+
+            List<int> dx1 = new List<int>
+            {
+                -1,
+                0,
+                1,
+                0
+            };
+
+            List<int> dy1 = new List<int>
+            {
+                0,
+                1,
+                0,
+                -1
+            };
+
+
+            while (d > 0)
+            {
+                px[d] = x;
+                py[d] = y;                   // записываем ячейку (x, y) в путь
+
+
+                d--;
+                for (k = 0; k < 4; ++k)
+                {
+                    int iy = y + dy1[k], ix = x + dx1[k];
+                    if (iy >= 0 && iy < H && ix >= 0 && ix < W &&
+                         grid[ix, iy] == d)
+                    {
+
+                        x = x + dx1[k];
+                        y = y + dy1[k];           // переходим в ячейку, которая на 1 ближе к старту
+
+                        CellClass.OverwriteCell(x, y, color);
+                        break;
+                    }
+                }
+            }
+
+            if (x == ax && y == ay)
+            {
+                return true;
+            }
+
+
+
+
+            return false;
         }
 
         bool leeold()
@@ -276,12 +335,12 @@ namespace DS.RVT.WaveAlgorythm
 
         bool IsCellEmpty(int ix, int iy)
         {
-            for (int i = 0; i< icLocX.Count; i++)
+            for (int i = 0; i < icLocX.Count; i++)
             {
                 if (icLocX[i] == ix && icLocY[i] == iy)
                     return false;
             }
-           
+
             return true;
         }
 
