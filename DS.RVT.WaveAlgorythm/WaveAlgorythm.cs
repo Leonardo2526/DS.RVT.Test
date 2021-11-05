@@ -109,14 +109,12 @@ namespace DS.RVT.WaveAlgorythm
                 1
             };
 
+            List<XYZ> freeCells = new List<XYZ>();
 
             int x = 0;
             int y = 0;
             int d = 0;
             int k;
-
-            //if (grid[ay, ax] == WALL || grid[by, bx] == WALL) return false;  // ячейка (ax, ay) или (bx, by) - стена          
-
 
             Color color;
 
@@ -124,7 +122,7 @@ namespace DS.RVT.WaveAlgorythm
             {
                 for (x = ax; x < W; x++)
                 {
-                   
+
                     for (k = 0; k < 4; ++k)                    // проходим по всем непомеченным соседям
                     {
                         int iy = y + dy[k], ix = x + dx[k];
@@ -133,11 +131,15 @@ namespace DS.RVT.WaveAlgorythm
                             if (grid[ix, iy] == 0)
                             {
                                 d = x + y + 1;
-                                    grid[ix, iy] = d;      // распространяем волну
+                                grid[ix, iy] = d;      // распространяем волну
 
                                 bool emptyCell = IsCellEmpty(ix, iy);
                                 if (emptyCell == true)
                                 {
+                                    XYZ xYZ = new XYZ(ix, iy, 0);
+                                    freeCells.Add(xYZ);
+
+
                                     bool even = IsEven(d);
                                     if (even == true)
                                     {
@@ -146,7 +148,7 @@ namespace DS.RVT.WaveAlgorythm
                                     else
                                         color = new Color(0, 255, 0);
                                     CellClass.OverwriteCell(ix, iy, color);
-                                    //Uidoc.RefreshActiveView();
+                                    //Uidoc.RefreshActiveView();                                    
                                 }
                             }
                         }
@@ -158,7 +160,7 @@ namespace DS.RVT.WaveAlgorythm
 
             grid[ax, ay] = 0;
 
-            TaskDialog.Show("Revit", d.ToString());
+            //TaskDialog.Show("Revit", freeCells.Count().ToString());
 
             return true;
         }
