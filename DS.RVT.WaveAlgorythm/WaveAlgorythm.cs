@@ -118,51 +118,63 @@ namespace DS.RVT.WaveAlgorythm
             int y = 0;
             int d = 0;
             int k;
+            bool stop;
+            Color color;
 
-            Color color;          
 
-            for (y = ay; y < H; y++)
+            grid[ay,ax] = 1;            // стартовая ячейка помечена 0
+            do
             {
-                if (y == by - 1)
-                    break;
-                for (x = ax; x < W; x++)
+               
+                for (y = ay; y < H; y++)
                 {
-                    if (x == bx)
+                    if (y == by - 1)
                         break;
-
-                    bool emptyCell = IsCellEmpty(x, y);
-                    if (emptyCell == false)
-                        continue;
-
-                    for (k = 0; k < 4; ++k)                    // проходим по всем непомеченным соседям
+                    for (x = ax; x < W; x++)
                     {
-                        int iy = y + dy[k], ix = x + dx[k];
-                        if (iy >= 0 && iy < H && ix >= 0 && ix < W)
+                        /*
+                        color = new Color(255, 255, 0);
+                        CellClass.OverwriteCell(x, y, color);
+                        Uidoc.RefreshActiveView();
+                        */
+                        if (grid[x, y] == 0)
+                            continue;
+                        /*
+                        bool emptyCell = IsCellEmpty(x, y);
+                        if (emptyCell == false)
+                            continue;
+                        */
+
+                        for (k = 0; k < 4; ++k)                    // проходим по всем непомеченным соседям
                         {
-                            if (grid[ix, iy] == 0)
+                            int iy = y + dy[k], ix = x + dx[k];
+                            if (iy >= 0 && iy < H && ix >= 0 && ix < W)
                             {
-
-                                emptyCell = IsCellEmpty(ix, iy);
-                                if (emptyCell == true)
+                                if (grid[ix, iy] == 0)
                                 {
-                                    d = x + y + 1;
-                                    // распространяем волну
-                                    grid[ix, iy] = d;
 
-                                    byte c = (byte)(d * 5);
+                                    bool emptyCell = IsCellEmpty(ix, iy);
+                                    if (emptyCell == true)
+                                    {
+                                        d = grid[x, y] + 1;
+                                        // распространяем волну
+                                        grid[ix, iy] = d;
 
-                                    color = new Color(0, c, 0);
-                                    CellClass.OverwriteCell(ix, iy, color);
+                                        byte c = (byte)(d * 5);
+
+                                        color = new Color(0, c, 0);
+                                        CellClass.OverwriteCell(ix, iy, color);
+                                        //Uidoc.RefreshActiveView();
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            }
+                }               
+            } while (grid[bx -1, by -1]==0);
 
-            grid[ax, ay] = 0;
-
-
+            grid[ay, ax] = 0;
+            //TaskDialog.Show("Revit", d.ToString());
 
 
             // восстановление пути
