@@ -118,18 +118,22 @@ namespace DS.RVT.WaveAlgorythm
             int y = 0;
             int d = 0;
             int k;
+            int a;
+
             bool stop;
             Color color;
 
-
+            int b = 0;
             grid[ay,ax] = 1;            // стартовая ячейка помечена 0
             do
             {
-               
+                a = 0;
                 for (y = ay; y < H; y++)
                 {
+                    /*
                     if (y == by - 1)
                         break;
+                    */
                     for (x = ax; x < W; x++)
                     {
                         /*
@@ -165,13 +169,17 @@ namespace DS.RVT.WaveAlgorythm
                                         color = new Color(0, c, 0);
                                         CellClass.OverwriteCell(ix, iy, color);
                                         //Uidoc.RefreshActiveView();
+                                        a++;
                                     }
                                 }
                             }
                         }
                     }
-                }               
-            } while (grid[bx -1, by -1]==0);
+                }
+            } while (grid[bx -1, by -1]==0 && a !=0);
+
+            if (grid[bx - 1, by - 1] == 0)
+                return false;
 
             grid[ay, ax] = 0;
             //TaskDialog.Show("Revit", d.ToString());
