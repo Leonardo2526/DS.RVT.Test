@@ -4,6 +4,7 @@ using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Autodesk.Revit.DB.Structure;
 
 namespace DS.RVT.WaveAlgorythm
 {
@@ -13,45 +14,25 @@ namespace DS.RVT.WaveAlgorythm
         readonly UIApplication Uiapp;
         readonly Document Doc;
         readonly UIDocument Uidoc;
+        readonly Data data;
 
-        public Cell(Application app, UIApplication uiapp, Document doc, UIDocument uidoc)
+        public Cell(Application app, UIApplication uiapp, Document doc, UIDocument uidoc, Data data)
         {
             App = app;
             Uiapp = uiapp;
             Doc = doc;
             Uidoc = uidoc;
+            this.data = data;
         }
 
-        public double CellSize { get; set; }
-        public double AreaSize { get; set; }
+        readonly List<FamilyInstance> Cells = new List<FamilyInstance>();
+        readonly ICollection<ElementId> CellsIds = new List<ElementId>();
 
-        double cellSizeF;
-
-        List<FamilyInstance> cells = new List<FamilyInstance>();
-        ICollection<ElementId> cellsIds = new List<ElementId>();
-
-        //List for cells XYZ which collide with other model elements
-        List<XYZ> ICLocations = new List<XYZ>();
+        //public List<FamilyInstance> familyInstances = new List<FamilyInstance>();
+        //public ICollection<ElementId> cellElementsIds = new List<ElementId>();
 
         public void GetCells()
         {
-            ICLocations = new List<XYZ>();
-            AreaSize = 1000;
-            double areaSizeF = UnitUtils.Convert(AreaSize / 1000,
-                                  DisplayUnitType.DUT_METERS,
-                                  DisplayUnitType.DUT_DECIMAL_FEET);
-
-            XYZ corner1 = new XYZ(0, 0, 0);
-            XYZ corner2 = new XYZ(areaSizeF, areaSizeF, 0);
-
-            CellSize = 50;
-            cellSizeF = UnitUtils.Convert(CellSize / 1000,
-                                  DisplayUnitType.DUT_METERS,
-                                  DisplayUnitType.DUT_DECIMAL_FEET);
-
-            List<Family> families = new List<Family>();
-            Family family = new Family(App, Uiapp, Doc, Uidoc);
-
             //List for cells XYZ
             List<XYZ> cellsLocations = new List<XYZ>();
 
@@ -61,17 +42,15 @@ namespace DS.RVT.WaveAlgorythm
                 try
                 {
                     transNew.Start();
-                    for (double Z = 0; Z <= corner2.Z; Z += cellSizeF)
+                    for (double Z = data.ZonePoint1.Z; Z <= data.ZonePoint2.Z; Z += data.CellSizeF)
                     {
-                        for (double Y = 0; Y <= corner2.Y; Y += cellSizeF)
+                        for (double Y = data.ZonePoint1.Y; Y <= data.ZonePoint2.Y; Y += data.CellSizeF)
                         {
-                            for (double X = 0; X <= corner2.X; X += cellSizeF)
+                            for (double X = data.ZonePoint1.X; X <= data.ZonePoint2.X; X += data.CellSizeF)
                             {
                                 XYZ centralPoint = new XYZ(X, Y, Z);
                                 cellsLocations.Add(centralPoint);
-                                families.Add(family);
-                                family.CreateCell(centralPoint);
-                                
+                                AddCell(centralPoint);                                
                             }
 
                         }
@@ -86,26 +65,22 @@ namespace DS.RVT.WaveAlgorythm
                 }
                 transNew.Commit();
             }
-
-            cells = family.familyInstances;
-            cellsIds = family.cellElementsIds;
         }
 
         public List<XYZ> FindCollisions()
         //Search for collisions between created cells and model elements
         {
-            List<XYZ> ICLocations = new List<XYZ>();
-            
-            Collision collision = new Collision(App, Uiapp, Doc, Uidoc);
+            //List for cells XYZ which collide with other model elements
+            List<XYZ> ICLocations = new List<XYZ>();            
            
-            ExclusionFilter exclusionFilter = new ExclusionFilter(cellsIds);
+            ExclusionFilter exclusionFilter = new ExclusionFilter(CellsIds);
 
             Color color = new Color(255, 0, 0);
 
             //find collisions between each cell and other model elements by filters
-            foreach (FamilyInstance familyInstance in cells)
+            foreach (FamilyInstance familyInstance in Cells)
             {
-                XYZ point = collision.FindCollision(familyInstance, exclusionFilter);
+                XYZ point = GetInstancePoint(familyInstance, exclusionFilter);
                 if (point != null)
                 {
                     OverwriteGraphic(familyInstance, color);
@@ -150,13 +125,14 @@ namespace DS.RVT.WaveAlgorythm
 
         }
 
-        public void OverwriteCell(int x, int y, Color color)
+        public void OverwriteCell(int x, int y, Color color, XYZ centerPoint = null)
         {
-            XYZ centerPoint = new XYZ(x * cellSizeF, y * cellSizeF, 0);
+            if (centerPoint == null)
+            centerPoint = new XYZ(data.ZonePoint1.X + x * data.CellSizeF, data.ZonePoint1.Y + y * data.CellSizeF, 0);
 
             BoundingBoxContainsPointFilter boundingBoxContainsPointFilter = new BoundingBoxContainsPointFilter(centerPoint);
 
-            FilteredElementCollector cellsCollector = new FilteredElementCollector(Doc, cellsIds);
+            FilteredElementCollector cellsCollector = new FilteredElementCollector(Doc, CellsIds);
             IList<Element> cellsElements = cellsCollector.WherePasses(boundingBoxContainsPointFilter).ToElements();
 
             foreach (FamilyInstance familyInstance in cellsElements)
@@ -165,30 +141,6 @@ namespace DS.RVT.WaveAlgorythm
             }
 
         }
-
-        void CreateCellBorders(XYZ centralPoint, double cellSizeF)
-        {
-
-
-            List<CellCorners> cellCorners = new List<CellCorners>();
-
-            cellCorners = GetCellCorners(centralPoint, cellSizeF);
-
-            foreach (CellCorners cC in cellCorners)
-            {
-                CreateCell(cC);
-            }
-
-        }
-
-        void CreateCell(CellCorners cC)
-        {
-            CreateModelLine(cC.C1, cC.C2);
-            CreateModelLine(cC.C2, cC.C3);
-            CreateModelLine(cC.C3, cC.C4);
-            CreateModelLine(cC.C4, cC.C1);
-        }
-
 
         List<CellCorners> GetCellCorners(XYZ centerPoint, double cellSizeF)
         {
@@ -244,6 +196,47 @@ namespace DS.RVT.WaveAlgorythm
                 transNew.Commit();
             }
         }
+       
 
+        public void AddCell(XYZ location)
+        {
+
+            // get the given view's level for beam creation
+            Level level = new FilteredElementCollector(Doc)
+                .OfClass(typeof(Level)).Cast<Level>().FirstOrDefault();
+
+            // get a family symbol
+            FilteredElementCollector collector = new FilteredElementCollector(Doc);
+            collector.OfClass(typeof(FamilySymbol)).OfCategory(BuiltInCategory.OST_GenericModel);
+
+            FamilySymbol gotSymbol = collector.FirstElement() as FamilySymbol;
+            FamilyInstance instance = null;
+
+            instance = Doc.Create.NewFamilyInstance(location, gotSymbol,
+                level, StructuralType.NonStructural);
+            Cells.Add(instance);
+            CellsIds.Add(instance.Id);
+        }
+
+        public XYZ GetInstancePoint(FamilyInstance instance, ExclusionFilter exclusionFilter)
+        {
+            ElementIntersectsElementFilter elementIntersectsElementFilter =
+                new ElementIntersectsElementFilter(instance);
+
+            //Get collector with filtered elements
+            FilteredElementCollector collector = new FilteredElementCollector(Doc);
+            collector.WherePasses(exclusionFilter);
+            collector.WherePasses(elementIntersectsElementFilter);
+
+
+            XYZ point = null;
+            if (collector.Count() > 0)
+            {
+                LocationPoint locationPopint = instance.Location as LocationPoint;
+                point = new XYZ(locationPopint.Point.X, locationPopint.Point.Y, locationPopint.Point.Z);
+            }
+
+            return point;
+        }
     }
 }

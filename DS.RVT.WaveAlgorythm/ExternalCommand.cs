@@ -17,27 +17,25 @@ namespace DS.RVT.WaveAlgorythm
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
+            //Input and get all input data
+            Data data = new Data();
+            data.SetValues();
 
-          
-
-            Cell cell = new Cell(app, uiapp, doc, uidoc);
+            Cell cell = new Cell(app, uiapp, doc, uidoc, data);
             cell.GetCells();
 
             
             List<XYZ> ICLocations = cell.FindCollisions();
 
-            //uidoc.RefreshActiveView();
+           uidoc.RefreshActiveView();
+         
 
-            XYZ startPoint = new XYZ(0, 0, 0);
-            XYZ endPoint = new XYZ(1000, 800, 0);
-
-            WaveAlgorythm waveAlgorythm = new WaveAlgorythm(app, uiapp, doc, uidoc, ICLocations, 
-                startPoint, endPoint, cell.AreaSize, cell.AreaSize, cell.CellSize, cell);
+            WaveAlgorythm waveAlgorythm = new WaveAlgorythm(app, uiapp, doc, uidoc, ICLocations, data, cell);
             waveAlgorythm.FindPath();
-
+             
 
             TaskDialog.Show("Revit", "Done!");
             return Autodesk.Revit.UI.Result.Succeeded;
-        } 
+        }
     }
 }
