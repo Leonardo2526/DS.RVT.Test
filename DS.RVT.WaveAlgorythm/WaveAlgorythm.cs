@@ -42,6 +42,22 @@ namespace DS.RVT.WaveAlgorythm
             cell = cl;
         }
 
+        // смещения, соответствующие соседям ячейки слева, сверху, справа, снизу
+        List<int> dx = new List<int>
+            {
+                -1,
+                0,
+                1,
+                0
+            };
+
+        List<int> dy = new List<int>
+            {
+                0,
+                1,
+                0,
+                -1
+            };
 
         public void FindPath()
         {
@@ -100,22 +116,7 @@ namespace DS.RVT.WaveAlgorythm
             //рабочее поле
             int[,] grid = new int[W, H];
 
-            // смещения, соответствующие соседям ячейки слева, сверху, справа, снизу
-            List<int> dx = new List<int>
-            {
-                -1,
-                0,
-                1,
-                0
-            };
-
-            List<int> dy = new List<int>
-            {
-                0,
-                1,
-                0,
-                -1
-            };
+           
 
             int x = 0;
             int y = 0;
@@ -210,13 +211,16 @@ namespace DS.RVT.WaveAlgorythm
                     if (iy >= 0 && iy < H && ix >= 0 && ix < W &&
                          grid[ix, iy] == d)
                     {
-
-                        x += dx[k];
-                        y += dy[k];           // переходим в ячейку, которая на 1 ближе к старту
-                        color = new Color(0, 0, 255);
-                        cell.OverwriteCell(x, y, color);
-                        //Uidoc.RefreshActiveView();
-                        break;
+                        if (CheckZone(x, y, k) == true)
+                        {
+                            x += dx[k];
+                            y += dy[k];           // переходим в ячейку, которая на 1 ближе к старту
+                            color = new Color(0, 0, 255);
+                            cell.OverwriteCell(x, y, color);
+                            //Uidoc.RefreshActiveView();
+                            break;
+                        }
+                     
                     }
                 }
             }
@@ -230,6 +234,32 @@ namespace DS.RVT.WaveAlgorythm
 
             return false;
         }
+
+        bool CheckZone(int x, int y, int k)
+        {
+            int kk;
+            for (kk = 0; kk < 4; kk++)
+            {
+                int j;
+                int yj;
+                int xj;
+
+                for (j = 1; j < 3; j++)
+                {
+                    yj = y + j * dy[kk];
+                    xj = x + j * dx[kk];
+
+                    bool emptyCell = IsCellEmpty(xj, yj);
+                    if (emptyCell == false)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
 
         void overWriteStartEndCell()
         {
