@@ -1,10 +1,10 @@
 ﻿using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Autodesk.Revit.DB.Structure;
 
 namespace DS.RVT.WaveAlgorythm
 {
@@ -28,6 +28,10 @@ namespace DS.RVT.WaveAlgorythm
         readonly List<FamilyInstance> Cells = new List<FamilyInstance>();
         readonly ICollection<ElementId> CellsIds = new List<ElementId>();
 
+        public int W { get; set; }
+        public int H { get; set; }
+
+
         //public List<FamilyInstance> familyInstances = new List<FamilyInstance>();
         //public ICollection<ElementId> cellElementsIds = new List<ElementId>();
 
@@ -35,6 +39,10 @@ namespace DS.RVT.WaveAlgorythm
         {
             //List for cells XYZ
             List<XYZ> cellsLocations = new List<XYZ>();
+
+            W = 0;
+            H = 0;
+
 
             //Open transaction cells creation
             using (Transaction transNew = new Transaction(Doc, "newTransaction"))
@@ -46,11 +54,15 @@ namespace DS.RVT.WaveAlgorythm
                     {
                         for (double Y = data.ZonePoint1.Y; Y <= data.ZonePoint2.Y; Y += data.CellSizeF)
                         {
+                            if (Z == data.ZonePoint1.Z)
+                                H++;
                             for (double X = data.ZonePoint1.X; X <= data.ZonePoint2.X; X += data.CellSizeF)
                             {
+                                if (Y == data.ZonePoint1.Y)
+                                    W++;
                                 XYZ centralPoint = new XYZ(X, Y, Z);
                                 cellsLocations.Add(centralPoint);
-                                AddCell(centralPoint);                                
+                                AddCell(centralPoint);
                             }
 
                         }
@@ -71,8 +83,8 @@ namespace DS.RVT.WaveAlgorythm
         //Search for collisions between created cells and model elements
         {
             //List for cells XYZ which collide with other model elements
-            List<XYZ> ICLocations = new List<XYZ>();            
-           
+            List<XYZ> ICLocations = new List<XYZ>();
+
             ExclusionFilter exclusionFilter = new ExclusionFilter(CellsIds);
 
             Color color = new Color(255, 0, 0);
@@ -98,7 +110,7 @@ namespace DS.RVT.WaveAlgorythm
             OverrideGraphicSettings pGraphics = new OverrideGraphicSettings();
             pGraphics.SetProjectionLineColor(color);
 
-            
+
             var patternCollector = new FilteredElementCollector(Doc);
             patternCollector.OfClass(typeof(FillPatternElement));
             FillPatternElement solidFillPattern = patternCollector.ToElements().Cast<FillPatternElement>().First(a => a.GetFillPattern().IsSolidFill);
@@ -106,7 +118,7 @@ namespace DS.RVT.WaveAlgorythm
 
             pGraphics.SetSurfaceForegroundPatternId(solidFillPattern.Id);
             pGraphics.SetSurfaceBackgroundPatternColor(color);
-            
+
             using (Transaction transNew = new Transaction(Doc, "newTransaction"))
             {
                 try
@@ -128,7 +140,7 @@ namespace DS.RVT.WaveAlgorythm
         public void OverwriteCell(int x, int y, Color color, XYZ centerPoint = null)
         {
             if (centerPoint == null)
-            centerPoint = new XYZ(data.ZonePoint1.X + x * data.CellSizeF, data.ZonePoint1.Y + y * data.CellSizeF, 0);
+                centerPoint = new XYZ(data.ZonePoint1.X + x * data.CellSizeF, data.ZonePoint1.Y + y * data.CellSizeF, 0);
 
             BoundingBoxContainsPointFilter boundingBoxContainsPointFilter = new BoundingBoxContainsPointFilter(centerPoint);
 
@@ -137,7 +149,7 @@ namespace DS.RVT.WaveAlgorythm
 
             foreach (FamilyInstance familyInstance in cellsElements)
             {
-                    OverwriteGraphic(familyInstance, color);
+                OverwriteGraphic(familyInstance, color);
             }
 
         }
@@ -196,7 +208,7 @@ namespace DS.RVT.WaveAlgorythm
                 transNew.Commit();
             }
         }
-       
+
 
         public void AddCell(XYZ location)
         {

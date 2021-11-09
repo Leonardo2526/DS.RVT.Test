@@ -58,17 +58,22 @@ namespace DS.RVT.WaveAlgorythm
             double bxdbl = (data.EndPoint.X - data.ZonePoint1.X) / data.CellSizeF;
             double bydbl = (data.EndPoint.Y - data.ZonePoint1.Y) / data.CellSizeF;
 
-            ax = (int)Math.Ceiling(axdbl);
-            ay = (int)Math.Ceiling(aydbl);
-            bx = (int)Math.Ceiling(bxdbl);
-            by = (int)Math.Ceiling(bydbl);
+            ax = (int)Math.Round(axdbl);
+            ay = (int)Math.Round(aydbl);
+            bx = (int)Math.Round(bxdbl);
+            by = (int)Math.Round(bydbl);
 
-            double Wdbl = (data.ZonePoint2.X - data.ZonePoint1.X) / data.CellSizeF;
-            double Hdbl = (data.ZonePoint2.Y - data.ZonePoint1.Y) / data.CellSizeF;
+            W = cell.W;
+            H = cell.H;
 
-
-            W = (int)Math.Ceiling(Wdbl);
-            H = (int)Math.Ceiling(Hdbl);
+            if (bx >= W)
+                bx = W - 1;
+            else if (ax < 0)
+                ax = 0;
+            else if (ay >= H)
+                ay = H;
+            else if (by >= H)
+                by = H;
 
             //координаты ячеек пути
             px = new int[W * H];
@@ -159,9 +164,9 @@ namespace DS.RVT.WaveAlgorythm
                                         d = grid[x, y] + 1;
                                         grid[ix, iy] = d;
 
-                                        byte c = (byte)(d * 2);
-                                        color = new Color(0, c, 0);
-                                        cell.OverwriteCell(ix, iy, color);
+                                        //byte c = (byte)(d * 2);
+                                        //color = new Color(0, c, 0);
+                                        //cell.OverwriteCell(ix, iy, color);
                                         //Uidoc.RefreshActiveView();
                                         a++;
                                     }
@@ -170,24 +175,22 @@ namespace DS.RVT.WaveAlgorythm
                         }
                     }
                 }
-            } while (grid[bx - 1, by - 1] == 0 && a != 0);
+            } while (grid[bx, by] == 0 && a != 0);
 
             
-            if (grid[bx - 1, by - 1] == 0)
+            if (grid[bx, by] == 0)
                 return false;
 
             grid[ax, ay] = 0;
             //TaskDialog.Show("Revit", d.ToString());
 
-
             // восстановление пути
-            len = grid[bx - 1, by - 1];            // длина кратчайшего пути из (ax, ay) в (bx, by)
+            len = grid[bx, by];            // длина кратчайшего пути из (ax, ay) в (bx, by)
             x = bx;
             y = by;
             d = len;
-           
 
-            while (d > 0)
+            while (d >= 0)
             {
                 px[d] = x;
                 py[d] = y;                   // записываем ячейку (x, y) в путь
@@ -204,6 +207,7 @@ namespace DS.RVT.WaveAlgorythm
                         y += dy[k];           // переходим в ячейку, которая на 1 ближе к старту
                         color = new Color(0, 0, 255);
                         cell.OverwriteCell(x, y, color);
+                        //Uidoc.RefreshActiveView();
                         break;
                     }
                 }
@@ -225,8 +229,8 @@ namespace DS.RVT.WaveAlgorythm
             cell.OverwriteCell(ax, ay, colorStart);
 
             Color colorEnd = new Color(0, 255, 255);
-            cell.OverwriteCell(bx, by, colorEnd, data.EndPoint);
-            Uidoc.RefreshActiveView();
+            cell.OverwriteCell(bx, by, colorEnd);
+            //Uidoc.RefreshActiveView();
         }
 
 

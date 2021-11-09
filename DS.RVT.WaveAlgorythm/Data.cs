@@ -19,8 +19,8 @@ namespace DS.RVT.WaveAlgorythm
         public void SetValues()
         {
 
-            StartPoint = new XYZ(5, 10, 0);
-            EndPoint = new XYZ(15, 10, 0);
+            StartPoint = new XYZ(5, 5, 0);
+            EndPoint = new XYZ(15, 1, 0);
             ZoneOffset = 1000;
             CellSize = 50;
 

@@ -24,10 +24,11 @@ namespace DS.RVT.WaveAlgorythm
             Cell cell = new Cell(app, uiapp, doc, uidoc, data);
             cell.GetCells();
 
-            
+            //uidoc.RefreshActiveView();
+
             List<XYZ> ICLocations = cell.FindCollisions();
 
-           uidoc.RefreshActiveView();
+           //uidoc.RefreshActiveView();
          
 
             WaveAlgorythm waveAlgorythm = new WaveAlgorythm(app, uiapp, doc, uidoc, ICLocations, data, cell);
