@@ -95,7 +95,7 @@ namespace DS.RVT.WaveAlgorythm
                 XYZ point = GetInstancePoint(familyInstance, exclusionFilter);
                 if (point != null)
                 {
-                    OverwriteGraphic(familyInstance, color);
+                    //OverwriteGraphic(familyInstance, color);
                     ICLocations.Add(point);
                 }
 

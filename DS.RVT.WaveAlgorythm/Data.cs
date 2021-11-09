@@ -20,7 +20,7 @@ namespace DS.RVT.WaveAlgorythm
         {
 
             StartPoint = new XYZ(5, 5, 0);
-            EndPoint = new XYZ(15, 1, 0);
+            EndPoint = new XYZ(15, 10, 0);
             ZoneOffset = 1000;
             CellSize = 50;
 

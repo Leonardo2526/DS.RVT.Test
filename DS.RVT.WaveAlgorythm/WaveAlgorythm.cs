@@ -19,6 +19,9 @@ namespace DS.RVT.WaveAlgorythm
         List<int> icLocX = new List<int>();
         List<int> icLocY = new List<int>();
 
+        Color color;
+
+
         readonly Application App;
         readonly UIApplication Uiapp;
         readonly Document Doc;
@@ -84,7 +87,7 @@ namespace DS.RVT.WaveAlgorythm
                 foreach (XYZ xyz in ICLocations)
                 {
                     int X = (int)Math.Round((xyz.X - data.ZonePoint1.X) / data.CellSizeF);
-                    int Y = (int)Math.Round((xyz.Y - data.ZonePoint1.Y )/ data.CellSizeF);
+                    int Y = (int)Math.Round((xyz.Y - data.ZonePoint1.Y) / data.CellSizeF);
                     icLocX.Add(X);
                     icLocY.Add(Y);
                 }
@@ -120,7 +123,10 @@ namespace DS.RVT.WaveAlgorythm
             int k;
             int a;
 
-            Color color;
+            //Check start cell
+            if (IsStartCellEmpty() == false)
+                return false;
+
 
             // стартовая ячейка
             grid[ax, ay] = 1;
@@ -177,7 +183,7 @@ namespace DS.RVT.WaveAlgorythm
                 }
             } while (grid[bx, by] == 0 && a != 0);
 
-            
+
             if (grid[bx, by] == 0)
                 return false;
 
@@ -219,17 +225,17 @@ namespace DS.RVT.WaveAlgorythm
             {
                 return true;
             }
-            
+
             return false;
         }
 
         void overWriteStartEndCell()
         {
-            Color colorStart = new Color(0, 255, 0);
-            cell.OverwriteCell(ax, ay, colorStart);
+            color = new Color(0, 255, 0);
+            cell.OverwriteCell(ax, ay, color);
 
-            Color colorEnd = new Color(0, 255, 255);
-            cell.OverwriteCell(bx, by, colorEnd);
+            color = new Color(0, 255, 255);
+            cell.OverwriteCell(bx, by, color);
             //Uidoc.RefreshActiveView();
         }
 
@@ -260,6 +266,64 @@ namespace DS.RVT.WaveAlgorythm
             return (a % 2) == 0;
         }
 
+        bool IsStartCellEmpty()
+        {
+            bool emptyCell = IsCellEmpty(ax, ay);
 
+            if (emptyCell == true)
+                return true;
+
+            //Try to move start point
+            bool pointMoved;
+
+            //Get side for move
+            if (ay < by)
+            {
+                pointMoved = MoveStartPointUp();
+            }
+            else
+                pointMoved = MoveStartPointDown();
+
+            //Check if moved
+            if (pointMoved == false)
+            {
+                TaskDialog.Show("Revit", "Process aborted! \nStart point is busy. Try to move it to another location.");
+                return false;
+            }
+            else
+            {
+                TaskDialog.Show("Revit", "Start point is busy but it have been moved successfully!");
+                return true;
+            }
+        }
+
+
+        bool MoveStartPointUp()
+        {
+            for (int y = ay; y <= H; y++)
+            {
+                bool emptyCell = IsCellEmpty(ax, y);
+                if (emptyCell == true)
+                {
+                    ay = y;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool MoveStartPointDown()
+        {
+            for (int y = ay; y >= 0; y--)
+            {
+                bool emptyCell = IsCellEmpty(ax, y);
+                if (emptyCell == true)
+                {
+                    ay = y;
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
