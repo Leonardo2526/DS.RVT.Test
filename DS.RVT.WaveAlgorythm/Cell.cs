@@ -148,9 +148,7 @@ namespace DS.RVT.WaveAlgorythm
             IList<Element> cellsElements = cellsCollector.WherePasses(boundingBoxContainsPointFilter).ToElements();
 
             foreach (FamilyInstance familyInstance in cellsElements)
-            {
                 OverwriteGraphic(familyInstance, color);
-            }
 
         }
 

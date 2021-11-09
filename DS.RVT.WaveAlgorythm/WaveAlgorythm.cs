@@ -126,7 +126,9 @@ namespace DS.RVT.WaveAlgorythm
             //Check start cell
             if (IsStartCellEmpty() == false)
                 return false;
-
+            //Check end cell
+            if (IsEndCellEmpty() == false)
+                return false;
 
             // стартовая ячейка
             grid[ax, ay] = 1;
@@ -279,10 +281,10 @@ namespace DS.RVT.WaveAlgorythm
             //Get side for move
             if (ay < by)
             {
-                pointMoved = MoveStartPointUp();
+                pointMoved = MovePointUp(ax, ref ay);
             }
             else
-                pointMoved = MoveStartPointDown();
+                pointMoved = MovePointDown(ax, ref ay);
 
             //Check if moved
             if (pointMoved == false)
@@ -297,32 +299,75 @@ namespace DS.RVT.WaveAlgorythm
             }
         }
 
-
-        bool MoveStartPointUp()
+        bool IsEndCellEmpty()
         {
-            for (int y = ay; y <= H; y++)
+            bool emptyCell = IsCellEmpty(bx, by);
+
+            if (emptyCell == true)
+                return true;
+
+            //Try to move end point
+            bool pointMoved = MoveEndPointToStart();
+            if (pointMoved == false)
             {
-                bool emptyCell = IsCellEmpty(ax, y);
+                //Get side for move
+                if (by < ay)
+                    pointMoved = MovePointUp(bx, ref by);
+                else
+                    pointMoved = MovePointDown(bx, ref by);
+            }
+          
+
+            //Check if moved
+            if (pointMoved == false)
+            {
+                TaskDialog.Show("Revit", "Process aborted! \nStart point is busy. Try to move it to another location.");
+                return false;
+            }
+            else
+            {
+                TaskDialog.Show("Revit", "Start point is busy but it have been moved successfully!");
+                return true;
+            }
+        }
+        bool MovePointUp(int px, ref int py)
+        {
+            for (int y = py; y <= H; y++)
+            {
+                bool emptyCell = IsCellEmpty(px, y);
                 if (emptyCell == true)
                 {
-                    ay = y;
+                    py = y;
                     return true;
                 }
             }
             return false;
         }
 
-        bool MoveStartPointDown()
+        bool MovePointDown(int px, ref int py)
         {
-            for (int y = ay; y >= 0; y--)
+            for (int y = py; y >= 0; y--)
             {
-                bool emptyCell = IsCellEmpty(ax, y);
+                bool emptyCell = IsCellEmpty(px, y);
                 if (emptyCell == true)
                 {
-                    ay = y;
+                    py = y;
                     return true;
                 }
             }
+            return false;
+        }
+
+        bool MoveEndPointToStart()
+        {
+            bool emptyCell = IsCellEmpty(bx, ay);
+
+            if (emptyCell == true)
+            {
+                by = ay;
+                return true;
+            }
+
             return false;
         }
     }
