@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using System;
@@ -109,63 +108,53 @@ namespace DS.RVT.WaveAlgorythm
         public void GetCurves()
         {
             // Create a Outline, uses a minimum and maximum XYZ point to initialize the outline. 
-            Outline myOutLn = new Outline(data.ZonePoint1, data.ZonePoint2);
+            Outline myOutLn = new Outline(new XYZ(0, 0, 0), new XYZ(10, 10, 10));
 
             // Create a BoundingBoxIntersects filter with this Outline
             BoundingBoxIntersectsFilter filter = new BoundingBoxIntersectsFilter(myOutLn);
 
             FilteredElementCollector collector = new FilteredElementCollector(Doc);
             collector.WherePasses(filter);
-            collector.OfClass(typeof(Pipe));
+            collector.OfClass(typeof(FamilyInstance));
 
             IList<Element> elements = collector.ToElements();
 
-           
 
             foreach (Element element in elements)
             {
-                Solid solid = GetSolid(element);
-                if (solid == null)
-                    continue;
-
-                List<XYZ> startPoints = new List<XYZ>();
-                List<XYZ> endPoints = new List<XYZ>();
-
-                int i = 0;
-
-                // Get the faces and edges from solid, and transform the formed points
-                foreach (Face face in solid.Faces)
+                List<Solid> solids = GetSolid(element);
+                foreach (Solid solid in solids)
                 {
-                   
-                    IList<CurveLoop> faceCurves = face.GetEdgesAsCurveLoops();
-                    foreach (CurveLoop cl in faceCurves)
+                    if (solid == null)
+                        continue;
+                    List<XYZ> startPoints = new List<XYZ>();
+                    List<XYZ> endPoints = new List<XYZ>();
+
+
+                    // Get the faces and edges from solid, and transform the formed points
+                    foreach (Face face in solid.Faces)
                     {
-                        CurveLoopIterator curveLoopIterator = cl.GetCurveLoopIterator();
-                        Curve cv = curveLoopIterator.Current;
+                        List<XYZ> facePoints = new List<XYZ>();
 
-                      
-                        XYZ p1 = cv.GetEndPoint(0);
-                        XYZ p2 = cv.GetEndPoint(1);
-                      
+                        Mesh mesh = face.Triangulate();
+                        foreach (XYZ ii in mesh.Vertices)
+                        {
+                            facePoints.Add(ii);
+                        }
 
-                        if (i == 0)
+                        int j;
+                        for (j = 0; j < facePoints.Count - 1; j++)
                         {
-                            startPoints.Add(p1);
-                            startPoints.Add(p2);
+                            CreateModelLine(facePoints[j], facePoints[j + 1]);
                         }
-                        else
-                        {
-                            endPoints.Add(p1);
-                            endPoints.Add(p2);
-                        }
+
                     }
 
-                    i++;
-
-
+                    //tr(startPoints, endPoints);
                 }
 
-                tr(startPoints, endPoints);
+
+
             }
         }
 
@@ -179,10 +168,10 @@ namespace DS.RVT.WaveAlgorythm
                 try
                 {
                     transNew.Start();
-                    //Doc.Create.NewModelCurve(cv, Uidoc.ActiveView.SketchPlane);
-                    Plane geomPlane = Plane.CreateByThreePoints(startPoints[0], endPoints[0], p3);
-                    SketchPlane sketch = SketchPlane.Create(Doc, geomPlane);
-                    Doc.Create.NewModelCurve(geomLine, sketch);
+                    Doc.Create.NewModelCurve(geomLine, Uidoc.ActiveView.SketchPlane);
+                    //Plane geomPlane = Plane.CreateByThreePoints(startPoints[0], endPoints[0], p3);
+                    //SketchPlane sketch = SketchPlane.Create(Doc, geomPlane);
+                    //Doc.Create.NewModelCurve(geomLine, sketch);
 
                 }
 
@@ -196,21 +185,73 @@ namespace DS.RVT.WaveAlgorythm
             }
         }
 
-        private Solid GetSolid(Element element)
+        void CreateCurve(Curve curve)
         {
-            GeometryElement geomElement = element.get_Geometry(new Options());
+            XYZ p1 = curve.GetEndPoint(0);
+            XYZ p2 = curve.GetEndPoint(1);
+            XYZ p3 = p2 + XYZ.BasisZ;
 
-            Solid solid = null;
-            foreach (GeometryObject geomObj in geomElement)
+            using (Transaction transNew = new Transaction(Doc, "CreateModelLine"))
             {
+                try
+                {
+                    transNew.Start();
+                    Plane geomPlane = Plane.CreateByThreePoints(p1, p2, p3);
+                    SketchPlane sketch = SketchPlane.Create(Doc, geomPlane);
+                    Doc.Create.NewModelCurve(curve, sketch);
 
-                solid = geomObj as Solid;
-                if (solid != null) break;
+                }
 
+                catch (Exception e)
+                {
+                    transNew.RollBack();
+                    TaskDialog.Show("Revit", e.ToString());
+                }
+
+                transNew.Commit();
+            }
+        }
+
+        private List<Solid> GetSolid(Element element)
+        {
+            List<Solid> solids = new List<Solid>();
+
+            Options options = new Options();
+            options.DetailLevel = ViewDetailLevel.Fine;
+            GeometryElement geomElem = element.get_Geometry(options);
+
+            foreach (GeometryObject geomObj in geomElem)
+            {
+                if (geomObj is Solid)
+                {
+                    Solid solid = (Solid)geomObj;
+                    if (solid.Faces.Size > 0 && solid.Volume > 0.0)
+                    {
+                        solids.Add(solid);
+                    }
+                    // Single-level recursive check of instances. If viable solids are more than
+                    // one level deep, this example ignores them.
+                }
+                else if (geomObj is GeometryInstance)
+                {
+                    GeometryInstance geomInst = (GeometryInstance)geomObj;
+                    GeometryElement instGeomElem = geomInst.GetInstanceGeometry();
+                    foreach (GeometryObject instGeomObj in instGeomElem)
+                    {
+                        if (instGeomObj is Solid)
+                        {
+                            Solid solid = (Solid)instGeomObj;
+                            if (solid.Faces.Size > 0 && solid.Volume > 0.0)
+                            {
+                                solids.Add(solid);
+                            }
+                        }
+                    }
+                }
             }
 
 
-            return solid;
+            return solids;
         }
 
         void OverwriteGraphic(FamilyInstance instance, Color color)
