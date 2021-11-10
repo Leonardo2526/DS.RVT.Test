@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using System;
@@ -103,6 +104,113 @@ namespace DS.RVT.WaveAlgorythm
 
             return ICLocations;
 
+        }
+
+        public void GetCurves()
+        {
+            // Create a Outline, uses a minimum and maximum XYZ point to initialize the outline. 
+            Outline myOutLn = new Outline(data.ZonePoint1, data.ZonePoint2);
+
+            // Create a BoundingBoxIntersects filter with this Outline
+            BoundingBoxIntersectsFilter filter = new BoundingBoxIntersectsFilter(myOutLn);
+
+            FilteredElementCollector collector = new FilteredElementCollector(Doc);
+            collector.WherePasses(filter);
+            collector.OfClass(typeof(Pipe));
+
+            IList<Element> elements = collector.ToElements();
+
+           
+
+            foreach (Element element in elements)
+            {
+                Solid solid = GetSolid(element);
+                if (solid == null)
+                    continue;
+
+                List<XYZ> startPoints = new List<XYZ>();
+                List<XYZ> endPoints = new List<XYZ>();
+
+                int i = 0;
+
+                // Get the faces and edges from solid, and transform the formed points
+                foreach (Face face in solid.Faces)
+                {
+                   
+                    IList<CurveLoop> faceCurves = face.GetEdgesAsCurveLoops();
+                    foreach (CurveLoop cl in faceCurves)
+                    {
+                        CurveLoopIterator curveLoopIterator = cl.GetCurveLoopIterator();
+                        Curve cv = curveLoopIterator.Current;
+
+                      
+                        XYZ p1 = cv.GetEndPoint(0);
+                        XYZ p2 = cv.GetEndPoint(1);
+                      
+
+                        if (i == 0)
+                        {
+                            startPoints.Add(p1);
+                            startPoints.Add(p2);
+                        }
+                        else
+                        {
+                            endPoints.Add(p1);
+                            endPoints.Add(p2);
+                        }
+                    }
+
+                    i++;
+
+
+                }
+
+                tr(startPoints, endPoints);
+            }
+        }
+
+        void tr(List<XYZ> startPoints, List<XYZ> endPoints)
+        {
+            XYZ p3 = startPoints[0] + XYZ.BasisZ;
+            Line geomLine = Line.CreateBound(startPoints[0], endPoints[0]);
+
+            using (Transaction transNew = new Transaction(Doc, "CreateModelLine"))
+            {
+                try
+                {
+                    transNew.Start();
+                    //Doc.Create.NewModelCurve(cv, Uidoc.ActiveView.SketchPlane);
+                    Plane geomPlane = Plane.CreateByThreePoints(startPoints[0], endPoints[0], p3);
+                    SketchPlane sketch = SketchPlane.Create(Doc, geomPlane);
+                    Doc.Create.NewModelCurve(geomLine, sketch);
+
+                }
+
+                catch (Exception e)
+                {
+                    transNew.RollBack();
+                    TaskDialog.Show("Revit", e.ToString());
+                }
+
+                transNew.Commit();
+            }
+        }
+
+        private Solid GetSolid(Element element)
+        {
+            GeometryElement geomElement = element.get_Geometry(new Options());
+
+            Solid solid = null;
+            foreach (GeometryObject geomObj in geomElement)
+            {
+
+                solid = geomObj as Solid;
+                if (solid != null) break;
+
+            }
+
+
+            return solid;
         }
 
         void OverwriteGraphic(FamilyInstance instance, Color color)

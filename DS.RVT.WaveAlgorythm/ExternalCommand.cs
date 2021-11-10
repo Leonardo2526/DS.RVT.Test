@@ -22,17 +22,18 @@ namespace DS.RVT.WaveAlgorythm
             data.SetValues();
 
             Cell cell = new Cell(app, uiapp, doc, uidoc, data);
-            cell.GetCells();
+            //cell.GetCells();
+            cell.GetCurves();
 
             //uidoc.RefreshActiveView();
 
-            List<XYZ> ICLocations = cell.FindCollisions();
+            //List<XYZ> ICLocations = cell.FindCollisions();
 
            //uidoc.RefreshActiveView();
          
 
-            WaveAlgorythm waveAlgorythm = new WaveAlgorythm(app, uiapp, doc, uidoc, ICLocations, data, cell);
-            waveAlgorythm.FindPath();
+            //WaveAlgorythm waveAlgorythm = new WaveAlgorythm(app, uiapp, doc, uidoc, ICLocations, data, cell);
+            //waveAlgorythm.FindPath();
              
 
             TaskDialog.Show("Revit", "Done!");
