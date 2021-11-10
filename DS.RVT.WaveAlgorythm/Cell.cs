@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using System;
@@ -115,7 +116,7 @@ namespace DS.RVT.WaveAlgorythm
 
             FilteredElementCollector collector = new FilteredElementCollector(Doc);
             collector.WherePasses(filter);
-            collector.OfClass(typeof(FamilyInstance));
+            collector.OfClass(typeof(Pipe));
 
             IList<Element> elements = collector.ToElements();
 
@@ -128,21 +129,26 @@ namespace DS.RVT.WaveAlgorythm
                     continue;
 
                 foreach (Solid solid in solids)
-                {
-                  
-                    List<XYZ> startPoints = new List<XYZ>();
-                    List<XYZ> endPoints = new List<XYZ>();
-
-
+                {                
                     // Get the faces and edges from solid, and transform the formed points
                     foreach (Face face in solid.Faces)
                     {
                         List<XYZ> facePoints = new List<XYZ>();
 
+                        XYZ point = new XYZ();
                         Mesh mesh = face.Triangulate();
-                        foreach (XYZ ii in mesh.Vertices)
+
+                        foreach (XYZ mv in mesh.Vertices)
                         {
-                            facePoints.Add(ii);
+                            UV uV = face.Project(mv).UVPoint;
+                            XYZ ofs = face.ComputeNormal(uV);
+                            //if (face.OrientationMatchesSurfaceOrientation == true)
+                            point = new XYZ(mv.X + ofs.X * data.CellSizeF, mv.Y + ofs.Y * data.CellSizeF, mv.Z + ofs.Z * data.CellSizeF);
+                            //else
+                               // point = new XYZ(mv.X - ofs.X * data.CellSizeF, mv.Y - ofs.Y * data.CellSizeF, mv.Z - ofs.Z * data.CellSizeF);
+
+
+                            facePoints.Add(point);
                         }
 
                         int j;
