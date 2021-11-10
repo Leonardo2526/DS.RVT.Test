@@ -173,9 +173,9 @@ namespace DS.RVT.WaveAlgorythm
                                         d = grid[x, y] + 1;
                                         grid[ix, iy] = d;
 
-                                        //byte c = (byte)(d * 2);
-                                        //color = new Color(0, c, 0);
-                                        //cell.OverwriteCell(ix, iy, color);
+                                        byte c = (byte)(d * 2);
+                                        color = new Color(0, c, 0);
+                                        cell.OverwriteCell(ix, iy, color);
                                         //Uidoc.RefreshActiveView();
                                         a++;
                                     }
