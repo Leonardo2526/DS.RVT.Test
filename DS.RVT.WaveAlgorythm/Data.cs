@@ -11,18 +11,22 @@ namespace DS.RVT.WaveAlgorythm
         public XYZ ZonePoint1 { get; set; }
         public XYZ ZonePoint2 { get; set; }
         public int CellSize { get; set; }
+        public double ElementOffset { get; set; }
 
         public double CellSizeF { get; set; }
         public double ZoneOffsetF { get; set; }
+        public double ElementOffsetF { get; set; }
+
 
 
         public void SetValues()
         {
 
             StartPoint = new XYZ(5, 5, 0);
-            EndPoint = new XYZ(10, 10 , 0);
+            EndPoint = new XYZ(10, 10 , 10);
             ZoneOffset = 1000;
             CellSize = 50;
+            ElementOffset = 50;
 
             ConvertToFeets();
 
@@ -42,7 +46,7 @@ namespace DS.RVT.WaveAlgorythm
             double Y2 = Math.Max(YSP, YEP);
 
             ZonePoint1 = new XYZ(StartPoint.X, Y1, StartPoint.Z);
-            ZonePoint2 = new XYZ(EndPoint.X, Y2, StartPoint.Z);        
+            ZonePoint2 = new XYZ(EndPoint.X, Y2, EndPoint.Z);        
         }
 
         void ConvertToFeets()
@@ -51,6 +55,9 @@ namespace DS.RVT.WaveAlgorythm
                                 DisplayUnitType.DUT_METERS,
                                 DisplayUnitType.DUT_DECIMAL_FEET);
             ZoneOffsetF = UnitUtils.Convert((double)ZoneOffset / 1000,
+                                DisplayUnitType.DUT_METERS,
+                                DisplayUnitType.DUT_DECIMAL_FEET);
+            ElementOffsetF = UnitUtils.Convert((double)ElementOffset / 1000,
                                 DisplayUnitType.DUT_METERS,
                                 DisplayUnitType.DUT_DECIMAL_FEET);
         }

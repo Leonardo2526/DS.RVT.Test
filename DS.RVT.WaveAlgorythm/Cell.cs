@@ -128,52 +128,73 @@ namespace DS.RVT.WaveAlgorythm
 
             foreach (Element element in elements)
             {
-                List<Solid> solids = GetSolid(element);
 
-                if (solids == null)
-                    continue;
-
-                foreach (Solid solid in solids)
-                {
-                    List<int> cellsOffset = new List<int>()
-                        {
-                            1,
-                            2
-                        };
-                    foreach (int co in cellsOffset)
-                    {
-                        
-                        // Get the faces and edges from solid, and transform the formed points
-                        foreach (Face face in solid.Faces)
-                        {
-                            XYZ point = new XYZ();
-                            Mesh mesh = face.Triangulate();
-                            List<XYZ> zonePoints = new List<XYZ>();
-
-                            foreach (XYZ mv in mesh.Vertices)
-                            {
-                                UV uV = face.Project(mv).UVPoint;
-                                XYZ ofs = face.ComputeNormal(uV);
-                                point = new XYZ(mv.X + co * ofs.X * data.CellSizeF, mv.Y + co * ofs.Y * data.CellSizeF, mv.Z + co * ofs.Z * data.CellSizeF);
-
-                                //elementZonePoints.Add(point);
-                                zonePoints.Add(point);
-                            }
-
-                            int j;
-                            for (j = 0; j < zonePoints.Count - 1; j++)
-                            {
-                                CreateModelLine(zonePoints[j], zonePoints[j + 1]);
-                                WriteElementZoneOddPoints(zonePoints[j], zonePoints[j + 1]);
-                            }
-                        }
-                    }
-                }
+                GetElementZoneOddPoints(element);
             }
-            AddElementZonePointsToIC();
+            //AddElementZonePointsToIC();
         }
 
-        void WriteElementZoneOddPoints(XYZ p1, XYZ p2)
+        void GetElementZoneOddPoints(Element element)
+        {
+            List<XYZ> pointsList = new List<XYZ>();
+
+            //Get pipes sizes
+            Pipe pipe = element as Pipe;
+            GetElementPoints(element, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint);
+
+            Parameter parameter = pipe.get_Parameter(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM);
+
+
+            XYZ newStartPointRight = new XYZ();
+            XYZ newStartPointLeft = new XYZ();
+
+            if (startPoint.Y < endPoint.Y)
+            {
+                 newStartPointRight = new XYZ(startPoint.X + parameter.AsDouble() / 2 + data.ElementOffsetF, startPoint.Y, startPoint.Z);
+                 newStartPointLeft = new XYZ(startPoint.X - parameter.AsDouble() / 2 - data.ElementOffsetF, startPoint.Y, startPoint.Z);
+            }
+            else
+            {
+                newStartPointRight = new XYZ(endPoint.X + parameter.AsDouble() / 2 + data.ElementOffsetF, endPoint.Y, endPoint.Z);
+                newStartPointLeft = new XYZ(endPoint.X - parameter.AsDouble() / 2 - data.ElementOffsetF, endPoint.Y, endPoint.Z);
+            }
+
+            double distance = startPoint.DistanceTo(endPoint);
+            int cellsCount = (int)(distance / data.CellSizeF);
+
+            int i;
+            XYZ pR = new XYZ(newStartPointRight.X, newStartPointRight.Y, newStartPointRight.Z);
+            XYZ pL = new XYZ(newStartPointLeft.X, newStartPointLeft.Y, newStartPointLeft.Z);
+
+            pointsList.Add(pR);
+            pointsList.Add(pL);
+
+            for (i = 0; i < cellsCount; i++)
+            {               
+                if (startPoint.Y < endPoint.Y)
+                {
+                    pR = new XYZ(pR.X, pR.Y + data.CellSizeF, pR.Z);
+                    pL = new XYZ(pL.X, pL.Y + data.CellSizeF, pL.Z);
+                }
+                else
+                {
+                    pR = new XYZ(pR.X, pR.Y + data.CellSizeF, pR.Z);
+                    pL = new XYZ(pL.X, pL.Y + data.CellSizeF, pL.Z);
+                }
+                pointsList.Add(pR);
+                pointsList.Add(pL);
+            }
+
+            int j;
+            for (j = 0; j< pointsList.Count; j ++)
+            {
+                XYZ p = new XYZ(pointsList[j].X + 0.05, pointsList[j].Y, pointsList[j].Z);
+                CreateModelLine(pointsList[j], p);
+            }
+        }
+
+
+        void WriteElementZoneOddPoints_old(XYZ p1, XYZ p2)
         {
             XYZ Normvector = (p1 - p2).Normalize();
             double x = 0;
@@ -456,7 +477,7 @@ namespace DS.RVT.WaveAlgorythm
         }
 
 
-        void GetPoints(Element element, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint)
+        void GetElementPoints(Element element, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint)
         {
             //get the current location           
             LocationCurve lc = element.Location as LocationCurve;
@@ -471,5 +492,6 @@ namespace DS.RVT.WaveAlgorythm
                 (startPoint.Z + endPoint.Z) / 2);
 
         }
+
     }
 }
