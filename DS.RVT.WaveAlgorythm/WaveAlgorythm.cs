@@ -173,10 +173,12 @@ namespace DS.RVT.WaveAlgorythm
                                         d = grid[x, y] + 1;
                                         grid[ix, iy] = d;
 
+                                        /*
                                         byte c = (byte)(d * 2);
                                         color = new Color(0, c, 0);
                                         cell.OverwriteCell(ix, iy, color);
-                                        //Uidoc.RefreshActiveView();
+                                        Uidoc.RefreshActiveView();
+                                        */
                                         a++;
                                     }
                                 }
@@ -190,6 +192,7 @@ namespace DS.RVT.WaveAlgorythm
             if (grid[bx, by] == 0)
                 return false;
 
+            //Uidoc.RefreshActiveView();
             grid[ax, ay] = 0;
             //TaskDialog.Show("Revit", d.ToString());
 
@@ -211,16 +214,12 @@ namespace DS.RVT.WaveAlgorythm
                     if (iy >= 0 && iy < H && ix >= 0 && ix < W &&
                          grid[ix, iy] == d)
                     {
-                        if (CheckZone(x, y, k) == true)
-                        {
                             x += dx[k];
                             y += dy[k];           // переходим в ячейку, которая на 1 ближе к старту
                             color = new Color(0, 0, 255);
                             cell.OverwriteCell(x, y, color);
                             //Uidoc.RefreshActiveView();
                             break;
-                        }
-                     
                     }
                 }
             }

@@ -89,7 +89,7 @@ namespace DS.RVT.WaveAlgorythm
         public List<XYZ> FindCollisions()
         //Search for collisions between created cells and model elements
         {
-            
+
 
             ExclusionFilter exclusionFilter = new ExclusionFilter(CellsIds);
 
@@ -132,63 +132,56 @@ namespace DS.RVT.WaveAlgorythm
                 GetElementZoneOddPoints(element);
             }
 
+
             int j;
             for (j = 0; j < elementZonePoints.Count; j++)
             {
                 XYZ p = new XYZ(elementZonePoints[j].X + 0.05, elementZonePoints[j].Y, elementZonePoints[j].Z);
                 CreateModelLine(elementZonePoints[j], p);
             }
-
-            //AddElementZonePointsToIC();
+            Uidoc.RefreshActiveView();
+            AddElementZonePointsToIC();
         }
 
         void GetElementZoneOddPoints(Element element)
         {
             List<XYZ> pointsList = new List<XYZ>();
 
+
+
             //Get pipes sizes
             Pipe pipe = element as Pipe;
             GetElementPoints(element, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint);
 
+            XYZ vector = endPoint - startPoint;
+
+            
+            int xs = (int)(vector.X / Math.Abs(vector.X));
+            int ys = (int)(vector.Y / Math.Abs(vector.Y));
+            int zs = (int)(vector.Z / Math.Abs(vector.Z));
+
+            if (vector.X == 0)
+                xs = 0;
+            else if (vector.Y == 0)
+                ys = 0;
+            else if (vector.Z == 0)
+                zs = 0;
+
             Parameter parameter = pipe.get_Parameter(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM);
-
-
-            XYZ newStartPointRight = new XYZ();
-            XYZ newStartPointLeft = new XYZ();
-
-            if (startPoint.Y < endPoint.Y)
-            {
-                 newStartPointRight = new XYZ(startPoint.X + parameter.AsDouble() / 2 + data.ElementOffsetF, startPoint.Y, startPoint.Z);
-                 newStartPointLeft = new XYZ(startPoint.X - parameter.AsDouble() / 2 - data.ElementOffsetF, startPoint.Y, startPoint.Z);
-            }
-            else
-            {
-                newStartPointRight = new XYZ(endPoint.X + parameter.AsDouble() / 2 + data.ElementOffsetF, endPoint.Y, endPoint.Z);
-                newStartPointLeft = new XYZ(endPoint.X - parameter.AsDouble() / 2 - data.ElementOffsetF, endPoint.Y, endPoint.Z);
-            }
 
             double distance = startPoint.DistanceTo(endPoint);
             int cellsCount = (int)(distance / data.CellSizeF);
 
             int i;
-            XYZ pR = new XYZ(newStartPointRight.X, newStartPointRight.Y, newStartPointRight.Z);
-            XYZ pL = new XYZ(newStartPointLeft.X, newStartPointLeft.Y, newStartPointLeft.Z);
-
+            XYZ pR = new XYZ(startPoint.X + parameter.AsDouble() / 2 + data.ElementOffsetF, startPoint.Y - ys * data.CellSizeF, startPoint.Z);
+            XYZ pL = new XYZ(startPoint.X - parameter.AsDouble() / 2 - data.ElementOffsetF, startPoint.Y - ys * data.CellSizeF, startPoint.Z);
             pointsList.Add(pR);
             pointsList.Add(pL);
 
-            for (i = 0; i < cellsCount; i++)
-            {               
-                if (startPoint.Y < endPoint.Y)
-                {
-                    pR = new XYZ(pR.X, pR.Y + data.CellSizeF, pR.Z);
-                    pL = new XYZ(pL.X, pL.Y + data.CellSizeF, pL.Z);
-                }
-                else
-                {
-                    pR = new XYZ(pR.X, pR.Y + data.CellSizeF, pR.Z);
-                    pL = new XYZ(pL.X, pL.Y + data.CellSizeF, pL.Z);
-                }
+            for (i = 0; i <= cellsCount + 1; i++)
+            {
+                pR = new XYZ(pR.X, pR.Y + ys * data.CellSizeF, pR.Z);
+                pL = new XYZ(pL.X, pL.Y + ys * data.CellSizeF, pL.Z);
                 pointsList.Add(pR);
                 pointsList.Add(pL);
             }
@@ -214,7 +207,7 @@ namespace DS.RVT.WaveAlgorythm
 
             Normvector = new XYZ(x, y, z);
 
-            int cellsCount = (int)(p1.DistanceTo(p2)/data.CellSizeF);
+            int cellsCount = (int)(p1.DistanceTo(p2) / data.CellSizeF);
             int i;
             for (i = 0; i < cellsCount; i++)
             {
