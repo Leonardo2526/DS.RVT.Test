@@ -115,6 +115,7 @@ namespace DS.RVT.WaveAlgorythm
 
             FilteredElementCollector collector = new FilteredElementCollector(Doc);
             collector.WherePasses(filter);
+            collector.OfClass(typeof(FamilyInstance));
 
             IList<Element> elements = collector.ToElements();
 
@@ -209,6 +210,7 @@ namespace DS.RVT.WaveAlgorythm
                     transNew.RollBack();
                     TaskDialog.Show("Revit", e.ToString());
                 }
+
 
                 transNew.Commit();
             }
