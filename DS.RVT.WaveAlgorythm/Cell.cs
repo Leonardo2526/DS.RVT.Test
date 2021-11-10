@@ -155,17 +155,29 @@ namespace DS.RVT.WaveAlgorythm
 
             XYZ vector = endPoint - startPoint;
 
-            
-            int xs = (int)(vector.X / Math.Abs(vector.X));
-            int ys = (int)(vector.Y / Math.Abs(vector.Y));
-            int zs = (int)(vector.Z / Math.Abs(vector.Z));
 
-            if (vector.X == 0)
+            int xs;
+            int ys;
+            int zs;
+
+            if (Math.Abs(vector.X) < 0.01)
                 xs = 0;
-            else if (vector.Y == 0)
+            else
+                xs = (int)(vector.X / Math.Abs(vector.X));
+
+            if (Math.Abs(vector.Y) < 0.01)
                 ys = 0;
-            else if (vector.Z == 0)
+            else
+                ys = (int)(vector.Y / Math.Abs(vector.Y));
+
+            if (Math.Abs(vector.Z) < 0.01)
                 zs = 0;
+            else
+                zs = (int)(vector.Z / Math.Abs(vector.Z));
+
+
+
+
 
             Parameter parameter = pipe.get_Parameter(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM);
 
@@ -173,15 +185,19 @@ namespace DS.RVT.WaveAlgorythm
             int cellsCount = (int)(distance / data.CellSizeF);
 
             int i;
-            XYZ pR = new XYZ(startPoint.X + parameter.AsDouble() / 2 + data.ElementOffsetF, startPoint.Y - ys * data.CellSizeF, startPoint.Z);
-            XYZ pL = new XYZ(startPoint.X - parameter.AsDouble() / 2 - data.ElementOffsetF, startPoint.Y - ys * data.CellSizeF, startPoint.Z);
+            XYZ pR = new XYZ(startPoint.X - ys * (parameter.AsDouble() / 2 + data.ElementOffsetF) - xs * data.CellSizeF, 
+                startPoint.Y - xs * (parameter.AsDouble() / 2 + data.ElementOffsetF) - ys * data.CellSizeF, startPoint.Z);
+
+            XYZ pL = new XYZ(startPoint.X + ys * (parameter.AsDouble() / 2 + data.ElementOffsetF) - xs * data.CellSizeF, 
+                startPoint.Y + xs * (parameter.AsDouble() / 2 + data.ElementOffsetF) - ys * data.CellSizeF, startPoint.Z);
+
             pointsList.Add(pR);
             pointsList.Add(pL);
 
             for (i = 0; i <= cellsCount + 1; i++)
             {
-                pR = new XYZ(pR.X, pR.Y + ys * data.CellSizeF, pR.Z);
-                pL = new XYZ(pL.X, pL.Y + ys * data.CellSizeF, pL.Z);
+                pR = new XYZ(pR.X + xs * data.CellSizeF, pR.Y + ys * data.CellSizeF, pR.Z);
+                pL = new XYZ(pL.X + xs * data.CellSizeF, pL.Y + ys * data.CellSizeF, pL.Z);
                 pointsList.Add(pR);
                 pointsList.Add(pL);
             }
