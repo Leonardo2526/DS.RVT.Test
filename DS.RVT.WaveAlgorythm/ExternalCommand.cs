@@ -33,7 +33,7 @@ namespace DS.RVT.WaveAlgorythm
             //uidoc.RefreshActiveView();
 
 
-            WaveAlgorythm waveAlgorythm = new WaveAlgorythm(app, uiapp, doc, uidoc, ICLocations, data, cell);
+            WaveAlgorythm waveAlgorythm = new WaveAlgorythm(uidoc, ICLocations, data, cell);
             waveAlgorythm.FindPath();
 
 

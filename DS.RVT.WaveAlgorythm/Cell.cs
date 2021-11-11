@@ -35,11 +35,7 @@ namespace DS.RVT.WaveAlgorythm
 
         //List for cells XYZ which collide with other model elements
         readonly List<XYZ> ICLocations = new List<XYZ>();
-
         readonly List<XYZ> elementZonePoints = new List<XYZ>();
-
-        //public List<FamilyInstance> familyInstances = new List<FamilyInstance>();
-        //public ICollection<ElementId> cellElementsIds = new List<ElementId>();
 
         public void GetCells()
         {
@@ -206,89 +202,6 @@ namespace DS.RVT.WaveAlgorythm
             elementZonePoints.AddRange(pointsList);
         }
 
-
-        void WriteElementZoneOddPoints_old(XYZ p1, XYZ p2)
-        {
-            XYZ Normvector = (p1 - p2).Normalize();
-            double x = 0;
-            double y = 0;
-            double z = 0;
-
-
-            if (Normvector.X != 0)
-                x = 1;
-            else if (Normvector.Y != 0)
-                y = 1;
-            else if (Normvector.Z != 0)
-                z = 1;
-
-            Normvector = new XYZ(x, y, z);
-
-            int cellsCount = (int)(p1.DistanceTo(p2) / data.CellSizeF);
-            int i;
-            for (i = 0; i < cellsCount; i++)
-            {
-                XYZ point = new XYZ(p1.X + Normvector.X * data.CellSizeF, p1.Y + Normvector.Y * data.CellSizeF, p1.Z + Normvector.Z * data.CellSizeF);
-                elementZonePoints.Add(point);
-            }
-        }
-
-
-        void tr(List<XYZ> startPoints, List<XYZ> endPoints)
-        {
-            XYZ p3 = startPoints[0] + XYZ.BasisZ;
-            Line geomLine = Line.CreateBound(startPoints[0], endPoints[0]);
-
-            using (Transaction transNew = new Transaction(Doc, "CreateModelLine"))
-            {
-                try
-                {
-                    transNew.Start();
-                    Doc.Create.NewModelCurve(geomLine, Uidoc.ActiveView.SketchPlane);
-                    //Plane geomPlane = Plane.CreateByThreePoints(startPoints[0], endPoints[0], p3);
-                    //SketchPlane sketch = SketchPlane.Create(Doc, geomPlane);
-                    //Doc.Create.NewModelCurve(geomLine, sketch);
-
-                }
-
-                catch (Exception e)
-                {
-                    transNew.RollBack();
-                    TaskDialog.Show("Revit", e.ToString());
-                }
-
-                transNew.Commit();
-            }
-        }
-
-        void CreateCurve(Curve curve)
-        {
-            XYZ p1 = curve.GetEndPoint(0);
-            XYZ p2 = curve.GetEndPoint(1);
-            XYZ p3 = p2 + XYZ.BasisZ;
-
-            using (Transaction transNew = new Transaction(Doc, "CreateModelLine"))
-            {
-                try
-                {
-                    transNew.Start();
-                    Plane geomPlane = Plane.CreateByThreePoints(p1, p2, p3);
-                    SketchPlane sketch = SketchPlane.Create(Doc, geomPlane);
-                    Doc.Create.NewModelCurve(curve, sketch);
-
-                }
-
-                catch (Exception e)
-                {
-                    transNew.RollBack();
-                    TaskDialog.Show("Revit", e.ToString());
-                }
-
-
-                transNew.Commit();
-            }
-        }
-
         private List<Solid> GetSolid(Element element)
         {
             List<Solid> solids = new List<Solid>();
@@ -379,28 +292,6 @@ namespace DS.RVT.WaveAlgorythm
             foreach (FamilyInstance familyInstance in cellsElements)
                 OverwriteGraphic(familyInstance, color);
 
-        }
-
-        List<CellCorners> GetCellCorners(XYZ centerPoint, double cellSizeF)
-        {
-            List<CellCorners> cellCorners = new List<CellCorners>()
-            {
-                new CellCorners {},
-            };
-
-            cellCorners[0].C1 = new XYZ(centerPoint.X - cellSizeF / 2, centerPoint.Y - cellSizeF / 2, centerPoint.Z + cellSizeF / 2);
-            cellCorners[0].C2 = new XYZ(centerPoint.X - cellSizeF / 2, centerPoint.Y + cellSizeF / 2, centerPoint.Z + cellSizeF / 2);
-            cellCorners[0].C3 = new XYZ(centerPoint.X + cellSizeF / 2, centerPoint.Y + cellSizeF / 2, centerPoint.Z + cellSizeF / 2);
-            cellCorners[0].C4 = new XYZ(centerPoint.X + cellSizeF / 2, centerPoint.Y - cellSizeF / 2, centerPoint.Z + cellSizeF / 2);
-
-            cellCorners[0].C5 = new XYZ(centerPoint.X - cellSizeF / 2, centerPoint.Y - cellSizeF / 2, centerPoint.Z - cellSizeF / 2);
-            cellCorners[0].C6 = new XYZ(centerPoint.X - cellSizeF / 2, centerPoint.Y + cellSizeF / 2, centerPoint.Z - cellSizeF / 2);
-            cellCorners[0].C7 = new XYZ(centerPoint.X + cellSizeF / 2, centerPoint.Y + cellSizeF / 2, centerPoint.Z - cellSizeF / 2);
-            cellCorners[0].C8 = new XYZ(centerPoint.X + cellSizeF / 2, centerPoint.Y - cellSizeF / 2, centerPoint.Z - cellSizeF / 2);
-
-
-
-            return cellCorners;
         }
 
         public void CreateModelLine(XYZ startPoint, XYZ endPoint)

@@ -20,23 +20,13 @@ namespace DS.RVT.WaveAlgorythm
         List<int> icLocX = new List<int>();
         List<int> icLocY = new List<int>();
 
-        Color color;
-
-
-        readonly Application App;
-        readonly UIApplication Uiapp;
-        readonly Document Doc;
         readonly UIDocument Uidoc;
         readonly List<XYZ> ICLocations;
         readonly Data data;
         readonly Cell cell;
 
-        public WaveAlgorythm(Application app, UIApplication uiapp, Document doc, UIDocument uidoc,
-            List<XYZ> impassableCellsLocations, Data data, Cell cl)
+        public WaveAlgorythm(UIDocument uidoc, List<XYZ> impassableCellsLocations, Data data, Cell cl)
         {
-            App = app;
-            Uiapp = uiapp;
-            Doc = doc;
             Uidoc = uidoc;
             ICLocations = impassableCellsLocations;
             this.data = data;
@@ -238,49 +228,6 @@ namespace DS.RVT.WaveAlgorythm
             return false;
         }
 
-        bool CheckZone(int x, int y, int k)
-        {
-            int kk;
-            for (kk = 0; kk < 4; kk++)
-            {
-                int j;
-                int yj;
-                int xj;
-
-                for (j = 1; j < 3; j++)
-                {
-                    yj = y + j * dy[kk];
-                    xj = x + j * dx[kk];
-
-                    bool emptyCell = IsCellEmpty(xj, yj);
-                    if (emptyCell == false)
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-
-        void overWriteStartEndCell()
-        {
-            color = new Color(0, 255, 0);
-            cell.OverwriteCell(color, ax, ay);
-
-            color = new Color(0, 255, 255);
-            cell.OverwriteCell(color, bx, by);
-            //Uidoc.RefreshActiveView();
-        }
-
-
-        void restoreWave()
-        {
-
-        }
-
-
         bool IsCellEmpty(int ix, int iy)
         {
             if (ICLocations.Count == 0)
@@ -294,7 +241,6 @@ namespace DS.RVT.WaveAlgorythm
 
             return true;
         }
-
 
         private bool IsEven(int a)
         {
