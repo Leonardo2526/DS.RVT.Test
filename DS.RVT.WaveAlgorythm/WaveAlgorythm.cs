@@ -1,5 +1,4 @@
-﻿using Autodesk.Revit.ApplicationServices;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
@@ -255,15 +254,23 @@ namespace DS.RVT.WaveAlgorythm
                 return true;
 
             //Try to move start point
-            bool pointMoved;
+            bool pointMoved = false;
 
-            //Get side for move
-            if (ay < by)
+            if (Math.Abs(ax - bx) >= Math.Abs(ay - by))
             {
-                pointMoved = MovePointUp(ax, ref ay);
+                //Get side for move
+                if (ay <= by)
+                    pointMoved = MovePointUp(ax, ref ay);
+                else if (ay > by)
+                    pointMoved = MovePointDown(ax, ref ay);
             }
             else
-                pointMoved = MovePointDown(ax, ref ay);
+            {
+                if (ax < bx)
+                    pointMoved = MovePointRight(ref ax, ay);
+                else if (ax > bx)
+                    pointMoved = MovePointLeft(ref ax, ay);
+            }
 
             //Check if moved
             if (pointMoved == false)
@@ -286,16 +293,24 @@ namespace DS.RVT.WaveAlgorythm
                 return true;
 
             //Try to move end point
-            bool pointMoved = MoveEndPointToStart();
-            if (pointMoved == false)
+            //bool pointMoved = MoveEndPointToStart();
+            bool pointMoved = false;
+
+            if (Math.Abs(ax - bx) >= Math.Abs(ay - by))
             {
                 //Get side for move
-                if (by < ay)
+                if (by <= ay)
                     pointMoved = MovePointUp(bx, ref by);
-                else
+                else if (by > ay)
                     pointMoved = MovePointDown(bx, ref by);
             }
-
+            else
+            {
+                if (bx <= ax)
+                    pointMoved = MovePointRight(ref bx, by);
+                else if (bx > ax)
+                    pointMoved = MovePointLeft(ref bx, by);
+            }           
 
             //Check if moved
             if (pointMoved == false)
@@ -338,6 +353,34 @@ namespace DS.RVT.WaveAlgorythm
             return false;
         }
 
+        bool MovePointRight(ref int px, int py)
+        {
+            for (int x = px; x <= W; x++)
+            {
+                bool emptyCell = IsCellEmpty(x, py);
+                if (emptyCell == true)
+                {
+                    px = x;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool MovePointLeft(ref int px, int py)
+        {
+            for (int x = px; x >= 0; x--)
+            {
+                bool emptyCell = IsCellEmpty(x, py);
+                if (emptyCell == true)
+                {
+                    px = x;
+                    return true;
+                }
+            }
+            return false;
+        }
+
         bool MoveEndPointToStart()
         {
             bool emptyCell = IsCellEmpty(bx, ay);
@@ -353,8 +396,8 @@ namespace DS.RVT.WaveAlgorythm
 
         void WritePathPoints(int x, int y)
         {
-                XYZ point = new XYZ(data.ZonePoint1.X + x * data.CellSizeF, data.ZonePoint1.Y + y * data.CellSizeF, 0);              
-                pathCoords.Add(point);
+            XYZ point = new XYZ(data.ZonePoint1.X + x * data.CellSizeF, data.ZonePoint1.Y + y * data.CellSizeF, 0);
+            pathCoords.Add(point);
         }
 
         void ShowPath()
@@ -364,9 +407,9 @@ namespace DS.RVT.WaveAlgorythm
 
             foreach (XYZ point in pathCoords)
             {
-                if (i==0) 
+                if (i == 0)
                     color = new Color(0, 255, 0);
-                else if (i== pathCoords.Count - 1)
+                else if (i == pathCoords.Count - 1)
                     color = new Color(0, 255, 255);
                 else
                     color = new Color(0, 0, 255);

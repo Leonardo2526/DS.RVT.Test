@@ -81,9 +81,9 @@ namespace DS.RVT.AutoPipesCoordinarion
             else if (ax >= W)
                 ax = W - 1;
             else if (ay >= H)
-                ay = H;
+                ay = H - 1;
             else if (by >= H)
-                by = H;
+                by = H - 1;
 
             //координаты ячеек пути
             px = new int[W * H];

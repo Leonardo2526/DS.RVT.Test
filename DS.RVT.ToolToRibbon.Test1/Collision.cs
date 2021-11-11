@@ -53,10 +53,6 @@ namespace DS.RVT.AutoPipesCoordinarion
 
             IList<Element> elements = collector.ToElements();
 
-            string elCount = "";
-            string IDS = "";
-            string names = "";
-
             RevitElements revitElements = new RevitElements(App, Uiapp, Uidoc , Doc);
 
             foreach (Element elementB in elements)
@@ -80,13 +76,6 @@ namespace DS.RVT.AutoPipesCoordinarion
 
                 WaveAlgorythm waveAlgorythm = new WaveAlgorythm(Uidoc, ICLocations, data, cell);
                 waveAlgorythm.FindPath();
-
-
-                IDS += "\n" + elementB.Id.ToString();
-                    names += "\n" + elementB.Category.Name;
-                    elCount += 1;
-              
-                      
             }
 
 

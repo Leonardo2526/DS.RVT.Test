@@ -22,8 +22,8 @@ namespace DS.RVT.WaveAlgorythm
         public void SetValues()
         {
 
-            StartPoint = new XYZ(5, 5, 0);
-            EndPoint = new XYZ(10, 10 , 0);
+            StartPoint = new XYZ(5, 15, 0);
+            EndPoint = new XYZ(10, 13 , 0);
             ZoneOffset = 1000;
             CellSize = 50;
             ElementOffset = 50;
@@ -45,8 +45,17 @@ namespace DS.RVT.WaveAlgorythm
 
             double Y2 = Math.Max(YSP, YEP);
 
-            ZonePoint1 = new XYZ(StartPoint.X, Y1, StartPoint.Z);
-            ZonePoint2 = new XYZ(EndPoint.X, Y2, EndPoint.Z);        
+            double XSP = StartPoint.X - ZoneOffsetF;
+            double XEP = EndPoint.X - ZoneOffsetF;
+            double X1 = Math.Min(XSP, XEP);
+
+            XSP = StartPoint.X + ZoneOffsetF;
+            XEP = EndPoint.X + ZoneOffsetF;
+
+            double X2 = Math.Max(XSP, XEP);
+
+            ZonePoint1 = new XYZ(X1, Y1, StartPoint.Z);
+            ZonePoint2 = new XYZ(X2, Y2, EndPoint.Z);        
         }
 
         void ConvertToFeets()
