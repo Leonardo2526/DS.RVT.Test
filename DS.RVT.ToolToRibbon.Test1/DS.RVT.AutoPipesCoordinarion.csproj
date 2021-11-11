@@ -58,6 +58,10 @@
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="Collision.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="wave\Cell.cs" />
+    <Compile Include="wave\CellCorners.cs" />
+    <Compile Include="wave\Data.cs" />
+    <Compile Include="wave\WaveAlgorythm.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

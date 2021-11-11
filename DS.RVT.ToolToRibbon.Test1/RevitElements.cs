@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.ApplicationServices;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 using System;
@@ -8,18 +9,109 @@ namespace DS.RVT.AutoPipesCoordinarion
 {
     class RevitElements
     {
+        readonly Application App;
         readonly UIDocument Uidoc;
         readonly Document Doc;
         readonly UIApplication Uiapp;
 
-        public RevitElements(UIApplication uiapp, UIDocument uidoc, Document doc)
+        public RevitElements(Application app, UIApplication uiapp, UIDocument uidoc, Document doc)
         {
+            App = app;
             Uiapp = uiapp;
             Uidoc = uidoc;
             Doc = doc;
         }
 
-        public void ModifyElements(Element elementA, Element elementB)
+
+        public void ModifyElements1(Element elementA, Element elementB)
+        // Find collisions between elements and a selected element by solid
+        {
+            double offset = 100;
+
+            XYZ newVector;
+
+            //Uidoc.RefreshActiveView();
+
+            bool solved = false;
+
+            int i;
+            for (offset = 100; offset < 1000; offset += 100)
+            {
+                Uidoc.RefreshActiveView();
+
+                DocEvent docEvent = new DocEvent(Uiapp);
+                docEvent.RegisterEvent();
+
+                newVector = GetOffset(elementA, elementB, offset, false);
+                CreateTransaction(elementB.Id, newVector);
+
+                Collision collision = new Collision(App, Uiapp, Uidoc, Doc);
+                if (collision.CheckCollisionsWithModifiedElements(docEvent.modifiedElementsIds) == false)
+                {
+                    solved = true;
+                    break;
+                }
+
+                //Try to move elementB in another position
+                newVector = GetOffset(elementA, elementB, offset, true);
+                CreateTransaction(elementB.Id, newVector);
+
+
+                // remove the event.
+                Uiapp.Application.DocumentChanged -= docEvent.application_DocumentChanged;
+            }
+
+
+            ModifyElements1(elementA, elementB);
+
+
+        }
+
+        public void ModifyElements0(Element elementA, Element elementB, double offset)
+        // Find collisions between elements and a selected element by solid
+        {           
+            DocEvent docEvent = new DocEvent(Uiapp);
+            docEvent.RegisterEvent();
+
+            XYZ newVector = GetOffset(elementA, elementB, offset, false);
+            CreateTransaction(elementB.Id, newVector);
+
+            //Uidoc.RefreshActiveView();
+
+            bool solved = false;
+
+            Collision collision = new Collision(App, Uiapp, Uidoc, Doc);
+            if (collision.CheckCollisionsWithModifiedElements(docEvent.modifiedElementsIds) == true)
+            {
+                DocEvent docEvent1 = new DocEvent(Uiapp);
+                docEvent1.RegisterEvent();
+
+                newVector = GetOffset(elementA, elementB, offset, true);
+                CreateTransaction(elementB.Id, newVector);                              
+
+                Collision collision1 = new Collision(App, Uiapp, Uidoc, Doc);
+                if (collision1.CheckCollisionsWithModifiedElements(docEvent1.modifiedElementsIds) == true)
+                {
+                    newVector = GetOffset(elementA, elementB, 500, false);
+                    CreateTransaction(elementB.Id, newVector);
+                }
+                Uiapp.Application.DocumentChanged -= docEvent1.application_DocumentChanged;
+            }
+            else
+                solved = true;
+     
+
+          
+            // remove the event.
+            Uiapp.Application.DocumentChanged -= docEvent.application_DocumentChanged;
+
+            
+          //if (solved == false)
+            //    ModifyElements(elementA, elementB, offset += 100);
+          
+        }
+
+        public void ModifyElements(Element elementA, Element elementB, ref ICollection<ElementId> modifiedElementsIds)
         // Find collisions between elements and a selected element by solid
         {
             double offset = 100;
@@ -27,28 +119,40 @@ namespace DS.RVT.AutoPipesCoordinarion
             DocEvent docEvent = new DocEvent(Uiapp);
             docEvent.RegisterEvent();
 
-            //Try to move elementB in default position
             XYZ newVector = GetOffset(elementA, elementB, offset, false);
             CreateTransaction(elementB.Id, newVector);
 
-            Collision collision = new Collision(Uiapp, Uidoc, Doc);
-            if (collision.CheckCollisionsWithModifiedElements(docEvent.modifiedElementsIds) == true)
+            modifiedElementsIds = docEvent.modifiedElementsIds;
+
+            Collision collision = new Collision(App, Uiapp, Uidoc, Doc);
+            if (collision.CheckCollisionsWithModifiedElements(modifiedElementsIds) == true)
             {
-                //Try to move elementB in another position
+                //docEvent.modifiedElementsIds.Clear();
+                //modifiedElementsIds = docEvent.modifiedElementsIds;
                 newVector = GetOffset(elementA, elementB, offset, true);
                 CreateTransaction(elementB.Id, newVector);
             }
-
-            if (collision.CheckCollisionsWithModifiedElements(docEvent.modifiedElementsIds) == true)
-            {
-                //Try to move elementB in another position
-                newVector = GetOffset(elementA, elementB, offset = 500, true);
-                CreateTransaction(elementB.Id, newVector);
-            }
-
-
+            /*
+            if (solved == false)
+                TaskDialog.Show("Revit", "No available path");
+            else
+                TaskDialog.Show("Revit", "Element moved");
+            */
             // remove the event.
             Uiapp.Application.DocumentChanged -= docEvent.application_DocumentChanged;
+
+
+            
+        }
+
+        public void check(ICollection<ElementId> modifiedElementsIds, Element elementA, Element elementB)
+        {
+            Collision collision = new Collision(App, Uiapp, Uidoc, Doc);
+            if (collision.CheckCollisionsWithModifiedElements(modifiedElementsIds) == true)
+            {
+                XYZ newVector = GetOffset(elementA, elementB, 500, false);
+                CreateTransaction(elementB.Id, newVector);
+            }
         }
 
         void CreateTransaction(ElementId elementBId, XYZ newVector)
@@ -59,6 +163,7 @@ namespace DS.RVT.AutoPipesCoordinarion
                 {
                     transNew.Start();
                     ElementTransformUtils.MoveElement(Doc, elementBId, newVector);
+                    
                 }
 
                 catch (Exception e)
@@ -69,6 +174,7 @@ namespace DS.RVT.AutoPipesCoordinarion
                 transNew.Commit();
             }
         }
+
 
 
         public XYZ CheckModifiesElements(Element elementA, Element elementB,
@@ -89,8 +195,6 @@ namespace DS.RVT.AutoPipesCoordinarion
             else
                 return null;
         }
-
-
 
 
         public XYZ GetOffset(Element ElementA, Element ElementB, double offset, bool changeDirection)

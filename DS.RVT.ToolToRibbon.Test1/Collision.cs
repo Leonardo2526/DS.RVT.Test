@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.ApplicationServices;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
@@ -10,12 +11,14 @@ namespace DS.RVT.AutoPipesCoordinarion
 {
     class Collision
     {
+        readonly Application App;
         readonly UIDocument Uidoc;
         readonly Document Doc;
         readonly UIApplication Uiapp;
 
-        public Collision(UIApplication uiapp, UIDocument uidoc, Document doc)
+        public Collision(Application app, UIApplication uiapp, UIDocument uidoc, Document doc)
         {
+            App = app;
             Uiapp = uiapp;
             Uidoc = uidoc;
             Doc = doc;
@@ -54,19 +57,69 @@ namespace DS.RVT.AutoPipesCoordinarion
             string IDS = "";
             string names = "";
 
-            RevitElements revitElements = new RevitElements(Uiapp, Uidoc , Doc);
+            RevitElements revitElements = new RevitElements(App, Uiapp, Uidoc , Doc);
 
             foreach (Element elementB in elements)
             {
+                
+                Pipe pipeB = elementB as Pipe;
+                revitElements.GetPoints(pipeB, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint);
+
+                Data data = new Data();
+                data.SetValues(startPoint, endPoint);
+
+                Cell cell = new Cell(App, Uiapp, Doc, Uidoc, data);
+                cell.GetCells();
+                cell.GetElementZonePoints();
+
+                //uidoc.RefreshActiveView();
+
+                List<XYZ> ICLocations = cell.FindCollisions();
+
+
+                //uidoc.RefreshActiveView();
+
+
+                WaveAlgorythm waveAlgorythm = new WaveAlgorythm(Uidoc, ICLocations, data, cell);
+                waveAlgorythm.FindPath();
+
+
+
+
+                /*
                 if (CheckElementForMove(elementA, elementB) == true)
                 {
-                    //RevitElements revitElements = new RevitElements(Uiapp, Uidoc, Doc);
-                    revitElements.ModifyElements(elementA,  elementB);
+                    Data data = new Data();
+                    data.SetValues(startPoint, endPoint);
 
-                    IDS += "\n" + elementB.Id.ToString();
+                    Cell cell = new Cell(App, Uiapp, Doc, Uidoc, data);
+                    cell.GetCells();
+                    cell.GetElementZonePoints();
+
+                    //uidoc.RefreshActiveView();
+
+                    List<XYZ> ICLocations = cell.FindCollisions();
+
+
+                    //uidoc.RefreshActiveView();
+
+
+                    WaveAlgorythm waveAlgorythm = new WaveAlgorythm(Uidoc, ICLocations, data, cell);
+                    waveAlgorythm.FindPath();
+
+                    
+                    //RevitElements revitElements = new RevitElements(Uiapp, Uidoc, Doc);
+                    ICollection<ElementId> modifiedElementsIds = new List<ElementId>();
+                    revitElements.ModifyElements(elementA,  elementB, ref modifiedElementsIds);
+                    revitElements.check(modifiedElementsIds, elementA, elementB);
+                    */
+
+
+                IDS += "\n" + elementB.Id.ToString();
                     names += "\n" + elementB.Category.Name;
                     elCount += 1;
-                }        
+              
+                      
             }
 
 
@@ -98,7 +151,7 @@ namespace DS.RVT.AutoPipesCoordinarion
                 XYZ startPoint = edge.Tessellate()[0];
                 XYZ endPoint = edge.Tessellate()[1];
 
-                RevitElements revitElements = new RevitElements(Uiapp, Uidoc, Doc);
+                RevitElements revitElements = new RevitElements(App, Uiapp, Uidoc, Doc);
                 revitElements.CreateModelLine(startPoint, endPoint);
             }
         }
@@ -107,7 +160,7 @@ namespace DS.RVT.AutoPipesCoordinarion
         {
             bool elementForMove = false;
 
-            RevitElements revitElements = new RevitElements(Uiapp, Uidoc, Doc);
+            RevitElements revitElements = new RevitElements(App, Uiapp, Uidoc, Doc);
             revitElements.GetPoints(elementA, out XYZ startPointA, out XYZ endPointA, out XYZ centerPointA);
             revitElements.GetPoints(elementB, out XYZ startPointB, out XYZ endPointB, out XYZ centerPointB);
 
