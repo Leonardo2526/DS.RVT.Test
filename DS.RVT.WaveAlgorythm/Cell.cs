@@ -132,7 +132,7 @@ namespace DS.RVT.WaveAlgorythm
                 GetElementZoneOddPoints(element);
             }
 
-
+            /*
             int j;
             for (j = 0; j < elementZonePoints.Count; j++)
             {
@@ -140,6 +140,7 @@ namespace DS.RVT.WaveAlgorythm
                 CreateModelLine(elementZonePoints[j], p);
             }
             Uidoc.RefreshActiveView();
+            */
             AddElementZonePointsToIC();
         }
 
@@ -365,7 +366,7 @@ namespace DS.RVT.WaveAlgorythm
 
         }
 
-        public void OverwriteCell(int x, int y, Color color, XYZ centerPoint = null)
+        public void OverwriteCell(Color color, int x = 0, int y = 0,  XYZ centerPoint = null)
         {
             if (centerPoint == null)
                 centerPoint = new XYZ(data.ZonePoint1.X + x * data.CellSizeF, data.ZonePoint1.Y + y * data.CellSizeF, 0);
@@ -483,7 +484,7 @@ namespace DS.RVT.WaveAlgorythm
             foreach (XYZ point in elementZonePoints)
             {
                 Color color = new Color(100, 100, 100);
-                OverwriteCell(0, 0, color, point);
+                OverwriteCell(color, 0, 0, point);
                 ICLocations.Add(point);
             }
         }

@@ -13,6 +13,7 @@ namespace DS.RVT.WaveAlgorythm
         //list of path coordinates
         int[] px;
         int[] py;
+        List<XYZ> pathCoords = new List<XYZ>();
 
         int ax, ay, bx, by, W, H;
 
@@ -116,7 +117,7 @@ namespace DS.RVT.WaveAlgorythm
             //рабочее поле
             int[,] grid = new int[W, H];
 
-           
+
 
             int x = 0;
             int y = 0;
@@ -202,10 +203,12 @@ namespace DS.RVT.WaveAlgorythm
             y = by;
             d = len;
 
+
             while (d >= 0)
             {
                 px[d] = x;
                 py[d] = y;                   // записываем ячейку (x, y) в путь
+                WritePathPoints(x, y);
 
                 d--;
                 for (k = 0; k < 4; ++k)
@@ -214,17 +217,18 @@ namespace DS.RVT.WaveAlgorythm
                     if (iy >= 0 && iy < H && ix >= 0 && ix < W &&
                          grid[ix, iy] == d)
                     {
-                            x += dx[k];
-                            y += dy[k];           // переходим в ячейку, которая на 1 ближе к старту
-                            color = new Color(0, 0, 255);
-                            cell.OverwriteCell(x, y, color);
-                            //Uidoc.RefreshActiveView();
-                            break;
+                        x += dx[k];
+                        y += dy[k];           // переходим в ячейку, которая на 1 ближе к старту
+                        //color = new Color(0, 0, 255);
+                        //cell.OverwriteCell(x, y, color);
+                        //Uidoc.RefreshActiveView();
+                        break;
                     }
                 }
             }
 
-            overWriteStartEndCell();
+            ShowPath();
+            //overWriteStartEndCell();
 
             if (x == ax && y == ay)
             {
@@ -263,10 +267,10 @@ namespace DS.RVT.WaveAlgorythm
         void overWriteStartEndCell()
         {
             color = new Color(0, 255, 0);
-            cell.OverwriteCell(ax, ay, color);
+            cell.OverwriteCell(color, ax, ay);
 
             color = new Color(0, 255, 255);
-            cell.OverwriteCell(bx, by, color);
+            cell.OverwriteCell(color, bx, by);
             //Uidoc.RefreshActiveView();
         }
 
@@ -345,7 +349,7 @@ namespace DS.RVT.WaveAlgorythm
                 else
                     pointMoved = MovePointDown(bx, ref by);
             }
-          
+
 
             //Check if moved
             if (pointMoved == false)
@@ -359,6 +363,7 @@ namespace DS.RVT.WaveAlgorythm
                 return true;
             }
         }
+
         bool MovePointUp(int px, ref int py)
         {
             for (int y = py; y <= H; y++)
@@ -398,6 +403,31 @@ namespace DS.RVT.WaveAlgorythm
             }
 
             return false;
+        }
+
+        void WritePathPoints(int x, int y)
+        {
+                XYZ point = new XYZ(data.ZonePoint1.X + x * data.CellSizeF, data.ZonePoint1.Y + y * data.CellSizeF, 0);              
+                pathCoords.Add(point);
+        }
+
+        void ShowPath()
+        {
+            Color color;
+            int i = 0;
+
+            foreach (XYZ point in pathCoords)
+            {
+                if (i==0) 
+                    color = new Color(0, 255, 0);
+                else if (i== pathCoords.Count - 1)
+                    color = new Color(0, 255, 255);
+                else
+                    color = new Color(0, 0, 255);
+
+                cell.OverwriteCell(color, 0, 0, point);
+                i++;
+            }
         }
     }
 }
