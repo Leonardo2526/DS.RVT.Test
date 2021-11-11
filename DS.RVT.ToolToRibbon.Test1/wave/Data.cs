@@ -22,7 +22,7 @@ namespace DS.RVT.AutoPipesCoordinarion
         public void SetValues(XYZ sp, XYZ ep)
         {
             StartPoint = sp;
-            EndPoint = ep;
+            EndPoint =ep;
             ZoneOffset = 1000;
             CellSize = 50;
             ElementOffset = 50;
@@ -44,8 +44,17 @@ namespace DS.RVT.AutoPipesCoordinarion
 
             double Y2 = Math.Max(YSP, YEP);
 
-            ZonePoint1 = new XYZ(StartPoint.X, Y1, StartPoint.Z);
-            ZonePoint2 = new XYZ(EndPoint.X, Y2, EndPoint.Z);        
+            int minx = (int)Math.Min(StartPoint.X, EndPoint.X);
+            int maxx = (int)Math.Max(StartPoint.X, EndPoint.X);
+            int miny = (int)Math.Min(Y1, Y2);
+            int maxy = (int)Math.Max(Y1, Y2);
+
+            if (Math.Abs(StartPoint.Z - EndPoint.Z) < 0.01)
+            {
+                ZonePoint1 = new XYZ(minx, miny, StartPoint.Z);
+                ZonePoint2 = new XYZ(maxx, maxy, EndPoint.Z + CellSizeF);
+            }
+                  
         }
 
         void ConvertToFeets()

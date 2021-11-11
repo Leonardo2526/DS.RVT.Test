@@ -70,49 +70,16 @@ namespace DS.RVT.AutoPipesCoordinarion
 
                 Cell cell = new Cell(App, Uiapp, Doc, Uidoc, data);
                 cell.GetCells();
-                cell.GetElementZonePoints();
+                cell.GetElementZonePoints(elementB);
 
-                //uidoc.RefreshActiveView();
+                //Uidoc.RefreshActiveView();
 
-                List<XYZ> ICLocations = cell.FindCollisions();
+                List<XYZ> ICLocations = cell.FindCollisions(elementB);
 
-
-                //uidoc.RefreshActiveView();
-
+                Uidoc.RefreshActiveView();
 
                 WaveAlgorythm waveAlgorythm = new WaveAlgorythm(Uidoc, ICLocations, data, cell);
                 waveAlgorythm.FindPath();
-
-
-
-
-                /*
-                if (CheckElementForMove(elementA, elementB) == true)
-                {
-                    Data data = new Data();
-                    data.SetValues(startPoint, endPoint);
-
-                    Cell cell = new Cell(App, Uiapp, Doc, Uidoc, data);
-                    cell.GetCells();
-                    cell.GetElementZonePoints();
-
-                    //uidoc.RefreshActiveView();
-
-                    List<XYZ> ICLocations = cell.FindCollisions();
-
-
-                    //uidoc.RefreshActiveView();
-
-
-                    WaveAlgorythm waveAlgorythm = new WaveAlgorythm(Uidoc, ICLocations, data, cell);
-                    waveAlgorythm.FindPath();
-
-                    
-                    //RevitElements revitElements = new RevitElements(Uiapp, Uidoc, Doc);
-                    ICollection<ElementId> modifiedElementsIds = new List<ElementId>();
-                    revitElements.ModifyElements(elementA,  elementB, ref modifiedElementsIds);
-                    revitElements.check(modifiedElementsIds, elementA, elementB);
-                    */
 
 
                 IDS += "\n" + elementB.Id.ToString();

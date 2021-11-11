@@ -78,8 +78,8 @@ namespace DS.RVT.AutoPipesCoordinarion
 
             if (bx >= W)
                 bx = W - 1;
-            else if (ax < 0)
-                ax = 0;
+            else if (ax >= W)
+                ax = W - 1;
             else if (ay >= H)
                 ay = H;
             else if (by >= H)

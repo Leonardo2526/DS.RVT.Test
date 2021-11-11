@@ -82,19 +82,18 @@ namespace DS.RVT.AutoPipesCoordinarion
 
         }
 
-        public List<XYZ> FindCollisions()
+        public List<XYZ> FindCollisions(Element elementB)
         //Search for collisions between created cells and model elements
         {
-
-
+           
             ExclusionFilter exclusionFilter = new ExclusionFilter(CellsIds);
-
+           
             Color color = new Color(255, 0, 0);
 
             //find collisions between each cell and other model elements by filters
             foreach (FamilyInstance familyInstance in Cells)
             {
-                XYZ point = GetInstancePoint(familyInstance, exclusionFilter);
+                XYZ point = GetInstancePoint(familyInstance, exclusionFilter, elementB);
                 if (point != null)
                 {
                     OverwriteGraphic(familyInstance, color);
@@ -107,20 +106,30 @@ namespace DS.RVT.AutoPipesCoordinarion
 
         }
 
-        public void GetElementZonePoints()
+        public void GetElementZonePoints(Element elementB)
         {
             // Create a Outline, uses a minimum and maximum XYZ point to initialize the outline. 
-            Outline myOutLn = new Outline(data.ZonePoint1, data.ZonePoint2);
+            Outline myOutLn = new Outline(new XYZ(20,3,0), new XYZ(25, 9, 0));
+            //Outline myOutLn = new Outline(data.ZonePoint1, data.ZonePoint2);
 
             // Create a BoundingBoxIntersects filter with this Outline
             BoundingBoxIntersectsFilter filter = new BoundingBoxIntersectsFilter(myOutLn);
 
+            // Get all element ids which are current selected by users
+            ICollection<ElementId> elementBIds = new List<ElementId>
+            {
+                elementB.Id
+            };
+
+            ExclusionFilter exclusionFilter = new ExclusionFilter(elementBIds);
+
+            //Get all pipes
             FilteredElementCollector collector = new FilteredElementCollector(Doc);
             collector.WherePasses(filter);
+            collector.WherePasses(exclusionFilter);
             collector.OfClass(typeof(Pipe));
 
             IList<Element> elements = collector.ToElements();
-
 
             foreach (Element element in elements)
             {
@@ -348,14 +357,25 @@ namespace DS.RVT.AutoPipesCoordinarion
             CellsIds.Add(instance.Id);
         }
 
-        public XYZ GetInstancePoint(FamilyInstance instance, ExclusionFilter exclusionFilter)
+        public XYZ GetInstancePoint(FamilyInstance instance, ExclusionFilter exclusionFilter, Element elementB)
         {
             ElementIntersectsElementFilter elementIntersectsElementFilter =
                 new ElementIntersectsElementFilter(instance);
 
+            // Get all element ids which are current selected by users
+            ICollection<ElementId> elementBIds = new List<ElementId>
+            {
+                elementB.Id
+            };
+
+            ExclusionFilter exclusionFilterelementB = new ExclusionFilter(elementBIds);
+
+
+
             //Get collector with filtered elements
             FilteredElementCollector collector = new FilteredElementCollector(Doc);
             collector.WherePasses(exclusionFilter);
+            collector.WherePasses(exclusionFilterelementB);
             collector.WherePasses(elementIntersectsElementFilter);
 
 
