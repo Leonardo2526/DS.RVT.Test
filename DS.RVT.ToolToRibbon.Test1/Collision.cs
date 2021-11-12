@@ -68,7 +68,7 @@ namespace DS.RVT.AutoPipesCoordinarion
                 cell.GetCells();
                 cell.GetElementZonePoints(elementB);
 
-                //Uidoc.RefreshActiveView();
+                //Uidoc.RefreshActiveView(); 
 
                 List<XYZ> ICLocations = cell.FindCollisions(elementB);
 

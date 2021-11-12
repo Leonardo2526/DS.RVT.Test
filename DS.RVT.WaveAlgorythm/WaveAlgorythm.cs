@@ -293,8 +293,7 @@ namespace DS.RVT.WaveAlgorythm
                 return true;
 
             //Try to move end point
-            //bool pointMoved = MoveEndPointToStart();
-            bool pointMoved = false;
+            bool pointMoved = MoveEndPointToStart();
 
             if (Math.Abs(ax - bx) >= Math.Abs(ay - by))
             {

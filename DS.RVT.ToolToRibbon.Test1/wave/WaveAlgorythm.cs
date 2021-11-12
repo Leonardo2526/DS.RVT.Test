@@ -247,6 +247,7 @@ namespace DS.RVT.AutoPipesCoordinarion
             return (a % 2) == 0;
         }
 
+
         bool IsStartCellEmpty()
         {
             bool emptyCell = IsCellEmpty(ax, ay);
@@ -255,15 +256,23 @@ namespace DS.RVT.AutoPipesCoordinarion
                 return true;
 
             //Try to move start point
-            bool pointMoved;
+            bool pointMoved = false;
 
-            //Get side for move
-            if (ay < by)
+            if (Math.Abs(ax - bx) >= Math.Abs(ay - by))
             {
-                pointMoved = MovePointUp(ax, ref ay);
+                //Get side for move
+                if (ay <= by)
+                    pointMoved = MovePointUp(ax, ref ay);
+                else if (ay > by)
+                    pointMoved = MovePointDown(ax, ref ay);
             }
             else
-                pointMoved = MovePointDown(ax, ref ay);
+            {
+                if (ax < bx)
+                    pointMoved = MovePointRight(ref ax, ay);
+                else if (ax > bx)
+                    pointMoved = MovePointLeft(ref ax, ay);
+            }
 
             //Check if moved
             if (pointMoved == false)
@@ -287,15 +296,22 @@ namespace DS.RVT.AutoPipesCoordinarion
 
             //Try to move end point
             bool pointMoved = MoveEndPointToStart();
-            if (pointMoved == false)
+
+            if (Math.Abs(ax - bx) >= Math.Abs(ay - by))
             {
                 //Get side for move
-                if (by < ay)
+                if (by <= ay)
                     pointMoved = MovePointUp(bx, ref by);
-                else
+                else if (by > ay)
                     pointMoved = MovePointDown(bx, ref by);
             }
-
+            else
+            {
+                if (bx <= ax)
+                    pointMoved = MovePointRight(ref bx, by);
+                else if (bx > ax)
+                    pointMoved = MovePointLeft(ref bx, by);
+            }
 
             //Check if moved
             if (pointMoved == false)
@@ -332,6 +348,34 @@ namespace DS.RVT.AutoPipesCoordinarion
                 if (emptyCell == true)
                 {
                     py = y;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool MovePointRight(ref int px, int py)
+        {
+            for (int x = px; x <= W; x++)
+            {
+                bool emptyCell = IsCellEmpty(x, py);
+                if (emptyCell == true)
+                {
+                    px = x;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool MovePointLeft(ref int px, int py)
+        {
+            for (int x = px; x >= 0; x--)
+            {
+                bool emptyCell = IsCellEmpty(x, py);
+                if (emptyCell == true)
+                {
+                    px = x;
                     return true;
                 }
             }

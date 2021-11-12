@@ -36,26 +36,23 @@ namespace DS.RVT.WaveAlgorythm
 
         void GetZonePoints()
         {
-            double YSP = StartPoint.Y - ZoneOffsetF;
-            double YEP = EndPoint.Y - ZoneOffsetF;
-            double Y1 = Math.Min(YSP, YEP);
+           
+            double Y1 = Math.Min(StartPoint.Y - ZoneOffsetF, EndPoint.Y - ZoneOffsetF);
+            double Y2 = Math.Max(StartPoint.Y + ZoneOffsetF, EndPoint.Y + ZoneOffsetF);
+            double X1 = Math.Min(StartPoint.X - ZoneOffsetF, EndPoint.X - ZoneOffsetF);
+            double X2 = Math.Max(StartPoint.X + ZoneOffsetF, EndPoint.X + ZoneOffsetF);
 
-            YSP = StartPoint.Y + ZoneOffsetF;
-            YEP = EndPoint.Y + ZoneOffsetF;
-
-            double Y2 = Math.Max(YSP, YEP);
-
-            double XSP = StartPoint.X - ZoneOffsetF;
-            double XEP = EndPoint.X - ZoneOffsetF;
-            double X1 = Math.Min(XSP, XEP);
-
-            XSP = StartPoint.X + ZoneOffsetF;
-            XEP = EndPoint.X + ZoneOffsetF;
-
-            double X2 = Math.Max(XSP, XEP);
-
-            ZonePoint1 = new XYZ(X1, Y1, StartPoint.Z);
-            ZonePoint2 = new XYZ(X2, Y2, EndPoint.Z);        
+            if (Math.Abs(StartPoint.X - EndPoint.X) >= Math.Abs(StartPoint.Y - EndPoint.Y))
+            {
+                ZonePoint1 = new XYZ(StartPoint.X, Y1, StartPoint.Z);
+                ZonePoint2 = new XYZ(EndPoint.X, Y2, EndPoint.Z);
+            }
+            else
+            {
+                ZonePoint1 = new XYZ(X1, StartPoint.Y , StartPoint.Z);
+                ZonePoint2 = new XYZ(X2, EndPoint.Y, EndPoint.Z);
+            }
+    
         }
 
         void ConvertToFeets()
