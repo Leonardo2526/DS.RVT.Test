@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DocEvent.cs" />
+    <Compile Include="DSPipe.cs" />
     <Compile Include="RevitElements.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="Collision.cs" />

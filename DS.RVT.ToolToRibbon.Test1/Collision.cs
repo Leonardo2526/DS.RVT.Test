@@ -53,29 +53,10 @@ namespace DS.RVT.AutoPipesCoordinarion
 
             IList<Element> elements = collector.ToElements();
 
-            RevitElements revitElements = new RevitElements(App, Uiapp, Uidoc , Doc);
 
             foreach (Element elementB in elements)
             {
-                
-                Pipe pipeB = elementB as Pipe;
-                revitElements.GetPoints(pipeB, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint);
-
-                Data data = new Data();
-                data.SetValues(startPoint, endPoint);
-
-                Cell cell = new Cell(App, Uiapp, Doc, Uidoc, data);
-                cell.GetCells();
-                cell.GetElementZonePoints(elementB);
-
-                //Uidoc.RefreshActiveView(); 
-
-                List<XYZ> ICLocations = cell.FindCollisions(elementB);
-
-                Uidoc.RefreshActiveView();
-
-                WaveAlgorythm waveAlgorythm = new WaveAlgorythm(Uidoc, ICLocations, data, cell);
-                waveAlgorythm.FindPath();
+                FindPath(elementB);
             }
 
 
@@ -171,6 +152,40 @@ namespace DS.RVT.AutoPipesCoordinarion
             }
 
                 return false;
+        }
+
+        void FindPath(Element element)
+        {
+            Pipe pipeB = element as Pipe;
+
+            RevitElements revitElements = new RevitElements(App, Uiapp, Uidoc, Doc);
+            revitElements.GetPoints(pipeB, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint);
+
+            Data data = new Data();
+            data.SetValues(startPoint, endPoint);
+
+            Cell cell = new Cell(App, Uiapp, Doc, Uidoc, data);
+            cell.GetCells();
+            cell.GetElementZonePoints(element);
+
+            //Uidoc.RefreshActiveView(); 
+
+            List<XYZ> ICLocations = cell.FindCollisions(element);
+
+            Uidoc.RefreshActiveView();
+
+            WaveAlgorythm waveAlgorythm = new WaveAlgorythm(Uidoc, ICLocations, data, cell);
+            waveAlgorythm.FindPath();
+
+
+            DSPipe pipe = new DSPipe(Uiapp, Uidoc, Doc);
+            pipe.GetPipeSystemTypes(element);
+
+            List<XYZ> pathCoords = waveAlgorythm.pathCoords;
+
+            pipe.CreateMultiplePipes(pathCoords, element);
+
+            pipe.DeleteElement(element);
         }
 
     }

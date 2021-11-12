@@ -397,7 +397,8 @@ namespace DS.RVT.AutoPipesCoordinarion
 
         void WritePathPoints(int x, int y)
         {
-                XYZ point = new XYZ(data.ZonePoint1.X + x * data.CellSizeF, data.ZonePoint1.Y + y * data.CellSizeF, 0);              
+                XYZ point = new XYZ(data.ZonePoint1.X + x * data.CellSizeF, data.ZonePoint1.Y + y * data.CellSizeF, 0); 
+            if (!pathCoords.Contains(point))
                 pathCoords.Add(point);
         }
 
