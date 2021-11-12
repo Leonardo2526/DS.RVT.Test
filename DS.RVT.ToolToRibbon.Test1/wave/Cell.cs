@@ -27,7 +27,7 @@ namespace DS.RVT.AutoPipesCoordinarion
         }
 
         readonly List<FamilyInstance> Cells = new List<FamilyInstance>();
-        readonly ICollection<ElementId> CellsIds = new List<ElementId>();
+        public readonly ICollection<ElementId> CellsIds = new List<ElementId>();
 
 
         public int W { get; set; }
@@ -148,6 +148,26 @@ namespace DS.RVT.AutoPipesCoordinarion
             */
             AddElementZonePointsToIC();
         }
+
+        public void DeleteCells()
+        {
+            using (Transaction transNew = new Transaction(Doc, "newTransaction"))
+            {
+                try
+                {
+                    transNew.Start();
+                    Doc.Delete(CellsIds);
+                }
+
+                catch (Exception e)
+                {
+                    transNew.RollBack();
+                    TaskDialog.Show("Revit", e.ToString());
+                }
+                transNew.Commit();
+            }
+        }
+
 
         void GetElementZoneOddPoints(Element element)
         {

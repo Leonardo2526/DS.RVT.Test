@@ -150,6 +150,7 @@ namespace DS.RVT.AutoPipesCoordinarion
             for (i=0; i< Points.Count - 1; i++)
             {
                 CreatePipe(Points[i], Points[i+1], element);
+                Uidoc.RefreshActiveView();
             }
         }
 

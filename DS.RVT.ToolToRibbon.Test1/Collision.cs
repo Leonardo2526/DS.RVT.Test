@@ -169,24 +169,47 @@ namespace DS.RVT.AutoPipesCoordinarion
             cell.GetElementZonePoints(element);
 
             //Uidoc.RefreshActiveView(); 
-
-            List<XYZ> ICLocations = cell.FindCollisions(element);
+                        List<XYZ> ICLocations = cell.FindCollisions(element);
 
             Uidoc.RefreshActiveView();
 
             WaveAlgorythm waveAlgorythm = new WaveAlgorythm(Uidoc, ICLocations, data, cell);
             waveAlgorythm.FindPath();
 
-
+            /*
             DSPipe pipe = new DSPipe(Uiapp, Uidoc, Doc);
             pipe.GetPipeSystemTypes(element);
 
-            List<XYZ> pathCoords = waveAlgorythm.pathCoords;
+            List<XYZ> pathCoords = ConvertCoords(waveAlgorythm.pathCoords);
 
             pipe.CreateMultiplePipes(pathCoords, element);
 
-            pipe.DeleteElement(element);
+           pipe.DeleteElement(element);
+
+            cell.DeleteCells();
+            */
+           
         }
 
+        List<XYZ> ConvertCoords (List<XYZ> pathCoords)
+        {
+            List<XYZ> convertedCoords = new List<XYZ>();
+            convertedCoords.Add(pathCoords[0]);
+            convertedCoords.Add(pathCoords.Last());
+
+            int i;
+            for (i=1; i< pathCoords.Count -1; i++)
+            {
+                double deltaX1 = Math.Abs(pathCoords[i].X - pathCoords[i - 1].X);
+                double deltaX2 = Math.Abs(pathCoords[i].X - pathCoords[i + 1].X);
+                double deltaX = Math.Abs(deltaX1- deltaX2);
+
+                if (deltaX > 0.01 )
+                    convertedCoords.Add(pathCoords[i]);
+            }
+
+
+            return convertedCoords;
+        }
     }
 }
