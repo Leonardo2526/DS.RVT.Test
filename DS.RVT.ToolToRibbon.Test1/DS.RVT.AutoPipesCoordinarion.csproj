@@ -7,8 +7,8 @@
     <ProjectGuid>{3423357B-A177-4697-B2BF-A720176B6135}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DS.RVT.ToolToRibbon.Test1</RootNamespace>
-    <AssemblyName>DS.RVT.ToolToRibbon.Test1</AssemblyName>
+    <RootNamespace>DS.RVT.AutoPipesCoordinarion</RootNamespace>
+    <AssemblyName>DS.RVT.AutoPipesCoordinarion</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -53,8 +53,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DocEvent.cs" />
+    <Compile Include="DSPipe.cs" />
+    <Compile Include="RevitElements.cs" />
     <Compile Include="ExternalCommand.cs" />
+    <Compile Include="Collision.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="wave\Cell.cs" />
+    <Compile Include="wave\CellCorners.cs" />
+    <Compile Include="wave\Data.cs" />
+    <Compile Include="wave\WaveAlgorythm.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

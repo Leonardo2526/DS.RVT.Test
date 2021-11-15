@@ -3,7 +3,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System;
 
-namespace DS.RVT.AutoPipesCoordinarion
+namespace DS.RVT.PipeTest
 {
     [Transaction(TransactionMode.Manual)]
     public class ExternalCommand : IExternalCommand
@@ -16,14 +16,15 @@ namespace DS.RVT.AutoPipesCoordinarion
 
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
-           
-            Collision collision = new Collision(application, uiapp, uidoc, doc);
-            collision.FindCollisions();
 
+            DSPipe pipe = new DSPipe(uiapp, uidoc, doc);
+            pipe.CreatePipeSystem();
+            //pipe.DeleteElement();
+            //pipe.SplitElement();
+
+
+            TaskDialog.Show("Revit", "Pipe created!");
             return Autodesk.Revit.UI.Result.Succeeded;
         }
-       
-
-      
     }
 }
