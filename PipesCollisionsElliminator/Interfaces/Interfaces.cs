@@ -20,4 +20,9 @@ namespace DS.PipesCollisionsElliminator
         void GetInfo();
 
     }
+
+    interface IModifyElement
+    {
+       
+    }
 }

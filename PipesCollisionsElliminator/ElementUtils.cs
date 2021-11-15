@@ -1,6 +1,11 @@
-﻿using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.ApplicationServices;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Plumbing;
+using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DS.PipesCollisionsElliminator
 {
@@ -26,7 +31,7 @@ namespace DS.PipesCollisionsElliminator
             return elementId;
         }
 
-        private List<Solid> GetSolid(Element element)
+        public List<Solid> GetSolids(Element element)
         {
             List<Solid> solids = new List<Solid>();
 
@@ -67,7 +72,6 @@ namespace DS.PipesCollisionsElliminator
 
             return solids;
         }
-
 
         public void GetPoints(Element element, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint)
         {
@@ -118,5 +122,6 @@ namespace DS.PipesCollisionsElliminator
 
             return point;
         }
+
     }
 }

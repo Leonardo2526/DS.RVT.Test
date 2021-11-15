@@ -53,13 +53,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collision.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="Interfaces\Interfaces.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="ElementInfo.cs" />
+    <Compile Include="Path.cs" />
     <Compile Include="PickedElement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ElementUtils.cs" />
+    <Compile Include="RevitElements.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

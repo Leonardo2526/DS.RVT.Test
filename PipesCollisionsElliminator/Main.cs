@@ -6,6 +6,7 @@ using Autodesk.Revit.UI.Selection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 namespace DS.PipesCollisionsElliminator
 {
     class Main
@@ -35,8 +36,20 @@ namespace DS.PipesCollisionsElliminator
         public void InitiateProcess()
         {
             ElementUtils elementUtils = new ElementUtils();
-            elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
-            
+            Element element = elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
+
+            Collision collision = new Collision(App, Uiapp, Uidoc, Doc, elementUtils);
+            IList<Element> collisionElements = collision.GetCollisions(element);
+
+            if (collisionElements.Count == 0)
+            {
+                TaskDialog.Show("Revit", "No collision found!");
+                return;
+            }
+
+            Path path = new Path(App, Uiapp, Uidoc, Doc, elementUtils);
+            path.FindAvailable(element, collisionElements);
+
 
         }
 
