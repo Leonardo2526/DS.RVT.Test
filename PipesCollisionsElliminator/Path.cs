@@ -35,9 +35,26 @@ namespace DS.PipesCollisionsElliminator
                     ElemUtils.GetPoints(SelectedElement, out XYZ startPoint, out XYZ endPoint, out XYZ centerPointElement);
 
                     RevitElements revitElements = new RevitElements(App, Uiapp, Uidoc, Doc);
-                    revitElements.CreateModelLine(startPoint, endPoint);
+                    double offset = 100;
+                    XYZ newVector = GetOffset(SelectedElement, colElem, offset, false);
+                    XYZ p1 = new XYZ(startPoint.X + newVector.X, startPoint.Y + newVector.Y, startPoint.Z + newVector.Z);
+                    XYZ p2 = new XYZ(endPoint.X + newVector.X, endPoint.Y + newVector.Y, endPoint.Z + newVector.Z);
 
-                    Line geomLine = Line.CreateBound(startPoint, endPoint);
+                    ModelCurve newLine = revitElements.CreateModelLine(p1, p2);
+
+                    Collision collision = new Collision(App, Uiapp, Uidoc, Doc, ElemUtils);
+                    IList<Element> NewcollisionElements = collision.GetElemElemCollisions(newLine.GeometryCurve);
+
+
+                    if (NewcollisionElements.Count == 0)
+                    {
+                        TaskDialog.Show("Revit", "No collision found!");
+                        return;
+                    }
+
+                    TaskDialog.Show("Revit", "New collision! \n" + NewcollisionElements[0].Id);
+
+                    Line geomLine = Line.CreateBound(p1, p2);
                 }
             }
         }

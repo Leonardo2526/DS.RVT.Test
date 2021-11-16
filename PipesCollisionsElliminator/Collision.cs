@@ -51,7 +51,37 @@ namespace DS.PipesCollisionsElliminator
             return collector.ToElements();
         }
 
+        public IList<Element> GetElemElemCollisions(Curve curve)
+        {
+            //Get all pipes in document
+            FilteredElementCollector collector = new FilteredElementCollector(Doc);
+            collector.OfClass(typeof(Pipe));
 
+            IList<Element> elements = collector.ToElements();
+            IList<Element> intersectedElements = new List<Element>();
+
+            foreach (Element element1 in elements)
+            {
+                SolidCurveIntersection intersection = null;
+
+                //Get element's solid
+                List<Solid> solids = ElemUtils.GetSolids(element1);
+                Solid elementSolid = null;
+
+                foreach (Solid solid in solids)
+                {
+                    elementSolid = solid;
+                    SolidCurveIntersectionOptions intersectOptions = new SolidCurveIntersectionOptions();
+                    intersection = elementSolid.IntersectWithCurve(curve, intersectOptions);
+                    if (intersection.SegmentCount != 0)
+                        intersectedElements.Add(element1);
+                }
+                  
+            }          
+
+
+            return intersectedElements;
+        }
 
 
         public void EliminateCollision(Element SelectedElement, IList<Element> collisionElements)

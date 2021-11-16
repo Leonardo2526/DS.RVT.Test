@@ -23,7 +23,7 @@ namespace DS.PipesCollisionsElliminator
         }
 
 
-        public void CreateModelLine(XYZ startPoint, XYZ endPoint)
+        public ModelCurve CreateModelLine(XYZ startPoint, XYZ endPoint)
         {
             Line geomLine = Line.CreateBound(startPoint, endPoint);
 
@@ -32,6 +32,7 @@ namespace DS.PipesCollisionsElliminator
             XYZ p2 = endPoint;
             XYZ p3 = p2 + XYZ.BasisZ;
             Plane geomPlane = Plane.CreateByThreePoints(p1, p2, p3);
+            ModelLine line = null;
 
             using (Transaction transNew = new Transaction(Doc, "CreateModelLine"))
             {
@@ -43,7 +44,7 @@ namespace DS.PipesCollisionsElliminator
                     SketchPlane sketch = SketchPlane.Create(Doc, geomPlane);
 
                     // Create a ModelLine element using the created geometry line and sketch plane
-                    ModelLine line = Doc.Create.NewModelCurve(geomLine, sketch) as ModelLine;
+                    line = Doc.Create.NewModelCurve(geomLine, sketch) as ModelLine;
                 }
 
                 catch (Exception e)
@@ -54,8 +55,28 @@ namespace DS.PipesCollisionsElliminator
 
                 transNew.Commit();
             }
+
+            return line;
         }
 
+        public void MoveElement(ElementId elementBId, XYZ newVector)
+        {
+            using (Transaction transNew = new Transaction(Doc, "newTransaction"))
+            {
+                try
+                {
+                    transNew.Start();
+                    ElementTransformUtils.MoveElement(Doc, elementBId, newVector);
 
+                }
+
+                catch (Exception e)
+                {
+                    transNew.RollBack();
+                    TaskDialog.Show("Revit", e.ToString());
+                }
+                transNew.Commit();
+            }
+        }
     }
 }
