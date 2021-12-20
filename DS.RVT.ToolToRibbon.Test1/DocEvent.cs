@@ -35,7 +35,7 @@ namespace DS.RVT.AutoPipesCoordinarion
             }
         }
 
-        public void application_DocumentChanged(object sender, DocumentChangedEventArgs e)
+        public void application_DocumentChanged0(object sender, DocumentChangedEventArgs e)
         {
             Document Doc = e.GetDocument();
 
@@ -52,6 +52,17 @@ namespace DS.RVT.AutoPipesCoordinarion
             }
 
             //TaskDialog.Show("Revit", "Modified elements IDs: \n" + IDS);
+
+        }
+
+
+        public void application_DocumentChanged(object sender, DocumentChangedEventArgs e)
+        {
+            Document Doc = e.GetDocument();
+
+            FailureDefinitionId failureDefinitionId = BuiltInFailures.ConnectorFailures.DisconnectedElements;
+
+            TaskDialog.Show("Revit", "Disconnectes elements IDs: \n" + failureDefinitionId.Guid.ToString());
 
         }
 

@@ -53,6 +53,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="VisiblePointsCreator.cs" />
+    <Compile Include="CreateModelCurveTransaction.cs" />
+    <Compile Include="GeneralPointExtractor.cs" />
     <Compile Include="Collision.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="Interfaces\Interfaces.cs" />

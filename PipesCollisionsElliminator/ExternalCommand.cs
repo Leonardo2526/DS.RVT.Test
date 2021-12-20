@@ -18,7 +18,7 @@ namespace DS.PipesCollisionsElliminator
             Document doc = uiapp.ActiveUIDocument.Document;
 
             Main main = new Main(app, uiapp, uidoc, doc);
-            main.InitiateProcess();
+            main.ExtractPoints();
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }

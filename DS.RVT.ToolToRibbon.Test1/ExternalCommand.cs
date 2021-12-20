@@ -16,10 +16,10 @@ namespace DS.RVT.AutoPipesCoordinarion
 
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
-           
+
             Collision collision = new Collision(application, uiapp, uidoc, doc);
             collision.FindCollisions();
-
+         
             return Autodesk.Revit.UI.Result.Succeeded;
         }
        
