@@ -22,7 +22,7 @@ namespace DS.RVT.RibbonForTest
             button.AddButtons();
 
             // Create a custom ribbon tab  
-            string tabName = "DS.RVT.RibbonForTest";
+            string tabName = "DS.RVT.Test";
             application.CreateRibbonTab(tabName); 
 
             // Create a ribbon panel 

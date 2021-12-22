@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.WaveAlgorythm", "DS.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipesCollisionsElliminator", "PipesCollisionsElliminator\PipesCollisionsElliminator.csproj", "{5A3CAE97-4274-4F2D-AFFE-602A52B5190B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.RibbonForTest", "DS.RVT.RibbonForTest\DS.RVT.RibbonForTest.csproj", "{E6F61001-1E40-44F9-B007-262C1E3B2682}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.Ribbon", "DS.RVT.RibbonForTest\DS.RVT.Ribbon.csproj", "{E6F61001-1E40-44F9-B007-262C1E3B2682}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.AutoPipesCoordinarion", "DS.RVT.ToolToRibbon.Test\DS.RVT.AutoPipesCoordinarion.csproj", "{3423357B-A177-4697-B2BF-A720176B6135}"
 EndProject
