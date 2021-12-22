@@ -35,6 +35,11 @@ namespace DS.RVT.ModelSpaceFragmentation
                 new ModelSpacePointsGenerator(BoundPoints.Point1, BoundPoints.Point2);
             List<XYZ> spacePoints = modelSpacePointsGenerator.Generate();
 
+            PointsSeparator pointsSeparator = new PointsSeparator(spacePoints);
+
+            List<XYZ> passablePoints = pointsSeparator.GetPassablePoints();
+            List<XYZ> unpassablePoints = pointsSeparator.GetUnpassablePoints();
+
             VisiblePointsCreator visiblePointsCreator = new VisiblePointsCreator();
             visiblePointsCreator.Create(Doc, spacePoints);
         }

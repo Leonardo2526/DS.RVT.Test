@@ -53,16 +53,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BoundPoints.cs" />
+    <Compile Include="Lines\ILineCreator.cs" />
+    <Compile Include="Lines\ILine.cs" />
+    <Compile Include="Lines\Ray.cs" />
+    <Compile Include="Points\BoundPoints.cs" />
     <Compile Include="ElementUtils.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="Interfaces\Interfaces.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="PickedElement.cs" />
-    <Compile Include="ModelSpacePointsGenerator.cs" />
-    <Compile Include="PointUtils.cs" />
+    <Compile Include="Lines\LineCreator.cs" />
+    <Compile Include="Points\IPoint.cs" />
+    <Compile Include="Points\ModelSpacePointsGenerator.cs" />
+    <Compile Include="Points\PointInSolidChecker.cs" />
+    <Compile Include="Points\PointsSeparator.cs" />
+    <Compile Include="Points\PointUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VisiblePointsCreator.cs" />
+    <Compile Include="Points\VisiblePointsCreator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
