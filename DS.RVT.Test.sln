@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.Ribbon", "DS.RVT.Rib
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.AutoPipesCoordinarion", "DS.RVT.ToolToRibbon.Test\DS.RVT.AutoPipesCoordinarion.csproj", "{3423357B-A177-4697-B2BF-A720176B6135}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.ModelSpaceFragmentation", "DS.RVT.ModelSpaceFragmentation\DS.RVT.ModelSpaceFragmentation.csproj", "{9208DCBD-3F74-477C-87E3-9598C551E538}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{3423357B-A177-4697-B2BF-A720176B6135}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3423357B-A177-4697-B2BF-A720176B6135}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3423357B-A177-4697-B2BF-A720176B6135}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9208DCBD-3F74-477C-87E3-9598C551E538}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9208DCBD-3F74-477C-87E3-9598C551E538}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9208DCBD-3F74-477C-87E3-9598C551E538}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9208DCBD-3F74-477C-87E3-9598C551E538}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
