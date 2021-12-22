@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+	<AddIn Type="Application">
+		<Name>DS.RVT.RibbonForTest</Name>
+		<Assembly>DS.RVT.RibbonForTest\DS.RVT.RibbonForTest.dll</Assembly>
+		<ClientId>11302581-1477-4a3d-bddd-3e402572e505</ClientId>
+		<FullClassName>DS.RVT.RibbonForTest.ExternalApplication</FullClassName>
+		<VendorId>DS</VendorId>
+	</AddIn>
+</RevitAddIns>

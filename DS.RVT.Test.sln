@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.AutoPipesCoordinarion", "DS.RVT.ToolToRibbon.Test1\DS.RVT.AutoPipesCoordinarion.csproj", "{3423357B-A177-4697-B2BF-A720176B6135}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.PipeTest", "DS.RVT.Pipe\DS.RVT.PipeTest.csproj", "{77B9B926-E8A4-4B99-82C3-ACD72A79C7B7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.WaveAlgorythm", "DS.RVT.WaveAlgorythm\DS.RVT.WaveAlgorythm.csproj", "{986BE5AE-4531-4457-83AB-F42B44242788}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PipesCollisionsElliminator", "PipesCollisionsElliminator\PipesCollisionsElliminator.csproj", "{5A3CAE97-4274-4F2D-AFFE-602A52B5190B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.RibbonForTest", "..\DS.RVT.RibbonForTest\DS.RVT.RibbonForTest\DS.RVT.RibbonForTest.csproj", "{E6F61001-1E40-44F9-B007-262C1E3B2682}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.RibbonForTest", "DS.RVT.RibbonForTest\DS.RVT.RibbonForTest.csproj", "{E6F61001-1E40-44F9-B007-262C1E3B2682}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.AutoPipesCoordinarion", "DS.RVT.ToolToRibbon.Test\DS.RVT.AutoPipesCoordinarion.csproj", "{3423357B-A177-4697-B2BF-A720176B6135}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,9 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3423357B-A177-4697-B2BF-A720176B6135}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3423357B-A177-4697-B2BF-A720176B6135}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3423357B-A177-4697-B2BF-A720176B6135}.Release|Any CPU.Build.0 = Release|Any CPU
 		{77B9B926-E8A4-4B99-82C3-ACD72A79C7B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{77B9B926-E8A4-4B99-82C3-ACD72A79C7B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77B9B926-E8A4-4B99-82C3-ACD72A79C7B7}.Release|Any CPU.Build.0 = Release|Any CPU
@@ -36,6 +33,10 @@ Global
 		{E6F61001-1E40-44F9-B007-262C1E3B2682}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6F61001-1E40-44F9-B007-262C1E3B2682}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6F61001-1E40-44F9-B007-262C1E3B2682}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3423357B-A177-4697-B2BF-A720176B6135}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3423357B-A177-4697-B2BF-A720176B6135}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3423357B-A177-4697-B2BF-A720176B6135}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3423357B-A177-4697-B2BF-A720176B6135}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
