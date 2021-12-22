@@ -3,7 +3,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System;
 
-namespace DS.RVT.AutoPipesCoordinarion
+namespace DS.PipesCollisionsElliminator
 {
     [Transaction(TransactionMode.Manual)]
     public class ExternalCommand : IExternalCommand
@@ -12,18 +12,15 @@ namespace DS.RVT.AutoPipesCoordinarion
            ref string message, ElementSet elements)
         {
             UIApplication uiapp = commandData.Application;
-            Autodesk.Revit.ApplicationServices.Application application = uiapp.Application;
+            Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
 
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            Collision collision = new Collision(application, uiapp, uidoc, doc);
-            collision.FindCollisions();
-         
+            Main main = new Main(app, uiapp, uidoc, doc);
+            main.ExtractPoints();
+
             return Autodesk.Revit.UI.Result.Succeeded;
         }
-       
-
-      
     }
 }
