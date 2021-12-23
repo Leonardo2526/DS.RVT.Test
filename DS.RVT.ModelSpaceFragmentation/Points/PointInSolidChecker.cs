@@ -12,18 +12,11 @@ namespace DS.RVT.ModelSpaceFragmentation
         {
             LineCreator lineCreator = new LineCreator();
             Ray ray = new Ray(point);
-            Line rayLine = lineCreator.Create(ray);
-
-            List<Line> lines = new List<Line>()
-            {
-                rayLine
-            };
+            Line rayLine = lineCreator.Create(ray);         
 
             LineCollision lineCollision = new LineCollision(Doc);
 
-            lineCollision.GetAllModelSolids(lines);
-
-            IList<Element> CheckCollisions = lineCollision.GetAllLinesCollisions(rayLine);
+            IList<Element> CheckCollisions = lineCollision.GetElementsCurveCollisions(rayLine, ModelSolid.modelSolids);
 
             foreach (CurveExtents curveExt in lineCollision.CurvesExtIntersection)
             {                

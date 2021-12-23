@@ -35,6 +35,9 @@ namespace DS.RVT.ModelSpaceFragmentation
                 new ModelSpacePointsGenerator(BoundPoints.Point1, BoundPoints.Point2);
             List<XYZ> spacePoints = modelSpacePointsGenerator.Generate();
 
+            ModelSolid modelSolid = new ModelSolid(Doc);
+            Dictionary<Element, List<Solid>> solids = modelSolid.GetSolids();
+
             PointsSeparator pointsSeparator = new PointsSeparator(spacePoints);
             pointsSeparator.Separate(Doc);
 

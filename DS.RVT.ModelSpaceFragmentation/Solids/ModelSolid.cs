@@ -16,9 +16,9 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         ElementUtils ElemUtils = new ElementUtils();
 
-        public Dictionary<Element, List<Solid>> modelSolids = new Dictionary<Element, List<Solid>>();
+        public static Dictionary<Element, List<Solid>> modelSolids = new Dictionary<Element, List<Solid>>();
 
-        public void Get()
+        public Dictionary<Element, List<Solid>> GetSolids()
         {
             FilteredElementCollector collector = new FilteredElementCollector(Doc);
 
@@ -30,14 +30,22 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             ElementMulticategoryFilter elementMulticategoryFilter = new ElementMulticategoryFilter(elementCategoryFilters);
 
+            collector.WhereElementIsNotElementType();
             IList<Element> intersectedElementsBox = collector.WherePasses(elementMulticategoryFilter).ToElements();
+            Dictionary<Element, List<Solid>> solidsDictionary = new Dictionary<Element, List<Solid>>();
 
             List<Solid> solids = new List<Solid>();
             foreach (Element elem in intersectedElementsBox)
             {
                 solids = ElemUtils.GetSolids(elem);
-                modelSolids.Add(elem, solids);
+                if (solids.Count !=0)
+                {
+                    modelSolids.Add(elem, solids);
+                    solidsDictionary.Add(elem, solids);
+                }             
             }
+
+            return solidsDictionary;
         }
 
 
