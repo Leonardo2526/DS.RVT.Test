@@ -16,10 +16,11 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         ElementUtils ElemUtils = new ElementUtils();
 
-        public static Dictionary<Element, List<Solid>> modelSolids = new Dictionary<Element, List<Solid>>();
+        public static Dictionary<Element, List<Solid>> SolidsInModel { get; set; }
 
         public Dictionary<Element, List<Solid>> GetSolids()
         {
+            SolidsInModel = new Dictionary<Element, List<Solid>>();
             FilteredElementCollector collector = new FilteredElementCollector(Doc);
 
             ICollection<BuiltInCategory> elementCategoryFilters = new List<BuiltInCategory>
@@ -40,7 +41,7 @@ namespace DS.RVT.ModelSpaceFragmentation
                 solids = ElemUtils.GetSolids(elem);
                 if (solids.Count !=0)
                 {
-                    modelSolids.Add(elem, solids);
+                    SolidsInModel.Add(elem, solids);
                     solidsDictionary.Add(elem, solids);
                 }             
             }

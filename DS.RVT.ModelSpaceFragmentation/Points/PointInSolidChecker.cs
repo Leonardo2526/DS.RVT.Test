@@ -16,7 +16,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             LineCollision lineCollision = new LineCollision(Doc);
 
-            IList<Element> CheckCollisions = lineCollision.GetElementsCurveCollisions(rayLine, ModelSolid.modelSolids);
+            IList<Element> CheckCollisions = lineCollision.GetElementsCurveCollisions(rayLine, ModelSolid.SolidsInModel);
 
             foreach (CurveExtents curveExt in lineCollision.CurvesExtIntersection)
             {                
