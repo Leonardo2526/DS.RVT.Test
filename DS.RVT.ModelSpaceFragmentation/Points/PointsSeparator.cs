@@ -16,26 +16,24 @@ namespace DS.RVT.ModelSpaceFragmentation
             SpacePoints = spacePoints;
         }
 
-        public List<XYZ> GetPassablePoints()
-        {
-            List<XYZ> passablePoints = new List<XYZ>();
+        public List<XYZ> PassablePoints { get; set; } = new List<XYZ>();
+        public List<XYZ> UnpassablePoints { get; set; } = new List<XYZ>();
 
+
+        public void Separate(Document Doc)
+        {
             foreach (XYZ point in SpacePoints)
             {
-                if (!PointInSolidChecker.IsPointInSolid(point))
+                if (!PointInSolidChecker.IsPointInSolid(Doc, point))
                 {
-                    passablePoints.Add(point);
+                    UnpassablePoints.Add(point);
+                }
+                else
+                {
+                    PassablePoints.Add(point);
+
                 }
             }
-
-                return passablePoints;
-        }
-
-        public List<XYZ> GetUnpassablePoints()
-        {
-            List<XYZ> unpassablePoints = new List<XYZ>();
-
-            return unpassablePoints;
         }
     }
 }

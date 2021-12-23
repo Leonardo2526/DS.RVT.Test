@@ -53,8 +53,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BoundingBoxFilter.cs" />
     <Compile Include="Lines\ILineCreator.cs" />
     <Compile Include="Lines\ILine.cs" />
+    <Compile Include="Lines\LineCollision.cs" />
     <Compile Include="Lines\Ray.cs" />
     <Compile Include="Points\BoundPoints.cs" />
     <Compile Include="ElementUtils.cs" />
@@ -70,7 +72,11 @@
     <Compile Include="Points\PointUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Points\VisiblePointsCreator.cs" />
+    <Compile Include="Transactions\ITransaction.cs" />
+    <Compile Include="Transactions\ModelCurveTransaction.cs" />
+    <Compile Include="Transactions\Transactions.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y  "$(TargetDir)$(TargetName).dll" "$(AppData)\Autodesk\Revit\Addins\2020\$(TargetName)\"</PostBuildEvent>

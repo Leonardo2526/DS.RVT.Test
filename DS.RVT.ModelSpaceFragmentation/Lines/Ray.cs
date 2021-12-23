@@ -8,18 +8,19 @@ using Autodesk.Revit.DB;
 namespace DS.RVT.ModelSpaceFragmentation.Lines
 {
     class Ray : ILine
-    {
-        readonly XYZ StartPoint;
+    {      
+        public XYZ StartPoint { get; set; }
+        public XYZ EndPoint { get; set; }
 
-        public Ray(XYZ startPoint)
+        public Ray(XYZ point)
         {
-            StartPoint = startPoint;
+            StartPoint = point;
         }
 
         public Line Create()
         {
-            XYZ endPoint = new XYZ(StartPoint.X + 10, StartPoint.Y + 5, StartPoint.Z + 3);
-            Line line = Line.CreateBound(StartPoint, endPoint);
+            EndPoint = new XYZ(StartPoint.X + 10, StartPoint.Y + 5, StartPoint.Z + 3);
+            Line line = Line.CreateBound(StartPoint, EndPoint);
 
             return line;
         }

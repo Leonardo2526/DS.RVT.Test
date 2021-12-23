@@ -26,5 +26,18 @@ namespace DS.RVT.ModelSpaceFragmentation
                 ylist.OrderByDescending(a => a).First(), zlist.OrderByDescending(a => a).First());
         }
 
+        public void FindMinMaxPointByLines(List<Line> allCurrentPositionLines, out XYZ minPoint, out XYZ maxPoint)
+        {
+            List<XYZ> points = new List<XYZ>();
+
+            foreach (Line line in allCurrentPositionLines)
+            {
+                points.Add(line.GetEndPoint(0));
+                points.Add(line.GetEndPoint(1));
+            }
+
+            FindMinMaxPointByPoints(points, out minPoint, out maxPoint);
+        }
+
     }    
 }

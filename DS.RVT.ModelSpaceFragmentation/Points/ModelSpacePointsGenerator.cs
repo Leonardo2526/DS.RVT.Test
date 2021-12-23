@@ -11,7 +11,7 @@ namespace DS.RVT.ModelSpaceFragmentation
     {
         XYZ Point1;
         XYZ Point2;
-        readonly int PointsStep = 100;
+        readonly int PointsStep = 200;
         double pointsStepF;
 
         int Xcount;
