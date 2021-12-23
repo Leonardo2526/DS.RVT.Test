@@ -12,9 +12,16 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         public static XYZ Point1 { get; set; }
         public static XYZ Point2 { get; set; }
+        public static double OffsetFromOriginByZ { get; } = 1000;
+        public static double OffsetFromOriginByXY { get; } = 1000;
+
+        double OffsetFromOriginByZInFeets;
+        double OffsetFromOriginByXYInFeets;
 
         public List<XYZ> GetPoints(Element element)
         {
+            ConvertToFeets();
+
             List<XYZ> elementPoints = new List<XYZ>();
 
             ElementUtils elementUtils = new ElementUtils();
@@ -28,10 +35,9 @@ namespace DS.RVT.ModelSpaceFragmentation
             pointUtils.FindMinMaxPointByPoints(elementPoints, out XYZ minPoint, out XYZ maxPoint);
 
             List<XYZ> boundPoints = new List<XYZ>();
-            double offset = 3;
 
-            minPoint = new XYZ(minPoint.X - offset, minPoint.Y - offset, minPoint.Z - offset);
-            maxPoint = new XYZ(maxPoint.X + offset, maxPoint.Y + offset, maxPoint.Z + offset);
+            minPoint = new XYZ(minPoint.X - OffsetFromOriginByXYInFeets, minPoint.Y - OffsetFromOriginByXYInFeets, minPoint.Z - OffsetFromOriginByZInFeets);
+            maxPoint = new XYZ(maxPoint.X + OffsetFromOriginByXYInFeets, maxPoint.Y + OffsetFromOriginByXYInFeets, maxPoint.Z + OffsetFromOriginByZInFeets);
 
             boundPoints.Add(minPoint);
             boundPoints.Add(maxPoint);
@@ -40,6 +46,16 @@ namespace DS.RVT.ModelSpaceFragmentation
             Point2 = maxPoint;
 
             return boundPoints;
+        }
+
+        void ConvertToFeets()
+        {
+            OffsetFromOriginByZInFeets = UnitUtils.Convert((double)OffsetFromOriginByZ / 1000,
+                                          DisplayUnitType.DUT_METERS,
+                                          DisplayUnitType.DUT_DECIMAL_FEET);
+            OffsetFromOriginByXYInFeets = UnitUtils.Convert((double)OffsetFromOriginByXY / 1000,
+                               DisplayUnitType.DUT_METERS,
+                               DisplayUnitType.DUT_DECIMAL_FEET);
         }
     }
 }

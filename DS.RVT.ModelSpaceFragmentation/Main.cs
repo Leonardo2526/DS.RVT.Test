@@ -30,8 +30,8 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             BoundPoints boundPoints = new BoundPoints();
             boundPoints.GetPoints(element);
-
-            ModelSpacePointsGenerator modelSpacePointsGenerator = 
+           
+               ModelSpacePointsGenerator modelSpacePointsGenerator = 
                 new ModelSpacePointsGenerator(BoundPoints.Point1, BoundPoints.Point2);
             List<XYZ> spacePoints = modelSpacePointsGenerator.Generate();
 
