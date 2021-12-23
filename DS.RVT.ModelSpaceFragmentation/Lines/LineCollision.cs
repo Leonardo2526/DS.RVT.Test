@@ -18,6 +18,8 @@ namespace DS.RVT.ModelSpaceFragmentation
         Dictionary<Element, List<Solid>> modelSolids = new Dictionary<Element, List<Solid>>();
         Dictionary<Element, List<Solid>> linksSolids = new Dictionary<Element, List<Solid>>();
 
+        public List<CurveExtents> CurvesExtIntersection { get; set; } = new List<CurveExtents>();
+
         public IList<Element> GetElementsCurveCollisions(Curve curve, Dictionary<Element, List<Solid>> elementsSolids)
         {
             IList<Element> intersectedElements = new List<Element>();
@@ -30,9 +32,13 @@ namespace DS.RVT.ModelSpaceFragmentation
 
                     //Get intersections with curve
                     SolidCurveIntersection intersection = solid.IntersectWithCurve(curve, intersectOptions);
-
                     if (intersection.SegmentCount != 0)
+                    {
+                        TransactionCreator transactionCreator = new TransactionCreator(Doc);
+                        CurvesExtIntersection.Add(intersection.GetCurveSegmentExtents(0));
+
                         intersectedElements.Add(keyValue.Key);
+                    }
                 }
             }
 
@@ -74,8 +80,18 @@ namespace DS.RVT.ModelSpaceFragmentation
             {
                 collector = new FilteredElementCollector(Doc);
 
-                ElementClassFilter elementClassFilter = new ElementClassFilter(typeof(Pipe));
-                collector.WherePasses(elementClassFilter);
+                //ElementClassFilter elementClassFilter1 = new ElementClassFilter(typeof(Pipe));
+                //ElementClassFilter elementClassFilter2= new ElementClassFilter(typeof(Wall));
+                ICollection<BuiltInCategory> elementCategoryFilters = new List<BuiltInCategory>
+                {
+                    BuiltInCategory.OST_PipeCurves,
+                    BuiltInCategory.OST_Walls
+                };
+
+
+                ElementMulticategoryFilter elementMulticategoryFilter = new ElementMulticategoryFilter(elementCategoryFilters);
+
+                collector.WherePasses(elementMulticategoryFilter);
                 modelSolids = GetModelSolids(collector, boundingBoxIntersectsFilter);
             }
             catch

@@ -39,7 +39,14 @@ namespace DS.RVT.ModelSpaceFragmentation
             pointsSeparator.Separate(Doc);
 
             VisiblePointsCreator visiblePointsCreator = new VisiblePointsCreator();
+            visiblePointsCreator.Create(Doc, pointsSeparator.PassablePoints);
+
+            visiblePointsCreator = new VisiblePointsCreator();
             visiblePointsCreator.Create(Doc, pointsSeparator.UnpassablePoints);
+
+            GraphicOverwriter graphicOverwriter = new GraphicOverwriter();
+            Color color = new Color(255, 0, 0);
+            graphicOverwriter.OverwriteElementsGraphic(visiblePointsCreator.Instances, color);
         }
 
 

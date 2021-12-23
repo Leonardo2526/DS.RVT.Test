@@ -6,14 +6,13 @@ namespace DS.RVT.ModelSpaceFragmentation
 {
     class PointInSolidChecker
     {
-        public static bool IsPointInSolid(Document Doc, XYZ point)
+        public List<int> Count { get; set; } = new List<int>();
+
+        public bool IsPointInSolid(Document Doc, XYZ point)
         {
             LineCreator lineCreator = new LineCreator();
             Ray ray = new Ray(point);
             Line rayLine = lineCreator.Create(ray);
-
-            //TransactionCreator transaction = new TransactionCreator(Doc);
-            //transaction.Create(new ModelCurveTransaction(ray.StartPoint, ray.EndPoint));
 
             List<Line> lines = new List<Line>()
             {
@@ -24,15 +23,15 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             lineCollision.GetAllModelSolids(lines);
 
-            foreach (Line gLine in lines)
-            {
-                IList<Element> CheckCollisions = lineCollision.GetAllLinesCollisions(gLine);
+            IList<Element> CheckCollisions = lineCollision.GetAllLinesCollisions(rayLine);
 
-                if (CheckCollisions.Count != 0)
-                    return false;
+            foreach (CurveExtents curveExt in lineCollision.CurvesExtIntersection)
+            {                
+                if (curveExt.StartParameter == 0 || curveExt.EndParameter == 0)
+                    return true;
             }
-
-            return true;
+          
+            return false;
         }
 
     }

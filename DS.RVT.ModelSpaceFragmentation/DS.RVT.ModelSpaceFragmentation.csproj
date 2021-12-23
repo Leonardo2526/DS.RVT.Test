@@ -71,7 +71,9 @@
     <Compile Include="Points\PointsSeparator.cs" />
     <Compile Include="Points\PointUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Points\VisiblePointsCreator.cs" />
+    <Compile Include="Solids\ModelSolid.cs" />
+    <Compile Include="Visualization\GraphicOverwriter.cs" />
+    <Compile Include="Visualization\VisiblePointsCreator.cs" />
     <Compile Include="Transactions\ITransaction.cs" />
     <Compile Include="Transactions\ModelCurveTransaction.cs" />
     <Compile Include="Transactions\Transactions.cs" />

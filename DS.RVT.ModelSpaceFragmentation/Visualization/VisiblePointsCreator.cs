@@ -10,6 +10,8 @@ namespace DS.RVT.ModelSpaceFragmentation
 {
     class VisiblePointsCreator
     {
+        public List<FamilyInstance> Instances { get; set; } = new List<FamilyInstance>();
+
         public void Create(Document Doc, List<XYZ> points)
         {
         
@@ -35,7 +37,6 @@ namespace DS.RVT.ModelSpaceFragmentation
             collector.OfClass(typeof(FamilySymbol)).OfCategory(BuiltInCategory.OST_GenericModel);
 
             FamilySymbol gotSymbol = collector.FirstElement() as FamilySymbol;
-            FamilyInstance instance = null;
 
             using (Transaction transNew = new Transaction(Doc, "AddPoint"))
             {
@@ -43,8 +44,8 @@ namespace DS.RVT.ModelSpaceFragmentation
                 {
                     transNew.Start();
 
-                    instance = Doc.Create.NewFamilyInstance(location, gotSymbol,
-                 level, StructuralType.NonStructural);
+                    Instances.Add(Doc.Create.NewFamilyInstance(location, gotSymbol,
+                 level, StructuralType.NonStructural));
                 }
 
                 catch (Exception e)

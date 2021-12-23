@@ -19,7 +19,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Lines
 
         public Line Create()
         {
-            EndPoint = new XYZ(StartPoint.X + 10, StartPoint.Y + 5, StartPoint.Z + 3);
+            EndPoint = new XYZ(StartPoint.X, StartPoint.Y + 10, StartPoint.Z );
+            //EndPoint = new XYZ(StartPoint.X + 10, StartPoint.Y + 5, StartPoint.Z + 3);
             Line line = Line.CreateBound(StartPoint, EndPoint);
 
             return line;
