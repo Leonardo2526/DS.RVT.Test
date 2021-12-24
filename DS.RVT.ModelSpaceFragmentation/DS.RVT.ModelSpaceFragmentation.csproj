@@ -2,6 +2,9 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{9208DCBD-3F74-477C-87E3-9598C551E538}</ProjectGuid>
@@ -58,6 +61,7 @@
     <Compile Include="Lines\ILine.cs" />
     <Compile Include="Lines\LineCollision.cs" />
     <Compile Include="Lines\Ray.cs" />
+    <Compile Include="Path\PathFinder.cs" />
     <Compile Include="Points\PointsInfo.cs" />
     <Compile Include="ElementUtils.cs" />
     <Compile Include="ExternalCommand.cs" />

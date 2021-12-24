@@ -25,6 +25,8 @@ namespace DS.RVT.ModelSpaceFragmentation
             Doc = doc;
         }
 
+        public List<XYZ> PassablePoints { get; set; }
+        public List<XYZ> UnpassablePoints { get; set; }
 
         public void FragmentSpace()
         {
@@ -44,6 +46,9 @@ namespace DS.RVT.ModelSpaceFragmentation
             PointsSeparator pointsSeparator = new PointsSeparator(spacePoints);
             pointsSeparator.Separate(Doc);
 
+            UnpassablePoints = pointsSeparator.UnpassablePoints;
+            PassablePoints = pointsSeparator.PassablePoints;
+
             Visualize(pointsSeparator);
         }
 
@@ -51,10 +56,11 @@ namespace DS.RVT.ModelSpaceFragmentation
         {
             PointsVisualizator visualizator = new PointsVisualizator(Doc);
             IPointsVisualization passablePointsVisualization = new SpacePointsVisualization(pointsSeparator.PassablePoints);
+            passablePointsVisualization.OverwriteGraphic = false;
             visualizator.Show(passablePointsVisualization);
 
             IPointsVisualization unpassablePointsVisualization = new SpacePointsVisualization(pointsSeparator.UnpassablePoints);
-            unpassablePointsVisualization.
+            unpassablePointsVisualization.OverwriteGraphic = true;
             visualizator.Show(new SpacePointsVisualization(pointsSeparator.UnpassablePoints));
         }
     }

@@ -23,17 +23,15 @@ namespace DS.RVT.ModelSpaceFragmentation
             Doc = doc;
         }
 
-        void GetPath(PointsSeparator pointsSeparator)
+
+        public void Implement()
         {
-            InputData data = new InputData(PointsInfo.MinBoundPoint, PointsInfo.MaxBoundPoint, 
-                pointsSeparator.UnpassablePoints);
-            data.ConvertToPlane();
+            SpaceFragmentator spaceFragmentator = new SpaceFragmentator(App, Uiapp, Uidoc, Doc);
+            spaceFragmentator.FragmentSpace();
 
-            WaveAlgorythm waveAlgorythm = new WaveAlgorythm(data);
-            List<XYZ> PathCoords = waveAlgorythm.FindPath();
+            PathFinder pathFinder = new PathFinder();
+            pathFinder.GetPath(PointsInfo.MinBoundPoint, PointsInfo.MaxBoundPoint, spaceFragmentator.UnpassablePoints);
         }
-
-
 
     }
 }
