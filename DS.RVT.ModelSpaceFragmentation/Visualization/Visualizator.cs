@@ -8,16 +8,16 @@ using DS.RVT.ModelSpaceFragmentation.Path;
 
 namespace DS.RVT.ModelSpaceFragmentation.Visualization
 {
-    class PointsVisualizator
+    class Visualizator
     {
         readonly Document Doc;
 
-        public PointsVisualizator(Document doc)
+        public Visualizator(Document doc)
         {
             Doc = doc;
         }
 
-        public void Show(IPointsVisualization pointsVisualization)
+        public void ShowPoints(IPointsVisualization pointsVisualization)
         {
             pointsVisualization.Show(Doc);
         }

@@ -54,15 +54,15 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         private void Visualize(PointsSeparator pointsSeparator)
         {
-            PointsVisualizator visualizator = new PointsVisualizator(Doc);
+            Visualizator visualizator = new Visualizator(Doc);
 
-            visualizator.Show(new SpacePointsVisualization(pointsSeparator.PassablePoints));
+            visualizator.ShowPoints(new SpacePointsVisualization(pointsSeparator.PassablePoints));
 
             IPointsVisualization unpassablePointsVisualization = new SpacePointsVisualization(pointsSeparator.UnpassablePoints)
             {
                 OverwriteGraphic = true
             };
-            visualizator.Show(unpassablePointsVisualization);
+            visualizator.ShowPoints(unpassablePointsVisualization);
         }
     }
 }

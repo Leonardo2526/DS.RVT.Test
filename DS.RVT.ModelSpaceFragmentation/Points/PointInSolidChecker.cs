@@ -11,7 +11,7 @@ namespace DS.RVT.ModelSpaceFragmentation
         public bool IsPointInSolid(Document Doc, XYZ point)
         {
             LineCreator lineCreator = new LineCreator();
-            Ray ray = new Ray(point);
+            RayCreator ray = new RayCreator(point);
             Line rayLine = lineCreator.Create(ray);         
 
             LineCollision lineCollision = new LineCollision(Doc);

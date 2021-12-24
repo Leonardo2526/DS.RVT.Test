@@ -7,12 +7,12 @@ using Autodesk.Revit.DB;
 
 namespace DS.RVT.ModelSpaceFragmentation.Lines
 {
-    class Ray : ILine
+    class RayCreator : ILine
     {      
         public XYZ StartPoint { get; set; }
         public XYZ EndPoint { get; set; }
 
-        public Ray(XYZ point)
+        public RayCreator(XYZ point)
         {
             StartPoint = point;
         }

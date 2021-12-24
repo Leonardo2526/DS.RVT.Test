@@ -1,9 +1,10 @@
 ﻿using Autodesk.Revit.DB;
+using System.Collections.Generic;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
-    interface ILine
+    interface ICurves
     {
-        Line Create();
+        void Create();
     }
 }

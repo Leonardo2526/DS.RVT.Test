@@ -57,10 +57,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BoundingBoxFilter.cs" />
-    <Compile Include="Lines\ILineCreator.cs" />
     <Compile Include="Lines\ILine.cs" />
+    <Compile Include="Lines\ICurves.cs" />
     <Compile Include="Lines\LineCollision.cs" />
-    <Compile Include="Lines\Ray.cs" />
+    <Compile Include="Lines\CurvesByPointsCreator.cs" />
+    <Compile Include="Lines\RayCreator.cs" />
     <Compile Include="Path\PathFinder.cs" />
     <Compile Include="Points\PointsInfo.cs" />
     <Compile Include="ElementUtils.cs" />
@@ -86,7 +87,7 @@
     <Compile Include="Transactions\Transactions.cs" />
     <Compile Include="Path\InputData.cs" />
     <Compile Include="Path\WaveAlgorythm.cs" />
-    <Compile Include="Visualization\PointsVisualizator.cs" />
+    <Compile Include="Visualization\Visualizator.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

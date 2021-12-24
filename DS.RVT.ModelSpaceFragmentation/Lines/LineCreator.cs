@@ -7,11 +7,16 @@ using Autodesk.Revit.DB;
 
 namespace DS.RVT.ModelSpaceFragmentation.Lines
 {
-    class LineCreator : ILineCreator
+    class LineCreator
     {
         public Line Create(ILine line)
         {
             return line.Create();
+        }
+
+        public void CreateCurves(ICurves curves)
+        {
+            curves.Create();
         }
     }
 }
