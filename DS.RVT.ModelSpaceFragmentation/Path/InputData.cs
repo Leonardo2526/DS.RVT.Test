@@ -7,6 +7,10 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 {
     class InputData
     {
+
+        public static List<RefPoint> RefPointsList { get; set; }
+
+
         /// <summary>
         /// Path coordinates by x
         /// </summary>
@@ -20,22 +24,38 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         /// Start point coordinate X in reference coordinates
         /// </summary>
         public static int Ax { get; set; }
+
         /// <summary>
         /// Start point coordinate Y in reference coordinates
         /// </summary>
         public static int Ay { get; set; }
+
+        /// <summary>
+        /// Start point coordinate Z in reference coordinates
+        /// </summary>
+        public static int Az { get; set; }
+
         /// <summary>
         /// End point coordinate X in reference coordinates
         /// </summary>
         public static int Bx { get; set; }
+
         /// <summary>
         /// End point coordinate X in reference coordinates
         /// </summary>
         public static int By { get; set; }
-        public static int W { get; set; }
-        public static int H { get; set; }
+
+        /// <summary>
+        /// End point coordinate Z in reference coordinates
+        /// </summary>
+        public static int Bz { get; set; }
+
+        public static int Xcount { get; set; }
+        public static int Ycount { get; set; }
+        public static int Zcount { get; set; }
         public static List<int> UnpassLocX { get; set; }
         public static List<int> UnpassLocY { get; set; } 
+        public static List<int> UnpassLocZ { get; set; }
         public static double PointsStepF { get; set; }
         public static XYZ ZonePoint1 { get; set; }
         public static XYZ ZonePoint2 { get; set; }
@@ -43,7 +63,6 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         public XYZ StartPoint { get; set; }
         public XYZ EndPoint { get; set; }
         public List<XYZ> UnpassablePoints { get; set; } = new List<XYZ>();   
-        public static double Z { get; set; }
 
         public InputData (XYZ startPoint, XYZ endPoint, List<XYZ> unpassablePoints)
         {
@@ -57,35 +76,29 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             ZonePoint1 = PointsInfo.MinBoundPoint;
             ZonePoint2 = PointsInfo.MaxBoundPoint;
             PointsStepF = ModelSpacePointsGenerator.PointsStepF;
-            Z = PointsInfo.CenterElemPoint.Z;
+
             UnpassLocX = new List<int>();
             UnpassLocY = new List<int>();
+            UnpassLocZ = new List<int>();
 
             double axdbl = (StartPoint.X - ZonePoint1.X) / PointsStepF;
             double aydbl = (StartPoint.Y - ZonePoint1.Y) / PointsStepF;
+            double azdbl = (StartPoint.Z - ZonePoint1.Z) / PointsStepF;
             double bxdbl = (EndPoint.X - ZonePoint1.X) / PointsStepF;
             double bydbl = (EndPoint.Y - ZonePoint1.Y) / PointsStepF;
+            double bzdbl = (EndPoint.Z - ZonePoint1.Z) / PointsStepF;
 
             Ax = (int)Math.Round(axdbl);
             Ay = (int)Math.Round(aydbl);
+            Az = (int)Math.Round(azdbl);
+
             Bx = (int)Math.Round(bxdbl) - 1;
             By = (int)Math.Round(bydbl) - 1;
+            Bz = (int)Math.Round(bzdbl) - 1;
 
-            W = ModelSpacePointsGenerator.Xcount;
-            H = ModelSpacePointsGenerator.Ycount;
-
-            //if (Bx >= W)
-            //    Bx = W - 1;
-            //else if (Ax < 0)
-            //    Ax = 0;
-            //else if (Ay >= H)
-            //    Ay = H;
-            //else if (By >= H)
-            //    By = H;
-
-            //координаты ячеек пути
-            Px = new int[W * H];
-            Py = new int[W * H];
+            Xcount = ModelSpacePointsGenerator.Xcount;
+            Ycount = ModelSpacePointsGenerator.Ycount;
+            Zcount = ModelSpacePointsGenerator.Zcount;
 
             if (UnpassablePoints.Count != 0)
             {
@@ -93,8 +106,10 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                 {
                     int X = (int)Math.Round((point.X - ZonePoint1.X) / PointsStepF);
                     int Y = (int)Math.Round((point.Y - ZonePoint1.Y) / PointsStepF);
+                    int Z = (int)Math.Round((point.Y - ZonePoint1.Y) / PointsStepF);
                     UnpassLocX.Add(X);
                     UnpassLocY.Add(Y);
+                    UnpassLocZ.Add(Z);
                 }
             }
 

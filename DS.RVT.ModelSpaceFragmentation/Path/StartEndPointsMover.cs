@@ -43,7 +43,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
         public bool MovePointRight(ref int px, int py)
         {
-            for (int x = px; x <= InputData.W; x++)
+            for (int x = px; x <= InputData.Xcount; x++)
             {
                 bool emptyCell = startEndPointsCheker.IsCellEmpty(x, py);
                 if (emptyCell == true)

@@ -65,6 +65,7 @@
     <Compile Include="Path\PathFinder.cs" />
     <Compile Include="Path\PathPointsCheck\PointsCheker.cs" />
     <Compile Include="Path\PathPointsCheck\StartEndPointsCheker.cs" />
+    <Compile Include="Path\RefPoint.cs" />
     <Compile Include="Path\StartEndPointsMover.cs" />
     <Compile Include="Points\PointsInfo.cs" />
     <Compile Include="ElementUtils.cs" />
