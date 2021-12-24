@@ -58,6 +58,7 @@
     <Compile Include="Lines\ILine.cs" />
     <Compile Include="Lines\LineCollision.cs" />
     <Compile Include="Lines\Ray.cs" />
+    <Compile Include="Points\BoundInfo.cs" />
     <Compile Include="Points\BoundPoints.cs" />
     <Compile Include="ElementUtils.cs" />
     <Compile Include="ExternalCommand.cs" />
@@ -77,6 +78,9 @@
     <Compile Include="Transactions\ITransaction.cs" />
     <Compile Include="Transactions\ModelCurveTransaction.cs" />
     <Compile Include="Transactions\Transactions.cs" />
+    <Compile Include="WaveAlgorythm\InputDataConverator.cs" />
+    <Compile Include="WaveAlgorythm\InputData.cs" />
+    <Compile Include="WaveAlgorythm\WaveAlgorythm.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

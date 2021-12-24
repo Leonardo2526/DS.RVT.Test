@@ -11,12 +11,12 @@ namespace DS.RVT.ModelSpaceFragmentation
     {
         XYZ Point1;
         XYZ Point2;
-        readonly int PointsStep = 200;
-        double pointsStepF;
+        public static int PointsStep = 200;
+        public static double PointsStepF;
 
-        int Xcount;
-        int Ycount;
-        int Zcount;
+        public static int Xcount { get; set; }
+        public static int Ycount { get; set; }
+        public static int Zcount { get; set; }
 
         public ModelSpacePointsGenerator (XYZ p1, XYZ p2)
         {
@@ -34,17 +34,17 @@ namespace DS.RVT.ModelSpaceFragmentation
             int z;
             for (z = 0; z < Zcount; z++)
             {
-                double zStep = z * pointsStepF;
+                double zStep = z * PointsStepF;
 
                 int y;
                 for (y = 0; y < Ycount; y++)
                 {
-                    double yStep = y * pointsStepF;
+                    double yStep = y * PointsStepF;
 
                     int x;
                     for (x = 0; x < Xcount; x++)
                     {
-                        double xStep = x * pointsStepF;
+                        double xStep = x * PointsStepF;
                         XYZ point = new XYZ(Point1.X + xStep, Point1.Y + yStep, Point1.Z + zStep);
                         spacePoints.Add(point);
                     }
@@ -57,16 +57,16 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         void GetStepInFeets()
         {
-            pointsStepF = UnitUtils.Convert((double)PointsStep / 1000,
+            PointsStepF = UnitUtils.Convert((double)PointsStep / 1000,
                                  DisplayUnitType.DUT_METERS,
                                  DisplayUnitType.DUT_DECIMAL_FEET);
         }
 
         void GetCount()
         {
-            Xcount = (int)Math.Round((Point2.X - Point1.X) / pointsStepF);
-            Ycount = (int)Math.Round((Point2.Y - Point1.Y) / pointsStepF);
-            Zcount = (int)Math.Round((Point2.Z - Point1.Z) / pointsStepF);
+            Xcount = (int)Math.Round((Point2.X - Point1.X) / PointsStepF);
+            Ycount = (int)Math.Round((Point2.Y - Point1.Y) / PointsStepF);
+            Zcount = (int)Math.Round((Point2.Z - Point1.Z) / PointsStepF);
         }
 
 

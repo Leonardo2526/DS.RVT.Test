@@ -18,7 +18,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             Document doc = uiapp.ActiveUIDocument.Document;
 
             Main main = new Main(app, uiapp, uidoc, doc);
-            main.StartProcess();
+            main.FragmentSpace();
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }

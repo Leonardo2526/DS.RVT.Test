@@ -9,9 +9,14 @@ namespace DS.RVT.ModelSpaceFragmentation
 {
     class BoundPoints
     {
-
-        public static XYZ Point1 { get; set; }
-        public static XYZ Point2 { get; set; }
+        /// <summary>
+        /// Minimum point of zone for fragmentation
+        /// </summary>
+        public static XYZ MinPoint { get; set; }
+        /// <summary>
+        /// Maximium point of zone for fragmentation
+        /// </summary>
+        public static XYZ MaxPoint { get; set; }
         public static double OffsetFromOriginByZ { get; } = 1000;
         public static double OffsetFromOriginByXY { get; } = 1000;
 
@@ -42,8 +47,8 @@ namespace DS.RVT.ModelSpaceFragmentation
             boundPoints.Add(minPoint);
             boundPoints.Add(maxPoint);
 
-            Point1 = minPoint;
-            Point2 = maxPoint;
+            MinPoint = minPoint;
+            MaxPoint = maxPoint;
 
             return boundPoints;
         }

@@ -23,7 +23,7 @@ namespace DS.RVT.ModelSpaceFragmentation
         }
 
 
-        public void StartProcess()
+        public void FragmentSpace()
         {
             ElementUtils elementUtils = new ElementUtils();
             Element element = elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
@@ -31,8 +31,8 @@ namespace DS.RVT.ModelSpaceFragmentation
             BoundPoints boundPoints = new BoundPoints();
             boundPoints.GetPoints(element);
            
-               ModelSpacePointsGenerator modelSpacePointsGenerator = 
-                new ModelSpacePointsGenerator(BoundPoints.Point1, BoundPoints.Point2);
+                ModelSpacePointsGenerator modelSpacePointsGenerator = 
+                new ModelSpacePointsGenerator(BoundPoints.MinPoint, BoundPoints.MaxPoint);
             List<XYZ> spacePoints = modelSpacePointsGenerator.Generate();
 
             ModelSolid modelSolid = new ModelSolid(Doc);
@@ -43,6 +43,8 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             Visualize(pointsSeparator);
         }
+
+        
 
         void Visualize(PointsSeparator pointsSeparator)
         {
