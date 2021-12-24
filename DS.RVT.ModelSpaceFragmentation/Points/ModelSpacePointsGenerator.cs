@@ -55,6 +55,31 @@ namespace DS.RVT.ModelSpaceFragmentation
             return spacePoints;
         }
 
+        public List<XYZ> GenerateOnPlane()
+        {
+            GetStepInFeets();
+            GetCount();
+
+            List<XYZ> spacePoints = new List<XYZ>();
+         
+                int y;
+                for (y = 0; y < Ycount; y++)
+                {
+                    double yStep = y * PointsStepF;
+
+                    int x;
+                    for (x = 0; x < Xcount; x++)
+                    {
+                        double xStep = x * PointsStepF;
+                        XYZ point = new XYZ(Point1.X + xStep, Point1.Y + yStep, 0);
+                        spacePoints.Add(point);
+                    }
+                }
+
+
+            return spacePoints;
+        }
+
         void GetStepInFeets()
         {
             PointsStepF = UnitUtils.Convert((double)PointsStep / 1000,

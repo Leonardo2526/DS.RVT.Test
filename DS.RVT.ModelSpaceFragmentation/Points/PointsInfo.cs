@@ -20,6 +20,8 @@ namespace DS.RVT.ModelSpaceFragmentation
         public static double OffsetFromOriginByZ { get; } = 1000;
         public static double OffsetFromOriginByXY { get; } = 1000;
 
+        public static XYZ CenterElemPoint { get; set; }
+
         double OffsetFromOriginByZInFeets;
         double OffsetFromOriginByXYInFeets;
 
@@ -35,6 +37,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             elementUtils.GetPoints(element, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint);
             elementPoints.Add(startPoint);
             elementPoints.Add(endPoint);
+            CenterElemPoint = centerPoint;
 
             PointUtils pointUtils = new PointUtils();
             pointUtils.FindMinMaxPointByPoints(elementPoints, out XYZ minPoint, out XYZ maxPoint);

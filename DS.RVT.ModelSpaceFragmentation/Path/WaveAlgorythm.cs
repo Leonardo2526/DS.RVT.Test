@@ -60,12 +60,12 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             int k;
             int a;
 
-            //Check start cell
-            if (IsStartCellEmpty() == false)
-                return false;
-            //Check end cell
-            if (IsEndCellEmpty() == false)
-                return false;
+            ////Check start cell
+            //if (IsStartCellEmpty() == false)
+            //    return false;
+            ////Check end cell
+            //if (IsEndCellEmpty() == false)
+            //    return false;
 
             // стартовая ячейка
             grid[Ax, Ay] = 1;
@@ -81,11 +81,6 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                     */
                     for (x = 0; x < InputData.W; x++)
                     {
-                        /*
-                        color = new Color(255, 255, 0);
-                        cell.OverwriteCell(x, y, color);
-                        Uidoc.RefreshActiveView();
-                        */
                         if (grid[x, y] == 0)
                             continue;
                         /*
@@ -94,7 +89,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                             continue;
                         */
 
-                        for (k = 0; k < 4; ++k)                    // проходим по всем непомеченным соседям
+                        // проходим по всем непомеченным соседям
+                        for (k = 0; k < 4; ++k)                    
                         {
                             int iy = y + Dy[k], ix = x + Dx[k];
                             if (iy >= 0 && iy < InputData.H && ix >= 0 && ix < InputData.W)
@@ -108,13 +104,6 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                                         // распространяем волну
                                         d = grid[x, y] + 1;
                                         grid[ix, iy] = d;
-
-                                        /*
-                                        Byte c = (Byte)(d * 2);
-                                        color = new Color(0, c, 0);
-                                        cell.OverwriteCell(ix, iy, color);
-                                        Uidoc.RefreshActiveView();
-                                        */
                                         a++;
                                     }
                                 }

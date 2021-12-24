@@ -38,7 +38,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             ModelSpacePointsGenerator modelSpacePointsGenerator =
             new ModelSpacePointsGenerator(PointsInfo.MinBoundPoint, PointsInfo.MaxBoundPoint);
-            List<XYZ> spacePoints = modelSpacePointsGenerator.Generate();
+            List<XYZ> spacePoints = modelSpacePointsGenerator.GenerateOnPlane();
 
             ModelSolid modelSolid = new ModelSolid(Doc);
             Dictionary<Element, List<Solid>> solids = modelSolid.GetSolids();
