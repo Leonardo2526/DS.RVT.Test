@@ -10,7 +10,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Visualization
 {
     class SpacePointsVisualization : IPointsVisualization
     {
-        public bool OverwriteGraphic { get; set; } = false;
+        public bool OverwriteGraphic { get; set; }
 
         readonly List<XYZ> Points;
         public SpacePointsVisualization(List<XYZ> points)

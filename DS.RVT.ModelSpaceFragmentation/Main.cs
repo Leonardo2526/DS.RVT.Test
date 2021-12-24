@@ -30,7 +30,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             spaceFragmentator.FragmentSpace();
 
             PathFinder pathFinder = new PathFinder();
-            pathFinder.GetPath(PointsInfo.MinBoundPoint, PointsInfo.MaxBoundPoint, spaceFragmentator.UnpassablePoints);
+            //pathFinder.GetPath(PointsInfo.MinBoundPoint, PointsInfo.MaxBoundPoint, spaceFragmentator.UnpassablePoints);
         }
 
     }
