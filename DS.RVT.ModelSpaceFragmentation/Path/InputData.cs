@@ -106,7 +106,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                 {
                     int X = (int)Math.Round((point.X - ZonePoint1.X) / PointsStepF);
                     int Y = (int)Math.Round((point.Y - ZonePoint1.Y) / PointsStepF);
-                    int Z = (int)Math.Round((point.Y - ZonePoint1.Y) / PointsStepF);
+                    int Z = (int)Math.Round((point.Z - ZonePoint1.Z) / PointsStepF);
                     UnpassLocX.Add(X);
                     UnpassLocY.Add(Y);
                     UnpassLocZ.Add(Z);

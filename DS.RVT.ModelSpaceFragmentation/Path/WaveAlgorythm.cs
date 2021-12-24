@@ -55,7 +55,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
         public List<XYZ> FindPath()
         {
-            if (!LaunchAlgorythm())
+            if (!Launch3DAlgorythm())
             {
                 TaskDialog.Show("Revit", "Путь не найден!");
                 return new List<XYZ>();
@@ -105,7 +105,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                                 if (grid[ix, iy] == 0)
                                 {
 
-                                    bool emptyCell = startEndPointsCheker.IsCellEmpty(ix, iy);
+                                    bool emptyCell = startEndPointsCheker.IsCellEmpty(ix, iy, 0);
                                     if (emptyCell == true)
                                     {
                                         // распространяем волну
@@ -204,25 +204,24 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                         for (x = 0; x < InputData.Xcount; x++)
                         {
                             RefPoint currentPoint = new RefPoint(x, y, z);
-                            int currentValue = grid[currentPoint];
-                            if (currentValue == 0)
+                            if (!grid.ContainsKey(currentPoint))
                                 continue;
 
+                            int currentValue = grid[currentPoint];
                             // проходим по всем непомеченным соседям
                             for (k = 0; k < 6; ++k)
                             {
-                                int iy = y + Dy[k], ix = x + Dx[k], iz = x + Dz[k]; 
+                                int iy = y + Dy[k], ix = x + Dx[k], iz = x + Dz[k];
                                 if (iz >= 0 && iz < InputData.Zcount &&
                                     iy >= 0 && iy < InputData.Ycount &&
                                     ix >= 0 && ix < InputData.Xcount)
                                 {
                                     RefPoint nextPoint = new RefPoint(ix, iy, iz);
-                                    int nextValue = grid[nextPoint];
 
-                                    if (nextValue == 0)
+                                    if (!grid.ContainsKey(nextPoint))
                                     {
 
-                                        bool emptyCell = startEndPointsCheker.IsCellEmpty(ix, iy);
+                                        bool emptyCell = startEndPointsCheker.IsCellEmpty(ix, iy, iz);
                                         if (emptyCell == true)
                                         {
                                             // распространяем волну
@@ -236,10 +235,10 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                         }
                     }
                 }
-            } while (grid[endRefPoint] != 0 && a != 0);
+            } while (grid.ContainsKey(endRefPoint)  && a != 0);
 
 
-            if (grid[endRefPoint] == 0)
+            if (!grid.ContainsKey(endRefPoint))
                 return false;
 
             grid[startRefPoint] = 0;
@@ -278,7 +277,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                 }
             }
 
-            if (x == Ax && y == Ay)
+            if (x == Ax && y == Ay && z == Az)
             {
                 return true;
             }
