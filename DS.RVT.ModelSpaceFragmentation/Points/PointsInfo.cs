@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
-    class BoundPoints
+    class PointsInfo
     {
         /// <summary>
         /// Minimum point of zone for fragmentation
         /// </summary>
-        public static XYZ MinPoint { get; set; }
+        public static XYZ MinBoundPoint { get; set; }
         /// <summary>
         /// Maximium point of zone for fragmentation
         /// </summary>
-        public static XYZ MaxPoint { get; set; }
+        public static XYZ MaxBoundPoint { get; set; }
         public static double OffsetFromOriginByZ { get; } = 1000;
         public static double OffsetFromOriginByXY { get; } = 1000;
 
@@ -47,8 +47,8 @@ namespace DS.RVT.ModelSpaceFragmentation
             boundPoints.Add(minPoint);
             boundPoints.Add(maxPoint);
 
-            MinPoint = minPoint;
-            MaxPoint = maxPoint;
+            MinBoundPoint = minPoint;
+            MaxBoundPoint = maxPoint;
 
             return boundPoints;
         }

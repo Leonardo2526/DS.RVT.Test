@@ -3,7 +3,7 @@ using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
 
-namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
+namespace DS.RVT.ModelSpaceFragmentation.Path
 {
     class WaveAlgorythm
     {
@@ -11,14 +11,10 @@ namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
 
         int len;
 
-        //list of path coordinates
-        int[] px;
-        int[] py;
-
-        int ax, ay, bx, by, W, H;
-
-        List<int> icLocX = new List<int>();
-        List<int> icLocY = new List<int>();
+        int Ax = InputData.Ax;
+        int Bx = InputData.Bx;
+        int Ay = InputData.Ay;
+        int By = InputData.By;
 
         readonly InputData data;
         public WaveAlgorythm(InputData inputData)
@@ -27,15 +23,14 @@ namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
         }
 
         // смещения, соответствующие соседям ячейки слева, сверху, справа, снизу
-        List<int> dx = new List<int>
+        readonly List<int> Dx = new List<int>
             {
                 -1,
                 0,
                 1,
                 0
             };
-
-        List<int> dy = new List<int>
+        readonly List<int> Dy = new List<int>
             {
                 0,
                 1,
@@ -43,23 +38,21 @@ namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
                 -1
             };
 
-        public void FindPath()
+        public List<XYZ> FindPath()
         {
-            ConvertToPlane();
-            bool pathFind = lee();
-
-            if (pathFind != true)
+            if (!lee())
             {
                 TaskDialog.Show("Revit", "Путь не найден!");
+                return new List<XYZ>();
             }
-        }
 
-      
+            return PathCoords;
+        }      
 
         bool lee()
         {
             //рабочее поле
-            int[,] grid = new int[W, H];
+            int[,] grid = new int[InputData.W, InputData.H];
 
             int x = 0;
             int y = 0;
@@ -75,18 +68,18 @@ namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
                 return false;
 
             // стартовая ячейка
-            grid[ax, ay] = 1;
+            grid[Ax, Ay] = 1;
 
             do
             {
                 a = 0;
-                for (y = 0; y < H; y++)
+                for (y = 0; y < InputData.H; y++)
                 {
                     /*
-                    if (y == by - 1)
+                    if (y == By - 1)
                         break;
                     */
-                    for (x = 0; x < W; x++)
+                    for (x = 0; x < InputData.W; x++)
                     {
                         /*
                         color = new Color(255, 255, 0);
@@ -103,8 +96,8 @@ namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
 
                         for (k = 0; k < 4; ++k)                    // проходим по всем непомеченным соседям
                         {
-                            int iy = y + dy[k], ix = x + dx[k];
-                            if (iy >= 0 && iy < H && ix >= 0 && ix < W)
+                            int iy = y + Dy[k], ix = x + Dx[k];
+                            if (iy >= 0 && iy < InputData.H && ix >= 0 && ix < InputData.W)
                             {
                                 if (grid[ix, iy] == 0)
                                 {
@@ -117,7 +110,7 @@ namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
                                         grid[ix, iy] = d;
 
                                         /*
-                                        byte c = (byte)(d * 2);
+                                        Byte c = (Byte)(d * 2);
                                         color = new Color(0, c, 0);
                                         cell.OverwriteCell(ix, iy, color);
                                         Uidoc.RefreshActiveView();
@@ -129,38 +122,38 @@ namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
                         }
                     }
                 }
-            } while (grid[bx, by] == 0 && a != 0);
+            } while (grid[Bx, By] == 0 && a != 0);
 
 
-            if (grid[bx, by] == 0)
+            if (grid[Bx, By] == 0)
                 return false;
 
             //Uidoc.RefreshActiveView();
-            grid[ax, ay] = 0;
+            grid[Ax, Ay] = 0;
             //TaskDialog.Show("Revit", d.ToString());
 
             // восстановление пути
-            len = grid[bx, by];            // длина кратчайшего пути из (ax, ay) в (bx, by)
-            x = bx;
-            y = by;
+            len = grid[Bx, By];            // длина кратчайшего пути из (ax, ay) в (bx, By)
+            x = Bx;
+            y = By;
             d = len;
 
 
             while (d >= 0)
             {
-                px[d] = x;
-                py[d] = y;                   // записываем ячейку (x, y) в путь
+                InputData.Px[d] = x;
+                InputData.Py[d] = y;                   // записываем ячейку (x, y) в путь
                 WritePathPoints(x, y);
 
                 d--;
                 for (k = 0; k < 4; ++k)
                 {
-                    int iy = y + dy[k], ix = x + dx[k];
-                    if (iy >= 0 && iy < H && ix >= 0 && ix < W &&
+                    int iy = y + Dy[k], ix = x + Dx[k];
+                    if (iy >= 0 && iy < InputData.H && ix >= 0 && ix < InputData.W &&
                          grid[ix, iy] == d)
                     {
-                        x += dx[k];
-                        y += dy[k];           // переходим в ячейку, которая на 1 ближе к старту
+                        x += Dx[k];
+                        y += Dy[k];           // переходим в ячейку, которая на 1 ближе к старту
                         //color = new Color(0, 0, 255);
                         //cell.OverwriteCell(x, y, color);
                         //Uidoc.RefreshActiveView();
@@ -169,10 +162,7 @@ namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
                 }
             }
 
-            ShowPath();
-            //overWriteStartEndCell();
-
-            if (x == ax && y == ay)
+            if (x == Ax && y == Ay)
             {
                 return true;
             }
@@ -185,9 +175,9 @@ namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
             if (data.UnpassablePoints.Count == 0)
                 return true;
 
-            for (int i = 0; i < icLocX.Count; i++)
+            for (int i = 0; i < InputData.UnpassLocX.Count; i++)
             {
-                if (icLocX[i] == ix && icLocY[i] == iy)
+                if (InputData.UnpassLocX[i] == ix && InputData.UnpassLocY[i] == iy)
                     return false;
             }
 
@@ -201,7 +191,7 @@ namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
 
         bool IsStartCellEmpty()
         {
-            bool emptyCell = IsCellEmpty(ax, ay);
+            bool emptyCell = IsCellEmpty(Ax, Ay);
 
             if (emptyCell == true)
                 return true;
@@ -209,20 +199,20 @@ namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
             //Try to move start point
             bool pointMoved = false;
 
-            if (Math.Abs(ax - bx) >= Math.Abs(ay - by))
+            if (Math.Abs(Ax - Bx) >= Math.Abs(Ay - By))
             {
                 //Get side for move
-                if (ay <= by)
-                    pointMoved = MovePointUp(ax, ref ay);
-                else if (ay > by)
-                    pointMoved = MovePointDown(ax, ref ay);
+                if (Ay <= By)
+                    pointMoved = MovePointUp(Ax, ref Ay);
+                else if (Ay > By)
+                    pointMoved = MovePointDown(Ax, ref Ay);
             }
             else
             {
-                if (ax < bx)
-                    pointMoved = MovePointRight(ref ax, ay);
-                else if (ax > bx)
-                    pointMoved = MovePointLeft(ref ax, ay);
+                if (Ax < Bx)
+                    pointMoved = MovePointRight(ref Ax, Ay);
+                else if (Ax > Bx)
+                    pointMoved = MovePointLeft(ref Ax, Ay);
             }
 
             //Check if moved
@@ -240,7 +230,7 @@ namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
 
         bool IsEndCellEmpty()
         {
-            bool emptyCell = IsCellEmpty(bx, by);
+            bool emptyCell = IsCellEmpty(Bx, By);
 
             if (emptyCell == true)
                 return true;
@@ -248,20 +238,20 @@ namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
             //Try to move end point
             bool pointMoved = MoveEndPointToStart();
 
-            if (Math.Abs(ax - bx) >= Math.Abs(ay - by))
+            if (Math.Abs(Ax - Bx) >= Math.Abs(Ay - By))
             {
                 //Get side for move
-                if (by <= ay)
-                    pointMoved = MovePointUp(bx, ref by);
-                else if (by > ay)
-                    pointMoved = MovePointDown(bx, ref by);
+                if (By <= Ay)
+                    pointMoved = MovePointUp(Bx, ref By);
+                else if (By > Ay)
+                    pointMoved = MovePointDown(Bx, ref By);
             }
             else
             {
-                if (bx <= ax)
-                    pointMoved = MovePointRight(ref bx, by);
-                else if (bx > ax)
-                    pointMoved = MovePointLeft(ref bx, by);
+                if (Bx <= Ax)
+                    pointMoved = MovePointRight(ref Bx, By);
+                else if (Bx > Ax)
+                    pointMoved = MovePointLeft(ref Bx, By);
             }           
 
             //Check if moved
@@ -279,7 +269,7 @@ namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
 
         bool MovePointUp(int px, ref int py)
         {
-            for (int y = py; y <= H; y++)
+            for (int y = py; y <= InputData.H; y++)
             {
                 bool emptyCell = IsCellEmpty(px, y);
                 if (emptyCell == true)
@@ -307,7 +297,7 @@ namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
 
         bool MovePointRight(ref int px, int py)
         {
-            for (int x = px; x <= W; x++)
+            for (int x = px; x <= InputData.W; x++)
             {
                 bool emptyCell = IsCellEmpty(x, py);
                 if (emptyCell == true)
@@ -335,11 +325,11 @@ namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
 
         bool MoveEndPointToStart()
         {
-            bool emptyCell = IsCellEmpty(bx, ay);
+            bool emptyCell = IsCellEmpty(Bx, Ay);
 
             if (emptyCell == true)
             {
-                by = ay;
+                By = Ay;
                 return true;
             }
 
@@ -348,27 +338,9 @@ namespace DS.RVT.ModelSpaceFragmentation.WaveAlgorythm
 
         void WritePathPoints(int x, int y)
         {
-            XYZ point = new XYZ(data.ZonePoint1.X + x * InputData.PointsStepF, data.ZonePoint1.Y + y * InputData.PointsStepF, 0);
+            XYZ point = new XYZ(InputData.ZonePoint1.X + x * InputData.PointsStepF, InputData.ZonePoint1.Y + y * InputData.PointsStepF, 0);
             PathCoords.Add(point);
         }
-
-        void ShowPath()
-        {
-            Color color;
-            int i = 0;
-
-            foreach (XYZ point in pathCoords)
-            {
-                if (i == 0)
-                    color = new Color(0, 255, 0);
-                else if (i == pathCoords.Count - 1)
-                    color = new Color(0, 255, 255);
-                else
-                    color = new Color(0, 0, 255);
-
-                cell.OverwriteCell(color, 0, 0, point);
-                i++;
-            }
-        }
+        
     }
 }

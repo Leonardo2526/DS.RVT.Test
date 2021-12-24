@@ -4,6 +4,7 @@ using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using System.Collections.Generic;
 using System.Linq;
+using DS.RVT.ModelSpaceFragmentation.Path;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -22,42 +23,17 @@ namespace DS.RVT.ModelSpaceFragmentation
             Doc = doc;
         }
 
-
-        public void FragmentSpace()
+        void GetPath(PointsSeparator pointsSeparator)
         {
-            ElementUtils elementUtils = new ElementUtils();
-            Element element = elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
+            InputData data = new InputData(PointsInfo.MinBoundPoint, PointsInfo.MaxBoundPoint, 
+                pointsSeparator.UnpassablePoints);
+            data.ConvertToPlane();
 
-            BoundPoints boundPoints = new BoundPoints();
-            boundPoints.GetPoints(element);
-           
-                ModelSpacePointsGenerator modelSpacePointsGenerator = 
-                new ModelSpacePointsGenerator(BoundPoints.MinPoint, BoundPoints.MaxPoint);
-            List<XYZ> spacePoints = modelSpacePointsGenerator.Generate();
-
-            ModelSolid modelSolid = new ModelSolid(Doc);
-            Dictionary<Element, List<Solid>> solids = modelSolid.GetSolids();
-
-            PointsSeparator pointsSeparator = new PointsSeparator(spacePoints);
-            pointsSeparator.Separate(Doc);
-
-            Visualize(pointsSeparator);
+            WaveAlgorythm waveAlgorythm = new WaveAlgorythm(data);
+            List<XYZ> PathCoords = waveAlgorythm.FindPath();
         }
 
-        
 
-        void Visualize(PointsSeparator pointsSeparator)
-        {
-            VisiblePointsCreator visiblePointsCreator = new VisiblePointsCreator();
-            visiblePointsCreator.Create(Doc, pointsSeparator.PassablePoints);
-
-            visiblePointsCreator = new VisiblePointsCreator();
-            visiblePointsCreator.Create(Doc, pointsSeparator.UnpassablePoints);
-
-            GraphicOverwriter graphicOverwriter = new GraphicOverwriter();
-            Color color = new Color(255, 0, 0);
-            graphicOverwriter.OverwriteElementsGraphic(visiblePointsCreator.Instances, color);
-        }
 
     }
 }
