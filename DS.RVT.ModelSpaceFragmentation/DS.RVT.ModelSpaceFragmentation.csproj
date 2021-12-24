@@ -63,6 +63,9 @@
     <Compile Include="Lines\CurvesByPointsCreator.cs" />
     <Compile Include="Lines\RayCreator.cs" />
     <Compile Include="Path\PathFinder.cs" />
+    <Compile Include="Path\PathPointsCheck\PointsCheker.cs" />
+    <Compile Include="Path\PathPointsCheck\StartEndPointsCheker.cs" />
+    <Compile Include="Path\StartEndPointsMover.cs" />
     <Compile Include="Points\PointsInfo.cs" />
     <Compile Include="ElementUtils.cs" />
     <Compile Include="ExternalCommand.cs" />
