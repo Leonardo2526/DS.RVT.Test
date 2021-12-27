@@ -24,21 +24,19 @@ namespace DS.RVT.ModelSpaceFragmentation
             Doc = doc;
         }
 
+        public static Element CurrentElement { get; set; }
 
         public void Implement()
         {
             ElementUtils elementUtils = new ElementUtils();
-            Element element = elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
+            CurrentElement = elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
 
             SpaceFragmentator spaceFragmentator = new SpaceFragmentator(App, Uiapp, Uidoc, Doc);
-            spaceFragmentator.FragmentSpace(element);
+            spaceFragmentator.FragmentSpace(CurrentElement);
 
-            PathFinder pathFinder = new PathFinder();
-          
-            XYZ newstartPoint = new XYZ(PointsInfo.StartElemPoint.X-2, PointsInfo.StartElemPoint.Y, PointsInfo.StartElemPoint.Z);
-            XYZ newendPoint = new XYZ(PointsInfo.EndElemPoint.X + 2, PointsInfo.EndElemPoint.Y, PointsInfo.EndElemPoint.Z);
+            PathFinder pathFinder = new PathFinder();          
 
-            List<XYZ> pathCoords = pathFinder.GetPath(newstartPoint, newendPoint, spaceFragmentator.UnpassablePoints);
+            List<XYZ> pathCoords = pathFinder.GetPath(PointsInfo.StartElemPoint, PointsInfo.EndElemPoint, spaceFragmentator.UnpassablePoints);
 
             LineCreator lineCreator = new LineCreator();
             lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));

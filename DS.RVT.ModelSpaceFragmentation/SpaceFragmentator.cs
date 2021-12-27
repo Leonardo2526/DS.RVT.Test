@@ -42,7 +42,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             Dictionary<Element, List<Solid>> solids = modelSolid.GetSolids();
 
             PointsSeparator pointsSeparator = new PointsSeparator(spacePoints);
-            pointsSeparator.Separate(Doc);
+            pointsSeparator.Separate();
 
             UnpassablePoints = pointsSeparator.UnpassablePoints;
             PassablePoints = pointsSeparator.PassablePoints;

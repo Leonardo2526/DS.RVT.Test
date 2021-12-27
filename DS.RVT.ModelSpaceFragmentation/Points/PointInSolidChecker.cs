@@ -8,13 +8,13 @@ namespace DS.RVT.ModelSpaceFragmentation
     {
         public List<int> Count { get; set; } = new List<int>();
 
-        public bool IsPointInSolid(Document Doc, XYZ point)
+        public bool IsPointInSolid(XYZ point)
         {
             LineCreator lineCreator = new LineCreator();
             RayCreator ray = new RayCreator(point);
             Line rayLine = lineCreator.Create(ray);         
 
-            LineCollision lineCollision = new LineCollision(Doc);
+            LineCollision lineCollision = new LineCollision();
 
             IList<Element> CheckCollisions = lineCollision.GetElementsCurveCollisions(rayLine, ModelSolid.SolidsInModel);
 

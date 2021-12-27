@@ -78,13 +78,6 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             int k;
             int a;
 
-            ////Check start cell
-            //if (IsStartCellEmpty() == false)
-            //    return false;
-            ////Check end cell
-            //if (IsEndCellEmpty() == false)
-            //    return false;
-
             // стартовая ячейка
             RefPoint startRefPoint = new RefPoint(Ax, Ay, Az);
             RefPoint endRefPoint = new RefPoint(Bx, By, Bz);

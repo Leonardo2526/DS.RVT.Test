@@ -19,12 +19,12 @@ namespace DS.RVT.ModelSpaceFragmentation
         public List<XYZ> PassablePoints { get; set; } = new List<XYZ>();
         public List<XYZ> UnpassablePoints { get; set; } = new List<XYZ>();
 
-        public void Separate(Document Doc)
+        public void Separate()
         {
             foreach (XYZ point in SpacePoints)
             {
                 PointInSolidChecker pointInSolidChecker = new PointInSolidChecker();
-                if (pointInSolidChecker.IsPointInSolid(Doc, point))
+                if (pointInSolidChecker.IsPointInSolid(point))
                 {
                     UnpassablePoints.Add(point);
                 }

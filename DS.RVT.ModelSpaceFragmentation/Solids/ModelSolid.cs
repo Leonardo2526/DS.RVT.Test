@@ -35,8 +35,18 @@ namespace DS.RVT.ModelSpaceFragmentation
             Outline myOutLn = new Outline(PointsInfo.MinBoundPoint, PointsInfo.MaxBoundPoint);
             BoundingBoxIntersectsFilter boundingBoxFilter = new BoundingBoxIntersectsFilter(myOutLn);
 
+
+            ICollection<ElementId> elementIds = new List<ElementId>
+            {
+                Main.CurrentElement.Id
+
+            };
+            ExclusionFilter exclusionFilter = new ExclusionFilter(elementIds);
+
+
             collector.WhereElementIsNotElementType();
             collector.WherePasses(boundingBoxFilter);
+            collector.WherePasses(exclusionFilter);
             IList<Element> intersectedElementsBox = collector.WherePasses(elementMulticategoryFilter).ToElements();
 
             Dictionary<Element, List<Solid>> solidsDictionary = new Dictionary<Element, List<Solid>>();
