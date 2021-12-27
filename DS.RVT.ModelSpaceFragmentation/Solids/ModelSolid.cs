@@ -25,14 +25,20 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             ICollection<BuiltInCategory> elementCategoryFilters = new List<BuiltInCategory>
                 {
+                    BuiltInCategory.OST_DuctCurves,
                     BuiltInCategory.OST_PipeCurves,
                     BuiltInCategory.OST_Walls
                 };
 
             ElementMulticategoryFilter elementMulticategoryFilter = new ElementMulticategoryFilter(elementCategoryFilters);
 
+            Outline myOutLn = new Outline(PointsInfo.MinBoundPoint, PointsInfo.MaxBoundPoint);
+            BoundingBoxIntersectsFilter boundingBoxFilter = new BoundingBoxIntersectsFilter(myOutLn);
+
             collector.WhereElementIsNotElementType();
+            collector.WherePasses(boundingBoxFilter);
             IList<Element> intersectedElementsBox = collector.WherePasses(elementMulticategoryFilter).ToElements();
+
             Dictionary<Element, List<Solid>> solidsDictionary = new Dictionary<Element, List<Solid>>();
 
             List<Solid> solids = new List<Solid>();

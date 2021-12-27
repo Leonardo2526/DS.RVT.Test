@@ -47,7 +47,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             UnpassablePoints = pointsSeparator.UnpassablePoints;
             PassablePoints = pointsSeparator.PassablePoints;
 
-            Visualize(pointsSeparator);
+            //Visualize(pointsSeparator);
         }
 
         private void Visualize(PointsSeparator pointsSeparator)

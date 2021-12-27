@@ -34,10 +34,9 @@ namespace DS.RVT.ModelSpaceFragmentation
             spaceFragmentator.FragmentSpace(element);
 
             PathFinder pathFinder = new PathFinder();
-            elementUtils.GetPoints(element, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint);
-
-            XYZ newstartPoint = new XYZ(startPoint.X-2, startPoint.Y, startPoint.Z);
-            XYZ newendPoint = new XYZ(endPoint.X + 2, endPoint.Y, endPoint.Z);
+          
+            XYZ newstartPoint = new XYZ(PointsInfo.StartElemPoint.X-2, PointsInfo.StartElemPoint.Y, PointsInfo.StartElemPoint.Z);
+            XYZ newendPoint = new XYZ(PointsInfo.EndElemPoint.X + 2, PointsInfo.EndElemPoint.Y, PointsInfo.EndElemPoint.Z);
 
             List<XYZ> pathCoords = pathFinder.GetPath(newstartPoint, newendPoint, spaceFragmentator.UnpassablePoints);
 
