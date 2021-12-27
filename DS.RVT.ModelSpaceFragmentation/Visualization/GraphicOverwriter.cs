@@ -5,6 +5,7 @@ using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DS.RVT.ModelSpaceFragmentation.Path;
 
 namespace DS.RVT.ModelSpaceFragmentation.Visualization
 { 
@@ -20,9 +21,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Visualization
         }
 
 
-        void OverwriteGraphic(FamilyInstance instance, Color color)
+        void OverwriteGraphic(Element element, Color color)
         {
-            Element element = instance as Element;
             Document doc = element.Document;
             UIDocument uIDocument = new UIDocument(doc);
 
@@ -44,8 +44,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Visualization
                 try
                 {
                     transNew.Start();
-                    doc.ActiveView.SetElementOverrides(instance.Id, pGraphics);
-                    view3D.SetElementOverrides(instance.Id, pGraphics);
+                    doc.ActiveView.SetElementOverrides(element.Id, pGraphics);
+                    view3D.SetElementOverrides(element.Id, pGraphics);
                 }
 
                 catch (Exception e)
@@ -75,6 +75,27 @@ namespace DS.RVT.ModelSpaceFragmentation.Visualization
                 }
             }
             return null;
+        }
+
+        public void OverwriteCell(Color color, int x = 0, int y = 0, int z = 0, XYZ point = null)
+        {
+            if (point == null)
+                point = new XYZ(InputData.ZonePoint1.X + x * InputData.PointsStepF, 
+                    InputData.ZonePoint1.Y + y * InputData.PointsStepF, InputData.ZonePoint1.Z + z * InputData.PointsStepF);
+
+            ElementUtils elementUtils = new ElementUtils();
+            foreach (ElementId elementId in VisiblePointsCreator.InstancesIds)
+            {
+                Element familyInstance = Main.Doc.GetElement(elementId);
+                LocationPoint locPoint = familyInstance.Location as LocationPoint;
+                XYZ centerPoint = locPoint.Point;
+
+                //if (point.DistanceTo(centerPoint)<0.01)
+                    OverwriteGraphic(familyInstance, color);
+            }
+
+
+
         }
     }
 }

@@ -10,12 +10,16 @@ namespace DS.RVT.ModelSpaceFragmentation.Visualization
 {
     class VisiblePointsCreator
     {
-        public List<FamilyInstance> Instances { get; set; } = new List<FamilyInstance>();
+        public List<FamilyInstance> Instances { get; set; }
+
+        public static ICollection<ElementId> InstancesIds { get; set; }
 
         public void Create(Document Doc, List<XYZ> points)
         {
-        
-            
+
+            Instances = new List<FamilyInstance>();
+            InstancesIds = new List<ElementId>();
+
             int j;
             foreach (XYZ point in points)
             {
@@ -44,8 +48,11 @@ namespace DS.RVT.ModelSpaceFragmentation.Visualization
                 {
                     transNew.Start();
 
-                    Instances.Add(Doc.Create.NewFamilyInstance(location, gotSymbol,
-                 level, StructuralType.NonStructural));
+                    FamilyInstance familyInstance = Doc.Create.NewFamilyInstance(location, gotSymbol,
+                 level, StructuralType.NonStructural);
+
+                        Instances.Add(familyInstance);
+                    InstancesIds.Add(familyInstance.Id);
                 }
 
                 catch (Exception e)

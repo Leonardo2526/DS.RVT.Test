@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System.Collections.Generic;
+using DS.RVT.ModelSpaceFragmentation.Visualization;
 
 namespace DS.RVT.ModelSpaceFragmentation.Path
 {
@@ -55,7 +56,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
         public List<XYZ> FindPath()
         {
-            if (!Launch3DAlgorythm())
+            if (!LaunchAlgorythm())
             {
                 TaskDialog.Show("Revit", "Путь не найден!");
                 return new List<XYZ>();
@@ -65,106 +66,6 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         }
 
         bool LaunchAlgorythm()
-        {
-            PointsCheker startEndPointsCheker = new PointsCheker(data);
-
-            //рабочее поле
-            int[,] grid = new int[InputData.Xcount, InputData.Ycount];
-
-            int x = 0;
-            int y = 0;
-            int d = 0;
-            int k;
-            int a;
-
-            ////Check start cell
-            //if (IsStartCellEmpty() == false)
-            //    return false;
-            ////Check end cell
-            //if (IsEndCellEmpty() == false)
-            //    return false;
-
-            // стартовая ячейка
-            grid[Ax, Ay] = 1;
-
-            do
-            {
-                a = 0;
-                for (y = 0; y < InputData.Ycount; y++)
-                {
-                    for (x = 0; x < InputData.Xcount; x++)
-                    {
-                        if (grid[x, y] == 0)
-                            continue;
-                        // проходим по всем непомеченным соседям
-                        for (k = 0; k < 4; ++k)
-                        {
-                            int iy = y + Dy[k], ix = x + Dx[k];
-                            if (iy >= 0 && iy < InputData.Ycount && ix >= 0 && ix < InputData.Xcount)
-                            {
-                                if (grid[ix, iy] == 0)
-                                {
-
-                                    bool emptyCell = startEndPointsCheker.IsCellEmpty(ix, iy, 0);
-                                    if (emptyCell == true)
-                                    {
-                                        // распространяем волну
-                                        d = grid[x, y] + 1;
-                                        grid[ix, iy] = d;
-                                        a++;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } while (grid[Bx, By] == 0 && a != 0);
-
-
-            if (grid[Bx, By] == 0)
-                return false;
-
-            grid[Ax, Ay] = 0;
-
-            // восстановление пути
-            // длина кратчайшего пути из (ax, ay) в (bx, By)
-            len = grid[Bx, By];
-            x = Bx;
-            y = By;
-            d = len;
-
-            while (d >= 0)
-            {
-                InputData.Px[d] = x;
-                InputData.Py[d] = y;
-
-                // записываем ячейку (x, y) в путь
-                WritePathPoints(x, y, 0);
-
-                d--;
-                for (k = 0; k < 4; ++k)
-                {
-                    int iy = y + Dy[k], ix = x + Dx[k];
-                    if (iy >= 0 && iy < InputData.Ycount && ix >= 0 && ix < InputData.Xcount &&
-                         grid[ix, iy] == d)
-                    {
-                        // переходим в ячейку, которая на 1 ближе к старту
-                        x += Dx[k];
-                        y += Dy[k];
-                        break;
-                    }
-                }
-            }
-
-            if (x == Ax && y == Ay)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        bool Launch3DAlgorythm()
         {
             PointsCheker startEndPointsCheker = new PointsCheker(data);
 
@@ -197,21 +98,24 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             do
             {
                 a = 0;
-                for (z = 0; z < InputData.Zcount; z++)
+                for (z = Az; z < InputData.Zcount; z++)
                 {
-                    for (y = 0; y < InputData.Ycount; y++)
+                    for (y = Ay; y < InputData.Ycount; y++)
                     {
-                        for (x = 0; x < InputData.Xcount; x++)
+                        for (x = Ax; x < InputData.Xcount; x++)
                         {
                             RefPoint currentPoint = new RefPoint(x, y, z);
+
+                            int currentValue;
                             if (!grid.ContainsKey(currentPoint))
                                 continue;
+                            else
+                                currentValue = grid[currentPoint];
 
-                            int currentValue = grid[currentPoint];
                             // проходим по всем непомеченным соседям
                             for (k = 0; k < 6; ++k)
                             {
-                                int iy = y + Dy[k], ix = x + Dx[k], iz = x + Dz[k];
+                                int iy = y + Dy[k], ix = x + Dx[k], iz = z + Dz[k];
                                 if (iz >= 0 && iz < InputData.Zcount &&
                                     iy >= 0 && iy < InputData.Ycount &&
                                     ix >= 0 && ix < InputData.Xcount)
@@ -228,6 +132,11 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                                             d = currentValue + 1;
                                             grid.Add(nextPoint, d);
                                             a++;
+                                            
+                                       //byte c = (byte)(d * 2);
+                                       //Color color = new Color(0, c, 0);
+                                       //     GraphicOverwriter graphicOverwriter = new GraphicOverwriter();
+                                       //     graphicOverwriter.OverwriteCell(color, ix, iy, iz);
                                         }
                                     }
                                 }
@@ -235,7 +144,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                         }
                     }
                 }
-            } while (grid.ContainsKey(endRefPoint)  && a != 0);
+            } while (!grid.ContainsKey(endRefPoint)  && a != 0);
 
 
             if (!grid.ContainsKey(endRefPoint))
@@ -259,9 +168,12 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                 d--;
                 for (k = 0; k < 6; ++k)
                 {
-                    int iy = y + Dy[k], ix = x + Dx[k], iz = x + Dz[k];
+                    int iy = y + Dy[k], ix = x + Dx[k], iz = z + Dz[k];
 
                     RefPoint nextPoint = new RefPoint(ix, iy, iz);
+
+                    if (!grid.ContainsKey(nextPoint))
+                        continue;
 
                     if (iz >= 0 && iz < InputData.Zcount &&
                         iy >= 0 && iy < InputData.Ycount &&
