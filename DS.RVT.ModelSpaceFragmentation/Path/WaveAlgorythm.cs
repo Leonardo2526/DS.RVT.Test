@@ -1,7 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using System;
 using System.Collections.Generic;
-using DS.RVT.ModelSpaceFragmentation.Visualization;
 
 namespace DS.RVT.ModelSpaceFragmentation.Path
 {
@@ -40,7 +40,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         {
             PointsCheker startEndPointsCheker = new PointsCheker(data);
 
-            List<RefPoint> RefPointsList = new List<RefPoint>();          
+            List<RefPoint> RefPointsList = new List<RefPoint>();
 
             int x = 0;
             int y = 0;
@@ -58,6 +58,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             {
                 { startRefPoint, 1 }
             };
+
+            List<StepPoint> priorityList = SetPriorities();
 
             do
             {
@@ -77,14 +79,11 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                                 currentValue = grid[currentPoint];
 
                             // проходим по всем непомеченным соседям
-                            StepsPriority stepsPriority = new StepsPriority();
-                            stepsPriority.GetPointsList(1);
-
                             for (k = 0; k < 6; ++k)
                             {
-                                int ix = x + stepsPriority.PriorityList[k].X,
-                                    iy = y + stepsPriority.PriorityList[k].Y,                                    
-                                    iz = z + stepsPriority.PriorityList[k].Z;
+                                int ix = x + priorityList[k].X,
+                                    iy = y + priorityList[k].Y,
+                                    iz = z + priorityList[k].Z;
 
                                 if (ix >= 0 && ix < InputData.Xcount &&
                                     iy >= 0 && iy < InputData.Ycount &&
@@ -109,7 +108,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                         }
                     }
                 }
-            } while (!grid.ContainsKey(endRefPoint)  && a != 0);
+            } while (!grid.ContainsKey(endRefPoint) && a != 0);
 
 
             if (!grid.ContainsKey(endRefPoint))
@@ -132,14 +131,13 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
                 d--;
 
-                StepsPriority stepsPriority = new StepsPriority();
-                stepsPriority.GetPointsList(1);
+                List<StepPoint> BackWaypriorityList = SetBackWayPriorities(x, y, z);
 
                 for (k = 0; k < 6; ++k)
                 {
-                    int ix = x + stepsPriority.PriorityList[k].X,
-                        iy = y + stepsPriority.PriorityList[k].Y,                         
-                        iz = z + stepsPriority.PriorityList[k].Z;
+                    int ix = x + BackWaypriorityList[k].X,
+                        iy = y + BackWaypriorityList[k].Y,
+                        iz = z + BackWaypriorityList[k].Z;
 
                     RefPoint nextPoint = new RefPoint(ix, iy, iz);
 
@@ -152,9 +150,9 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                          grid[nextPoint] == d)
                     {
                         // переходим в ячейку, которая на 1 ближе к старту
-                        x += stepsPriority.PriorityList[k].X;
-                        y += stepsPriority.PriorityList[k].Y;
-                        z += stepsPriority.PriorityList[k].Z;
+                        x += BackWaypriorityList[k].X;
+                        y += BackWaypriorityList[k].Y;
+                        z += BackWaypriorityList[k].Z;
                         break;
                     }
                 }
@@ -170,10 +168,54 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
         void WritePathPoints(int x, int y, int z)
         {
-            XYZ point = new XYZ(InputData.ZonePoint1.X + x * InputData.PointsStepF, 
-                InputData.ZonePoint1.Y + y * InputData.PointsStepF, 
+            XYZ point = new XYZ(InputData.ZonePoint1.X + x * InputData.PointsStepF,
+                InputData.ZonePoint1.Y + y * InputData.PointsStepF,
                 InputData.ZonePoint1.Z + z * InputData.PointsStepF);
             PathCoords.Add(point);
+        }
+
+        List<StepPoint> SetPriorities()
+        {
+            StepsPriority stepsPriority = new StepsPriority();
+
+            if (Math.Abs(PointsInfo.StartElemPoint.X - PointsInfo.EndElemPoint.X) < 0.01)
+                return stepsPriority.GetPointsList(2);
+            else
+                return stepsPriority.GetPointsList(1);
+        }
+
+        List<StepPoint> SetBackWayPriorities(int x, int y, int z)
+        {
+            StepsPriority stepsPriority = new StepsPriority();
+
+            if (Math.Abs(PointsInfo.StartElemPoint.Z - PointsInfo.EndElemPoint.Z) < 0.01 &&
+            Math.Abs(PointsInfo.StartElemPoint.Y - PointsInfo.EndElemPoint.Y) < 0.01)
+            {
+                if (y != By)
+                    return stepsPriority.GetPointsList(2);
+                else if (z != Bz)
+                    return stepsPriority.GetPointsList(3);
+                else
+                    return stepsPriority.GetPointsList(1);
+            }
+            else if (Math.Abs(PointsInfo.StartElemPoint.Z - PointsInfo.EndElemPoint.Z) < 0.01 &&
+            Math.Abs(PointsInfo.StartElemPoint.X - PointsInfo.EndElemPoint.X) < 0.01)
+            {
+                if (x != Bx)
+                    return stepsPriority.GetPointsList(1);
+                else if (z != Bz)
+                    return stepsPriority.GetPointsList(3);
+                else
+                    return stepsPriority.GetPointsList(2);
+            }
+
+            if (Math.Abs(PointsInfo.StartElemPoint.X - PointsInfo.EndElemPoint.X) < 0.01 && x != Bx)
+                return stepsPriority.GetPointsList(1);
+
+            if (Math.Abs(PointsInfo.StartElemPoint.Y - PointsInfo.EndElemPoint.Y) < 0.01 && y != By)
+                return stepsPriority.GetPointsList(2);
+
+            return stepsPriority.GetPointsList(1);
         }
 
     }
