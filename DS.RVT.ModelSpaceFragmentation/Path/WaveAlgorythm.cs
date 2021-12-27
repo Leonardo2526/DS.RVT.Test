@@ -25,35 +25,6 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             data = inputData;
         }
 
-        // смещения, соответствующие соседям ячейки слева, сверху, справа, снизу
-        readonly List<int> Dx = new List<int>
-            {
-                -1,
-                0,
-                1,
-                0,
-                0,
-                0
-            };
-        readonly List<int> Dy = new List<int>
-            {
-                0,
-                1,
-                0,
-                -1,
-                0,
-                0
-            };
-        readonly List<int> Dz = new List<int>
-            {
-                0,
-                0,
-                0,
-                0,
-                1,
-                -1
-            };
-
         public List<XYZ> FindPath()
         {
             if (!LaunchAlgorythm())
@@ -106,12 +77,18 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                                 currentValue = grid[currentPoint];
 
                             // проходим по всем непомеченным соседям
+                            StepsPriority stepsPriority = new StepsPriority();
+                            stepsPriority.GetPointsList(1);
+
                             for (k = 0; k < 6; ++k)
                             {
-                                int iy = y + Dy[k], ix = x + Dx[k], iz = z + Dz[k];
-                                if (iz >= 0 && iz < InputData.Zcount &&
+                                int ix = x + stepsPriority.PriorityList[k].X,
+                                    iy = y + stepsPriority.PriorityList[k].Y,                                    
+                                    iz = z + stepsPriority.PriorityList[k].Z;
+
+                                if (ix >= 0 && ix < InputData.Xcount &&
                                     iy >= 0 && iy < InputData.Ycount &&
-                                    ix >= 0 && ix < InputData.Xcount)
+                                    iz >= 0 && iz < InputData.Zcount)
                                 {
                                     RefPoint nextPoint = new RefPoint(ix, iy, iz);
 
@@ -154,24 +131,30 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                 WritePathPoints(x, y, z);
 
                 d--;
+
+                StepsPriority stepsPriority = new StepsPriority();
+                stepsPriority.GetPointsList(1);
+
                 for (k = 0; k < 6; ++k)
                 {
-                    int iy = y + Dy[k], ix = x + Dx[k], iz = z + Dz[k];
+                    int ix = x + stepsPriority.PriorityList[k].X,
+                        iy = y + stepsPriority.PriorityList[k].Y,                         
+                        iz = z + stepsPriority.PriorityList[k].Z;
 
                     RefPoint nextPoint = new RefPoint(ix, iy, iz);
 
                     if (!grid.ContainsKey(nextPoint))
                         continue;
 
-                    if (iz >= 0 && iz < InputData.Zcount &&
+                    if (ix >= 0 && ix < InputData.Xcount &&
                         iy >= 0 && iy < InputData.Ycount &&
-                        ix >= 0 && ix < InputData.Xcount &&
+                        iz >= 0 && iz < InputData.Zcount &&
                          grid[nextPoint] == d)
                     {
                         // переходим в ячейку, которая на 1 ближе к старту
-                        x += Dx[k];
-                        y += Dy[k];
-                        z += Dz[k];
+                        x += stepsPriority.PriorityList[k].X;
+                        y += stepsPriority.PriorityList[k].Y;
+                        z += stepsPriority.PriorityList[k].Z;
                         break;
                     }
                 }
