@@ -27,11 +27,19 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         public void Implement()
         {
+            ElementUtils elementUtils = new ElementUtils();
+            Element element = elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
+
             SpaceFragmentator spaceFragmentator = new SpaceFragmentator(App, Uiapp, Uidoc, Doc);
-            spaceFragmentator.FragmentSpace();
+            spaceFragmentator.FragmentSpace(element);
 
             PathFinder pathFinder = new PathFinder();
-            List<XYZ> pathCoords = pathFinder.GetPath(PointsInfo.MinBoundPoint, PointsInfo.MaxBoundPoint, spaceFragmentator.UnpassablePoints);
+            elementUtils.GetPoints(element, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint);
+
+            XYZ newstartPoint = new XYZ(startPoint.X-2, startPoint.Y, startPoint.Z);
+            XYZ newendPoint = new XYZ(endPoint.X + 2, endPoint.Y, endPoint.Z);
+
+            List<XYZ> pathCoords = pathFinder.GetPath(newstartPoint, newendPoint, spaceFragmentator.UnpassablePoints);
 
             LineCreator lineCreator = new LineCreator();
             lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));

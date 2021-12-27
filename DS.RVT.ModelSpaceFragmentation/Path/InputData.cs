@@ -92,9 +92,9 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             Ay = (int)Math.Round(aydbl);
             Az = (int)Math.Round(azdbl);
 
-            Bx = (int)Math.Round(bxdbl) - 1;
-            By = (int)Math.Round(bydbl) - 1;
-            Bz = (int)Math.Round(bzdbl) - 1;
+            Bx = (int)Math.Round(bxdbl);
+            By = (int)Math.Round(bydbl);
+            Bz = (int)Math.Round(bzdbl);
 
             Xcount = ModelSpacePointsGenerator.Xcount;
             Ycount = ModelSpacePointsGenerator.Ycount;

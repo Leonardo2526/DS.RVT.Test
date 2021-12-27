@@ -28,11 +28,9 @@ namespace DS.RVT.ModelSpaceFragmentation
         public List<XYZ> PassablePoints { get; set; }
         public List<XYZ> UnpassablePoints { get; set; }
 
-        public void FragmentSpace()
+        public void FragmentSpace(Element element)
         {
-            ElementUtils elementUtils = new ElementUtils();
-            Element element = elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
-
+            
             PointsInfo pointsInfo = new PointsInfo();
             pointsInfo.GetPoints(element);
 

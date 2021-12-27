@@ -98,11 +98,11 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             do
             {
                 a = 0;
-                for (z = Az; z < InputData.Zcount; z++)
+                for (z = 0; z < InputData.Zcount; z++)
                 {
-                    for (y = Ay; y < InputData.Ycount; y++)
+                    for (y = 0; y < InputData.Ycount; y++)
                     {
-                        for (x = Ax; x < InputData.Xcount; x++)
+                        for (x = 0; x < InputData.Xcount; x++)
                         {
                             RefPoint currentPoint = new RefPoint(x, y, z);
 
@@ -132,11 +132,6 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                                             d = currentValue + 1;
                                             grid.Add(nextPoint, d);
                                             a++;
-                                            
-                                       //byte c = (byte)(d * 2);
-                                       //Color color = new Color(0, c, 0);
-                                       //     GraphicOverwriter graphicOverwriter = new GraphicOverwriter();
-                                       //     graphicOverwriter.OverwriteCell(color, ix, iy, iz);
                                         }
                                     }
                                 }
