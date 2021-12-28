@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DS.RVT.ModelSpaceFragmentation.Path;
 using DS.RVT.ModelSpaceFragmentation.Lines;
+using DS.RVT.ModelSpaceFragmentation.Visualization;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -31,15 +32,22 @@ namespace DS.RVT.ModelSpaceFragmentation
             ElementUtils elementUtils = new ElementUtils();
             CurrentElement = elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
 
-            SpaceFragmentator spaceFragmentator = new SpaceFragmentator(App, Uiapp, Uidoc, Doc);
-            spaceFragmentator.FragmentSpace(CurrentElement);
+            ElementSize elementSize = new ElementSize();
+            elementSize.GetElementSizes(CurrentElement as MEPCurve);
 
-            PathFinder pathFinder = new PathFinder();          
+            PointClearanceZone pointClearanceZone = new PointClearanceZone();
+            pointClearanceZone.Create(new ZoneByCircle());
+            pointClearanceZone.ShowPoints(PointsInfo.StartElemPoint);
 
-            List<XYZ> pathCoords = pathFinder.GetPath(PointsInfo.StartElemPoint, PointsInfo.EndElemPoint, spaceFragmentator.UnpassablePoints);
+        //SpaceFragmentator spaceFragmentator = new SpaceFragmentator(App, Uiapp, Uidoc, Doc);
+        //    spaceFragmentator.FragmentSpace(CurrentElement);
 
-            LineCreator lineCreator = new LineCreator();
-            lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
+            //    PathFinder pathFinder = new PathFinder();          
+
+            //    List<XYZ> pathCoords = pathFinder.GetPath(PointsInfo.StartElemPoint, PointsInfo.EndElemPoint, spaceFragmentator.UnpassablePoints);
+
+            //    LineCreator lineCreator = new LineCreator();
+            //    lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
         }
 
     }

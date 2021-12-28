@@ -57,17 +57,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BoundingBoxFilter.cs" />
+    <Compile Include="ElementSize.cs" />
     <Compile Include="Lines\ILine.cs" />
     <Compile Include="Lines\ICurves.cs" />
     <Compile Include="Lines\LineCollision.cs" />
     <Compile Include="Lines\CurvesByPointsCreator.cs" />
     <Compile Include="Lines\RayCreator.cs" />
+    <Compile Include="Path\ClearanceZone\IZonePoints.cs" />
+    <Compile Include="Path\ClearanceZone\PointClearanceZone.cs" />
     <Compile Include="Path\StepPoint.cs" />
     <Compile Include="Path\PathFinder.cs" />
     <Compile Include="Path\PathPointsCheck\PointsCheker.cs" />
     <Compile Include="Path\RefPoint.cs" />
     <Compile Include="Path\StepPointsList.cs" />
     <Compile Include="Path\StepsPriority.cs" />
+    <Compile Include="Path\ClearanceZone\ZoneByCircle.cs" />
     <Compile Include="Points\PointsInfo.cs" />
     <Compile Include="ElementUtils.cs" />
     <Compile Include="ExternalCommand.cs" />
