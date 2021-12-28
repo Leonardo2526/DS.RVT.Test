@@ -57,15 +57,15 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
             int step = (int)Math.Round((double)fullZoneCleranceInSteps / 2);
 
-            for (int z = -fullZoneCleranceInSteps; z <= fullZoneCleranceInSteps; z += step)
+            for (int z = -fullZoneCleranceInSteps; z <= fullZoneCleranceInSteps; z += fullZoneCleranceInSteps)
             {
                 int yCount = fullZoneCleranceInSteps - Math.Abs(z);
 
-                for (int y = -yCount; y <= yCount; y += step)
+                for (int y = -yCount; y <= yCount; y += fullZoneCleranceInSteps)
                 {
-                    int xCount = fullZoneCleranceInSteps - Math.Abs(y);
+                    int xCount = yCount - Math.Abs(y);
 
-                    for (int x = -xCount; x <= xCount; x += step)
+                    for (int x = -xCount; x <= xCount; x += fullZoneCleranceInSteps)
                     {
                         if (x == 0 && y == 0 && z == 0)
                             continue;

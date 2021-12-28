@@ -105,7 +105,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                                         bool checkClearancePoint = pointsCheker.IsClearanceZoneAvailable(nextPoint, clearancePoints);
                                         if (checkUnpassablePoint && checkClearancePoint)
                                             if (checkUnpassablePoint)
-                                            {
+                                        {
                                             // распространяем волну
                                             d = currentValue + 1;
                                             grid.Add(nextPoint, d);
@@ -158,9 +158,12 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                         iz >= 0 && iz < InputData.Zcount &&
                          grid[nextPoint] == d)
                     {
-                      
-                            // переходим в ячейку, которая на 1 ближе к старту
-                            x += BackWaypriorityList[k].X;
+                        bool clearanceAvailable = IsClearanceAvailable(nextPoint, BackWaypriorityList[k], grid);
+                        if (!clearanceAvailable)
+                            continue;
+
+                        // переходим в ячейку, которая на 1 ближе к старту
+                        x += BackWaypriorityList[k].X;
                             y += BackWaypriorityList[k].Y;
                             z += BackWaypriorityList[k].Z;
                             break;                          
@@ -228,5 +231,45 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             return stepsPriority.GetPointsList(1);
         }
 
+
+        bool IsClearanceAvailable(StepPoint stepPoint, StepPoint BackWaystepPoint, Dictionary<StepPoint, int> grid)
+        {
+            //StepPoint nextPoint = new StepPoint(stepPoint.X + BackWaystepPoint.X * (1 + PointClearanceZone.ZoneClearanceInSteps), 
+            //    stepPoint.Y + BackWaystepPoint.Y * (1 + PointClearanceZone.ZoneClearanceInSteps), 
+            //    stepPoint.Z + BackWaystepPoint.Z * (1 + PointClearanceZone.ZoneClearanceInSteps));
+
+            //if (!grid.ContainsKey(nextPoint))
+            //    return false;
+
+            if (StepsPriority.Priority == 1)
+            {
+                for (int i = 0; i <= PointClearanceZone.ZoneClearanceInSteps; i++)
+                {
+                    StepPoint nextPoint = new StepPoint(stepPoint.X + BackWaystepPoint.X * (1 + i), stepPoint.Y, stepPoint.Z);
+                    if (!grid.ContainsKey(nextPoint))
+                        return false;
+                }
+            }
+            else if (StepsPriority.Priority == 2)
+            {
+                for (int i = 0; i <= PointClearanceZone.ZoneClearanceInSteps; i++)
+                {
+                    StepPoint nextPoint = new StepPoint(stepPoint.X, stepPoint.Y + BackWaystepPoint.Y * (1 + i), stepPoint.Z);
+                    if (!grid.ContainsKey(nextPoint))
+                        return false;
+                }
+            }
+            else if (StepsPriority.Priority == 3)
+            {
+                for (int i = 0; i <= PointClearanceZone.ZoneClearanceInSteps; i++)
+                {
+                    StepPoint nextPoint = new StepPoint(stepPoint.X, stepPoint.Y, stepPoint.Z + BackWaystepPoint.Z * (1 + i));
+                    if (!grid.ContainsKey(nextPoint))
+                        return false;
+                }
+            }
+
+            return true;
+        }
     }
 }

@@ -4,10 +4,10 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 {
     class StepsPriority
     {
-       
+
         public List<StepPoint> PriorityList { get; set; }
 
-
+        public static int Priority {get; set;}
 
         /// <summary>
         /// >Set the priority step. 1 - priority by X, 2 - priority by Y, 3 - priority by Z.
@@ -15,6 +15,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         public List<StepPoint> GetPointsList(int priority)
         {           
             PriorityList = new List<StepPoint>();
+            Priority = priority;
 
             if (priority == 1)
             {

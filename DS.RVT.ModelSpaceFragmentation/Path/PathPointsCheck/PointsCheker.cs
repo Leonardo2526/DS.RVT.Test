@@ -52,7 +52,6 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             List<StepPoint> clearancePoints)
         {
             
-            
            foreach (StepPoint clearancePoint in clearancePoints)
             {
                 StepPoint currentPoint = new StepPoint(
@@ -60,14 +59,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                     stepPoint.Y + clearancePoint.Y,
                     stepPoint.Z + clearancePoint.Z
                     );
-
-                for (int i = 0; i < InputData.UnpassLocX.Count; i++)
-                {
-                    if (InputData.UnpassLocX[i] == currentPoint.X &&
-                        InputData.UnpassLocY[i] == currentPoint.Y &&
-                        InputData.UnpassLocZ[i] == currentPoint.Z)
+                if (InputData.UnpassStepPoints.Contains(currentPoint))
                         return false;
-                }
             }
 
             return true;

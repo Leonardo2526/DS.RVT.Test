@@ -27,6 +27,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         public List<StepPoint> Create(IZonePoints zonePoints)
         {
             GetZoneClearanceInSteps();
+            ClerancePoints = new List<StepPoint>();
             ClerancePoints = zonePoints.CreateZonePoints();
             return ClerancePoints;
         }

@@ -56,6 +56,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         public static List<int> UnpassLocX { get; set; }
         public static List<int> UnpassLocY { get; set; } 
         public static List<int> UnpassLocZ { get; set; }
+        public static List<StepPoint> UnpassStepPoints { get; set; }
         public static double PointsStepF { get; set; }
         public static XYZ ZonePoint1 { get; set; }
         public static XYZ ZonePoint2 { get; set; }
@@ -100,6 +101,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             Ycount = ModelSpacePointsGenerator.Ycount;
             Zcount = ModelSpacePointsGenerator.Zcount;
 
+            UnpassStepPoints = new List<StepPoint>();
             if (UnpassablePoints.Count != 0)
             {
                 foreach (XYZ point in UnpassablePoints)
@@ -110,6 +112,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                     UnpassLocX.Add(X);
                     UnpassLocY.Add(Y);
                     UnpassLocZ.Add(Z);
+                    StepPoint stepPoint = new StepPoint(X, Y, Z);
+                    UnpassStepPoints.Add(stepPoint);
                 }
             }
 
