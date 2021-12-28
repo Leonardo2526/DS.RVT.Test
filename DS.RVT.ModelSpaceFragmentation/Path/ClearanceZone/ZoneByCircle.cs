@@ -21,7 +21,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             return PointClearanceZone.ZoneClearanceInSteps + (int)Math.Round(ElemDiameterInSteps / 2);
         }
 
-        public List<StepPoint> CreateZonePoints()
+        public List<StepPoint> CreateZonePointsOld()
         {
             int fullZoneCleranceInSteps = GetFullZoneCleranceInSteps();
 
@@ -42,13 +42,40 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
                             StepPoint stepPoint = new StepPoint(x, y, z);
                             ZonePoints.Add(stepPoint);
-                        
-
                     }
+
                 }
             }
+            return ZonePoints;
+        }
 
+        public List<StepPoint> CreateZonePoints()
+        {
+            int fullZoneCleranceInSteps = GetFullZoneCleranceInSteps();
 
+            List<StepPoint> ZonePoints = new List<StepPoint>();
+
+            int step = (int)Math.Round((double)fullZoneCleranceInSteps / 2);
+
+            for (int z = -fullZoneCleranceInSteps; z <= fullZoneCleranceInSteps; z += step)
+            {
+                int yCount = fullZoneCleranceInSteps - Math.Abs(z);
+
+                for (int y = -yCount; y <= yCount; y += step)
+                {
+                    int xCount = fullZoneCleranceInSteps - Math.Abs(y);
+
+                    for (int x = -xCount; x <= xCount; x += step)
+                    {
+                        if (x == 0 && y == 0 && z == 0)
+                            continue;
+
+                        StepPoint stepPoint = new StepPoint(x, y, z);
+                        ZonePoints.Add(stepPoint);
+                    }
+
+                }
+            }
             return ZonePoints;
         }
     }

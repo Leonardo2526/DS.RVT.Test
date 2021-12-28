@@ -10,10 +10,10 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 {
     class PointClearanceZone
     {
-        private static double ZoneClearance = 150;
+        private static double ZoneClearance = 100;
         public static int ZoneClearanceInSteps { get; set; }
 
-        public List<StepPoint> ZonePoints { get; set; }
+        public List<StepPoint> ClerancePoints { get; set; }
 
         void GetZoneClearanceInSteps()
         {
@@ -27,15 +27,15 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         public List<StepPoint> Create(IZonePoints zonePoints)
         {
             GetZoneClearanceInSteps();
-            ZonePoints = zonePoints.CreateZonePoints();
-            return ZonePoints;
+            ClerancePoints = zonePoints.CreateZonePoints();
+            return ClerancePoints;
         }
 
         List<XYZ> PointsConverter(XYZ basePoint)
         {
             List<XYZ> modelSpacePoints = new List<XYZ>();
 
-            foreach(StepPoint stepPoint in ZonePoints)
+            foreach(StepPoint stepPoint in ClerancePoints)
             {
                 XYZ point = new XYZ(basePoint.X + stepPoint.X * InputData.PointsStepF,
                     basePoint.Y + stepPoint.Y * InputData.PointsStepF,

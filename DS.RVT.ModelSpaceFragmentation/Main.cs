@@ -45,9 +45,9 @@ namespace DS.RVT.ModelSpaceFragmentation
             LineCreator lineCreator = new LineCreator();
             lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
 
-            PointClearanceZone pointClearanceZone = new PointClearanceZone();
-            pointClearanceZone.Create(new ZoneByCircle());
-            pointClearanceZone.ShowPoints(PointsInfo.StartElemPoint);
+            //PointClearanceZone pointClearanceZone = new PointClearanceZone();
+            //pointClearanceZone.Create(new ZoneByCircle());
+            //pointClearanceZone.ShowPoints(PointsInfo.StartElemPoint);
 
         }
 

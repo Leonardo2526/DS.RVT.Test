@@ -38,9 +38,9 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
         bool LaunchAlgorythm()
         {
-            PointsCheker startEndPointsCheker = new PointsCheker(data);
+            PointsCheker pointsCheker = new PointsCheker(data);
 
-            List<RefPoint> RefPointsList = new List<RefPoint>();
+            List<StepPoint> StepPointsList = new List<StepPoint>();
 
             int x = 0;
             int y = 0;
@@ -50,11 +50,18 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             int a;
 
             // стартовая ячейка
-            RefPoint startRefPoint = new RefPoint(Ax, Ay, Az);
-            RefPoint endRefPoint = new RefPoint(Bx, By, Bz);
+            StepPoint startRefPoint = new StepPoint(Ax, Ay, Az);
+            StepPoint endRefPoint = new StepPoint(Bx, By, Bz);
 
-            RefPointsList.Add(startRefPoint);
-            Dictionary<RefPoint, int> grid = new Dictionary<RefPoint, int>
+            PointClearanceZone pointClearanceZone = new PointClearanceZone();
+            List<StepPoint> clearancePoints = pointClearanceZone.Create(new ZoneByCircle());
+
+            if (!pointsCheker.IsStartEndPointAvailable(startRefPoint, clearancePoints) |
+                !pointsCheker.IsStartEndPointAvailable(endRefPoint, clearancePoints))
+                return false;
+
+            StepPointsList.Add(startRefPoint);
+            Dictionary<StepPoint, int> grid = new Dictionary<StepPoint, int>
             {
                 { startRefPoint, 1 }
             };
@@ -70,7 +77,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                     {
                         for (x = 0; x < InputData.Xcount; x++)
                         {
-                            RefPoint currentPoint = new RefPoint(x, y, z);
+                            StepPoint currentPoint = new StepPoint(x, y, z);
 
                             int currentValue;
                             if (!grid.ContainsKey(currentPoint))
@@ -89,14 +96,16 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                                     iy >= 0 && iy < InputData.Ycount &&
                                     iz >= 0 && iz < InputData.Zcount)
                                 {
-                                    RefPoint nextPoint = new RefPoint(ix, iy, iz);
+                                    StepPoint nextPoint = new StepPoint(ix, iy, iz);
 
                                     if (!grid.ContainsKey(nextPoint))
                                     {
 
-                                        bool emptyCell = startEndPointsCheker.IsCellEmpty(ix, iy, iz);
-                                        if (emptyCell == true)
-                                        {
+                                        bool checkUnpassablePoint = pointsCheker.IsPointPassable(nextPoint);
+                                        bool checkClearancePoint = pointsCheker.IsClearanceZoneAvailable(nextPoint, clearancePoints);
+                                        if (checkUnpassablePoint && checkClearancePoint)
+                                            if (checkUnpassablePoint)
+                                            {
                                             // распространяем волну
                                             d = currentValue + 1;
                                             grid.Add(nextPoint, d);
@@ -139,7 +148,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                         iy = y + BackWaypriorityList[k].Y,
                         iz = z + BackWaypriorityList[k].Z;
 
-                    RefPoint nextPoint = new RefPoint(ix, iy, iz);
+                    StepPoint nextPoint = new StepPoint(ix, iy, iz);
 
                     if (!grid.ContainsKey(nextPoint))
                         continue;
@@ -149,11 +158,12 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                         iz >= 0 && iz < InputData.Zcount &&
                          grid[nextPoint] == d)
                     {
-                        // переходим в ячейку, которая на 1 ближе к старту
-                        x += BackWaypriorityList[k].X;
-                        y += BackWaypriorityList[k].Y;
-                        z += BackWaypriorityList[k].Z;
-                        break;
+                      
+                            // переходим в ячейку, которая на 1 ближе к старту
+                            x += BackWaypriorityList[k].X;
+                            y += BackWaypriorityList[k].Y;
+                            z += BackWaypriorityList[k].Z;
+                            break;                          
                     }
                 }
             }
