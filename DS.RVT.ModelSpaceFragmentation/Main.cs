@@ -35,19 +35,20 @@ namespace DS.RVT.ModelSpaceFragmentation
             ElementSize elementSize = new ElementSize();
             elementSize.GetElementSizes(CurrentElement as MEPCurve);
 
+            SpaceFragmentator spaceFragmentator = new SpaceFragmentator(App, Uiapp, Uidoc, Doc);
+            spaceFragmentator.FragmentSpace(CurrentElement);
+         
+            PathFinder pathFinder = new PathFinder();
+
+            List<XYZ> pathCoords = pathFinder.GetPath(PointsInfo.StartElemPoint, PointsInfo.EndElemPoint, spaceFragmentator.UnpassablePoints);
+
+            LineCreator lineCreator = new LineCreator();
+            lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
+
             PointClearanceZone pointClearanceZone = new PointClearanceZone();
             pointClearanceZone.Create(new ZoneByCircle());
             pointClearanceZone.ShowPoints(PointsInfo.StartElemPoint);
 
-        //SpaceFragmentator spaceFragmentator = new SpaceFragmentator(App, Uiapp, Uidoc, Doc);
-        //    spaceFragmentator.FragmentSpace(CurrentElement);
-
-            //    PathFinder pathFinder = new PathFinder();          
-
-            //    List<XYZ> pathCoords = pathFinder.GetPath(PointsInfo.StartElemPoint, PointsInfo.EndElemPoint, spaceFragmentator.UnpassablePoints);
-
-            //    LineCreator lineCreator = new LineCreator();
-            //    lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
         }
 
     }

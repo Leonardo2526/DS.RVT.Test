@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Autodesk.Revit.DB;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,30 +11,38 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
     {
         private static double ElemDiameter { get; } = ElementSize.ElemDiameter;
 
-        private readonly double ElemDiameterInSteps = ElemDiameter / InputData.PointsStepF;
-        
+        int GetFullZoneCleranceInSteps()
+        {
+            double ElemDiameterF = UnitUtils.Convert(ElemDiameter / 1000,
+                                DisplayUnitType.DUT_METERS,
+                                DisplayUnitType.DUT_DECIMAL_FEET);
+
+            double ElemDiameterInSteps = ElemDiameterF / InputData.PointsStepF;
+            return PointClearanceZone.ZoneClearanceInSteps + (int)Math.Round(ElemDiameterInSteps / 2);
+        }
 
         public List<StepPoint> CreateZonePoints()
         {
-            int fullZoneCleranceInSteps = PointClearanceZone.ZoneClearanceInSteps + (int)Math.Round(ElemDiameterInSteps / 2);
+            int fullZoneCleranceInSteps = GetFullZoneCleranceInSteps();
 
             List<StepPoint> ZonePoints = new List<StepPoint>();
 
-            for (int z = 0; z <= fullZoneCleranceInSteps; z++)
+            for (int z = -fullZoneCleranceInSteps; z <= fullZoneCleranceInSteps; z++)
             {
-                int yCount = fullZoneCleranceInSteps - z;
+                int yCount = fullZoneCleranceInSteps - Math.Abs(z);
 
-                for (int y = 0; y <= yCount; y++)
+                for (int y = -yCount; y <= yCount; y++)
                 {
-                    int xCount = fullZoneCleranceInSteps - y;
+                    int xCount = fullZoneCleranceInSteps - Math.Abs(y);
 
-                    for (int x = 0; x <= xCount; x++)
+                    for (int x = -xCount; x <= xCount; x++)
                     {
-                        if (x != 0 && y != 0 && z != 0)
-                        {
+                        if (x == 0 && y == 0 && z == 0)
+                            continue;
+
                             StepPoint stepPoint = new StepPoint(x, y, z);
                             ZonePoints.Add(stepPoint);
-                        }
+                        
 
                     }
                 }

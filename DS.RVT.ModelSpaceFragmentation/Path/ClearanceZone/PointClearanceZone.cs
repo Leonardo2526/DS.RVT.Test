@@ -11,13 +11,22 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
     class PointClearanceZone
     {
         private static double ZoneClearance = 150;
-        public static int ZoneClearanceInSteps = 
-            (int)Math.Round(ZoneClearance / InputData.PointsStepF);
+        public static int ZoneClearanceInSteps { get; set; }
 
         public List<StepPoint> ZonePoints { get; set; }
 
+        void GetZoneClearanceInSteps()
+        {
+            double ZoneClearanceF = UnitUtils.Convert(ZoneClearance / 1000,
+                                DisplayUnitType.DUT_METERS,
+                                DisplayUnitType.DUT_DECIMAL_FEET);
+            ZoneClearanceInSteps = (int)Math.Round(ZoneClearanceF / InputData.PointsStepF);
+        }
+
+
         public List<StepPoint> Create(IZonePoints zonePoints)
         {
+            GetZoneClearanceInSteps();
             ZonePoints = zonePoints.CreateZonePoints();
             return ZonePoints;
         }
