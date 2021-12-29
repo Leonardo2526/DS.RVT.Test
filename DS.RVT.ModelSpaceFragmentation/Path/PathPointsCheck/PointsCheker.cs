@@ -6,14 +6,7 @@ using System.Collections.Generic;
 namespace DS.RVT.ModelSpaceFragmentation.Path
 {
     class PointsCheker
-    {
-        readonly InputData data;
-        public PointsCheker(InputData inputData)
-        {
-            data = inputData;
-        }
-
-
+    {      
         private bool IsEven(int a)
         {
             return (a % 2) == 0;
@@ -21,7 +14,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
         public bool IsPointPassable(StepPoint point)
         {
-            if (data.UnpassablePoints.Count == 0)
+            if (InputData.UnpassStepPoints.Count == 0)
                 return true;
 
             for (int i = 0; i < InputData.UnpassLocX.Count; i++)
@@ -51,8 +44,10 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         public bool IsClearanceZoneAvailable(StepPoint stepPoint, 
             List<StepPoint> clearancePoints)
         {
-            
-           foreach (StepPoint clearancePoint in clearancePoints)
+            if (InputData.UnpassStepPoints.Count == 0)
+                return true;
+
+            foreach (StepPoint clearancePoint in clearancePoints)
             {
                 StepPoint currentPoint = new StepPoint(
                     stepPoint.X + clearancePoint.X,

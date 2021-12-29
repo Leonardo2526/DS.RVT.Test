@@ -7,10 +7,6 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 {
     class InputData
     {
-
-        public static List<RefPoint> RefPointsList { get; set; }
-
-
         /// <summary>
         /// Path coordinates by x
         /// </summary>

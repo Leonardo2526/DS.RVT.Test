@@ -38,7 +38,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
         bool LaunchAlgorythm()
         {
-            PointsCheker pointsCheker = new PointsCheker(data);
+            PointsCheker pointsCheker = new PointsCheker();
 
             List<StepPoint> StepPointsList = new List<StepPoint>();
 
@@ -104,7 +104,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                                         bool checkUnpassablePoint = pointsCheker.IsPointPassable(nextPoint);
                                         bool checkClearancePoint = pointsCheker.IsClearanceZoneAvailable(nextPoint, clearancePoints);
                                         if (checkUnpassablePoint && checkClearancePoint)
-                                            if (checkUnpassablePoint)
+                                            //if (checkUnpassablePoint)
                                         {
                                             // распространяем волну
                                             d = currentValue + 1;
@@ -158,9 +158,12 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                         iz >= 0 && iz < InputData.Zcount &&
                          grid[nextPoint] == d)
                     {
-                        bool clearanceAvailable = IsClearanceAvailable(nextPoint, BackWaypriorityList[k], grid);
-                        if (!clearanceAvailable)
-                            continue;
+
+                        //pointClearanceZone.Create(new ZoneByCircle());
+                        //pointClearanceZone.ShowPoints(PointsInfo.StartElemPoint);
+                        ////bool clearanceAvailable = IsClearanceAvailable(nextPoint, BackWaypriorityList[k], grid);
+                        //if (!clearanceAvailable)
+                        //    continue;
 
                         // переходим в ячейку, которая на 1 ближе к старту
                         x += BackWaypriorityList[k].X;

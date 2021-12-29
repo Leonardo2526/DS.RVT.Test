@@ -26,7 +26,10 @@ namespace DS.RVT.ModelSpaceFragmentation
             ICollection<BuiltInCategory> elementCategoryFilters = new List<BuiltInCategory>
                 {
                     BuiltInCategory.OST_DuctCurves,
+                    BuiltInCategory.OST_DuctFitting,
                     BuiltInCategory.OST_PipeCurves,
+                    BuiltInCategory.OST_PipeFitting,
+                    BuiltInCategory.OST_MechanicalEquipment,
                     BuiltInCategory.OST_Walls
                 };
 

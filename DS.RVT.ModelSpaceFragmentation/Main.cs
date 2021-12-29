@@ -7,6 +7,7 @@ using System.Linq;
 using DS.RVT.ModelSpaceFragmentation.Path;
 using DS.RVT.ModelSpaceFragmentation.Lines;
 using DS.RVT.ModelSpaceFragmentation.Visualization;
+using DS.RVT.ModelSpaceFragmentation.Points;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -45,9 +46,13 @@ namespace DS.RVT.ModelSpaceFragmentation
             LineCreator lineCreator = new LineCreator();
             lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
 
-            PointClearanceZone pointClearanceZone = new PointClearanceZone();
-            pointClearanceZone.Create(new ZoneByCircle());
-            pointClearanceZone.ShowPoints(PointsInfo.StartElemPoint);
+            //PointClearanceZone pointClearanceZone = new PointClearanceZone();
+            //pointClearanceZone.Create(new ZoneByCircle());
+            //pointClearanceZone.ShowPoints(PointsInfo.StartElemPoint);
+            PointConvertor pointConvertor = new PointConvertor();
+            StepPoint sp = pointConvertor.XYZToStepPoint(PointsInfo.StartElemPoint);
+            XYZ spXYZ = pointConvertor.StepPointToXYZ(sp);
+
 
         }
 
