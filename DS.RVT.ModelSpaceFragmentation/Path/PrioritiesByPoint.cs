@@ -26,9 +26,6 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         {
             StepsPriority stepsPriority = new StepsPriority();
 
-            ////bool clearanceAvailable = FurtherPointChecker.IsClearanceAvailable(CurrentPoint, BackWayStepPoint, Grid);
-            //if (clearanceAvailable)            
-            //{
                 if (Math.Abs(PointsInfo.StartElemPoint.Z - PointsInfo.EndElemPoint.Z) < 0.01 &&
                 Math.Abs(PointsInfo.StartElemPoint.Y - PointsInfo.EndElemPoint.Y) < 0.01)
                 {
@@ -57,8 +54,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                 if (Math.Abs(PointsInfo.StartElemPoint.Y - PointsInfo.EndElemPoint.Y) < 0.01 &&
                     CurrentPoint.Y != EndPoint.Y)
                     return stepsPriority.GetPointsList(2);
-            //}
-            
+          
+
 
             return stepsPriority.GetPointsList(1);
         }

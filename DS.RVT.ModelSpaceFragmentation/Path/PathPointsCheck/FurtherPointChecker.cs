@@ -12,13 +12,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             Dictionary<StepPoint, int> grid)
         {
             StepPoint nextPoint;
-            //nextPoint = new StepPoint(stepPoint.X + BackWayStepPoint.X * (1 + ZoneByCircle.FullZoneCleranceInSteps), 
-            //    stepPoint.Y + BackWayStepPoint.Y * (1 + ZoneByCircle.FullZoneCleranceInSteps), 
-            //    stepPoint.Z + BackWayStepPoint.Z * (1 + ZoneByCircle.FullZoneCleranceInSteps));
 
-            //if (!grid.ContainsKey(nextPoint))
-            //    return false;
-            if (WaveAlgorythm.InitialPriority == StepsPriority.CurrentPriority)
+            if (StepsPriority.CurrentPriority == WaveAlgorythm.InitialPriority)
                 return true;
 
             if (StepsPriority.CurrentPriority == 1)
@@ -43,7 +38,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             {
                 for (int i = 0; i <= ZoneByCircle.FullZoneCleranceInSteps; i++)
                 {
-                    nextPoint = new StepPoint(stepPoint.X, stepPoint.Y, stepPoint.Z + BackWayStepPoint.Z * (1 + i));
+                    nextPoint = new StepPoint(stepPoint.X, stepPoint.Y, stepPoint.Z + BackWayStepPoint.Z * (2 + i));
                     if (!grid.ContainsKey(nextPoint))
                         return false;
                 }

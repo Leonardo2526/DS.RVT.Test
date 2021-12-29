@@ -1,12 +1,13 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using DS.RVT.ModelSpaceFragmentation.Lines;
 using DS.RVT.ModelSpaceFragmentation.Points;
 using System;
 using System.Collections.Generic;
 
 namespace DS.RVT.ModelSpaceFragmentation.Path
 {
-    class WaveAlgorythm
+    class LaunchAlgorythm
     {
         public List<XYZ> PathCoords = new List<XYZ>();
 
@@ -27,6 +28,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         }
 
         public static int InitialPriority { get; set; }
+        List<StepPoint> InitialPriorityList { get; set; }
 
         public List<XYZ> FindPath()
         {
@@ -70,7 +72,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             };
 
             Priority priority = new Priority();
-            List<StepPoint> initialPriorityList = priority.GetPriorities();
+            InitialPriorityList = priority.GetPriorities();
 
             InitialPriority = StepsPriority.CurrentPriority;
 
@@ -94,9 +96,9 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                             // проходим по всем непомеченным соседям
                             for (k = 0; k < 6; ++k)
                             {
-                                int ix = x + initialPriorityList[k].X,
-                                    iy = y + initialPriorityList[k].Y,
-                                    iz = z + initialPriorityList[k].Z;
+                                int ix = x + InitialPriorityList[k].X,
+                                    iy = y + InitialPriorityList[k].Y,
+                                    iz = z + InitialPriorityList[k].Z;
 
                                 if (ix >= 0 && ix < InputData.Xcount &&
                                     iy >= 0 && iy < InputData.Ycount &&
@@ -139,6 +141,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             z = Bz;
             d = len;
 
+            //List<StepPoint> BackWayPriorityList = InitialPriorityList;
+
             while (d >= 0)
             {
                 // записываем ячейку (x, y) в путь
@@ -166,18 +170,40 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                          grid[nextPoint] == d)
                     {
 
-                        pointClearanceZone.Create(new ZoneByCircle());
+                 
+
+                        //pointClearanceZone.Create(new ZoneByCircle());
 
                         //PointConvertor pointConvertor = new PointConvertor();
                         //pointClearanceZone.ShowPoints(pointConvertor.StepPointToXYZ(nextPoint));
-                        //////bool clearanceAvailable = IsClearanceAvailable(nextPoint, BackWaypriorityList[k], grid);
-                        //if (!clearanceAvailable)
-                        //    continue;
+
+                       //bool clearanceAvailable = FurtherPointChecker.IsClearanceAvailable(nextPoint, BackWayPriorityList[k], grid);
+                       // if (!clearanceAvailable)
+                       //     continue;
+
+                        PointConvertor pointConvertor = new PointConvertor();
+
+                        XYZ p1 = pointConvertor.StepPointToXYZ(new StepPoint(x, y, z));
 
                         // переходим в ячейку, которая на 1 ближе к старту
                         x += BackWayPriorityList[k].X;
                         y += BackWayPriorityList[k].Y;
                         z += BackWayPriorityList[k].Z;
+
+                        XYZ p2 = pointConvertor.StepPointToXYZ(new StepPoint(x, y, z));
+
+                        List<XYZ> pathCoords = new List<XYZ>()
+                        {
+                            p1,
+                            p2
+                        };
+
+                        LineCreator lineCreator = new LineCreator();
+                        lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
+
+                        //PrioritiesByPoint prioritiesByPoint = new PrioritiesByPoint(nextPoint, endStepPoint, BackWayPriorityList[k], grid);
+                        //BackWayPriorityList = prioritiesByPoint.GetPrioritiesByPoint();
+
                         break;
                     }
                 }
