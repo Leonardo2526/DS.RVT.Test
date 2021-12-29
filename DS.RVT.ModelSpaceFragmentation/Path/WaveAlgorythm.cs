@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using DS.RVT.ModelSpaceFragmentation.Points;
 using System;
 using System.Collections.Generic;
 
@@ -159,8 +160,10 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                          grid[nextPoint] == d)
                     {
 
-                        //pointClearanceZone.Create(new ZoneByCircle());
-                        //pointClearanceZone.ShowPoints(PointsInfo.StartElemPoint);
+                        pointClearanceZone.Create(new ZoneByCircle());
+
+                        PointConvertor pointConvertor = new PointConvertor();
+                        pointClearanceZone.ShowPoints(pointConvertor.StepPointToXYZ(nextPoint));
                         ////bool clearanceAvailable = IsClearanceAvailable(nextPoint, BackWaypriorityList[k], grid);
                         //if (!clearanceAvailable)
                         //    continue;

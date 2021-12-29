@@ -10,7 +10,7 @@ namespace DS.RVT.ModelSpaceFragmentation
     class ElementSize
     {
       
-        public static double ElemDiameter { get; set; }
+        public static double ElemDiameterF { get; set; }
 
         public void GetElementSizes(MEPCurve elMEPCurve)
         {
@@ -21,7 +21,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             {
                 Pipe pipe = elMEPCurve as Pipe;
 
-                ElemDiameter = pipe.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER).AsDouble();         
+                ElemDiameterF = pipe.get_Parameter(BuiltInParameter.RBS_PIPE_OUTER_DIAMETER).AsDouble();         
 
             }
         }

@@ -33,5 +33,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Points
             (int)Math.Round(refPoint.Z / ModelSpacePointsGenerator.PointsStepF));
 
         }
+
+
     }
 }

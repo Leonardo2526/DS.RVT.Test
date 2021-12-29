@@ -49,10 +49,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             //PointClearanceZone pointClearanceZone = new PointClearanceZone();
             //pointClearanceZone.Create(new ZoneByCircle());
             //pointClearanceZone.ShowPoints(PointsInfo.StartElemPoint);
-            PointConvertor pointConvertor = new PointConvertor();
-            StepPoint sp = pointConvertor.XYZToStepPoint(PointsInfo.StartElemPoint);
-            XYZ spXYZ = pointConvertor.StepPointToXYZ(sp);
-
+          
 
         }
 

@@ -65,6 +65,7 @@
     <Compile Include="Lines\RayCreator.cs" />
     <Compile Include="Path\ClearanceZone\IZonePoints.cs" />
     <Compile Include="Path\ClearanceZone\PointClearanceZone.cs" />
+    <Compile Include="Path\ClearanceZone\ClearancePointsConvertor.cs" />
     <Compile Include="Points\StepPoint.cs" />
     <Compile Include="Path\PathFinder.cs" />
     <Compile Include="Path\PathPointsCheck\PointsCheker.cs" />
