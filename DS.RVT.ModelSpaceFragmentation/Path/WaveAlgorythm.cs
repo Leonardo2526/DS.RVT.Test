@@ -26,6 +26,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             data = inputData;
         }
 
+        public static int InitialPriority { get; set; }
+
         public List<XYZ> FindPath()
         {
             if (!LaunchAlgorythm())
@@ -51,23 +53,26 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             int a;
 
             // стартовая ячейка
-            StepPoint startRefPoint = new StepPoint(Ax, Ay, Az);
-            StepPoint endRefPoint = new StepPoint(Bx, By, Bz);
+            StepPoint startStepPoint = new StepPoint(Ax, Ay, Az);
+            StepPoint endStepPoint = new StepPoint(Bx, By, Bz);
 
             PointClearanceZone pointClearanceZone = new PointClearanceZone();
             List<StepPoint> clearancePoints = pointClearanceZone.Create(new ZoneByCircle());
 
-            if (!pointsCheker.IsStartEndPointAvailable(startRefPoint, clearancePoints) |
-                !pointsCheker.IsStartEndPointAvailable(endRefPoint, clearancePoints))
+            if (!pointsCheker.IsStartEndPointAvailable(startStepPoint, clearancePoints) |
+                !pointsCheker.IsStartEndPointAvailable(endStepPoint, clearancePoints))
                 return false;
 
-            StepPointsList.Add(startRefPoint);
+            StepPointsList.Add(startStepPoint);
             Dictionary<StepPoint, int> grid = new Dictionary<StepPoint, int>
             {
-                { startRefPoint, 1 }
+                { startStepPoint, 1 }
             };
 
-            List<StepPoint> priorityList = SetPriorities();
+            Priority priority = new Priority();
+            List<StepPoint> initialPriorityList = priority.GetPriorities();
+
+            InitialPriority = StepsPriority.CurrentPriority;
 
             do
             {
@@ -89,9 +94,9 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                             // проходим по всем непомеченным соседям
                             for (k = 0; k < 6; ++k)
                             {
-                                int ix = x + priorityList[k].X,
-                                    iy = y + priorityList[k].Y,
-                                    iz = z + priorityList[k].Z;
+                                int ix = x + initialPriorityList[k].X,
+                                    iy = y + initialPriorityList[k].Y,
+                                    iz = z + initialPriorityList[k].Z;
 
                                 if (ix >= 0 && ix < InputData.Xcount &&
                                     iy >= 0 && iy < InputData.Ycount &&
@@ -105,7 +110,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                                         bool checkUnpassablePoint = pointsCheker.IsPointPassable(nextPoint);
                                         bool checkClearancePoint = pointsCheker.IsClearanceZoneAvailable(nextPoint, clearancePoints);
                                         if (checkUnpassablePoint && checkClearancePoint)
-                                            //if (checkUnpassablePoint)
+                                        //if (checkUnpassablePoint)
                                         {
                                             // распространяем волну
                                             d = currentValue + 1;
@@ -118,17 +123,17 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                         }
                     }
                 }
-            } while (!grid.ContainsKey(endRefPoint) && a != 0);
+            } while (!grid.ContainsKey(endStepPoint) && a != 0);
 
 
-            if (!grid.ContainsKey(endRefPoint))
+            if (!grid.ContainsKey(endStepPoint))
                 return false;
 
-            grid[startRefPoint] = 0;
+            grid[startStepPoint] = 0;
 
             // восстановление пути
             // длина кратчайшего пути из (ax, ay) в (bx, By)
-            len = grid[endRefPoint];
+            len = grid[endStepPoint];
             x = Bx;
             y = By;
             z = Bz;
@@ -141,13 +146,14 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
                 d--;
 
-                List<StepPoint> BackWaypriorityList = SetBackWayPriorities(x, y, z);
+                StepPoint currentPoint = new StepPoint(x, y, z);
+                List<StepPoint> BackWayPriorityList = priority.GetPrioritiesByPointOld(currentPoint, endStepPoint);
 
                 for (k = 0; k < 6; ++k)
                 {
-                    int ix = x + BackWaypriorityList[k].X,
-                        iy = y + BackWaypriorityList[k].Y,
-                        iz = z + BackWaypriorityList[k].Z;
+                    int ix = x + BackWayPriorityList[k].X,
+                        iy = y + BackWayPriorityList[k].Y,
+                        iz = z + BackWayPriorityList[k].Z;
 
                     StepPoint nextPoint = new StepPoint(ix, iy, iz);
 
@@ -162,17 +168,17 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
                         pointClearanceZone.Create(new ZoneByCircle());
 
-                        PointConvertor pointConvertor = new PointConvertor();
-                        pointClearanceZone.ShowPoints(pointConvertor.StepPointToXYZ(nextPoint));
-                        ////bool clearanceAvailable = IsClearanceAvailable(nextPoint, BackWaypriorityList[k], grid);
+                        //PointConvertor pointConvertor = new PointConvertor();
+                        //pointClearanceZone.ShowPoints(pointConvertor.StepPointToXYZ(nextPoint));
+                        //////bool clearanceAvailable = IsClearanceAvailable(nextPoint, BackWaypriorityList[k], grid);
                         //if (!clearanceAvailable)
                         //    continue;
 
                         // переходим в ячейку, которая на 1 ближе к старту
-                        x += BackWaypriorityList[k].X;
-                            y += BackWaypriorityList[k].Y;
-                            z += BackWaypriorityList[k].Z;
-                            break;                          
+                        x += BackWayPriorityList[k].X;
+                        y += BackWayPriorityList[k].Y;
+                        z += BackWayPriorityList[k].Z;
+                        break;
                     }
                 }
             }
@@ -191,91 +197,11 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                 InputData.ZonePoint1.Y + y * InputData.PointsStepF,
                 InputData.ZonePoint1.Z + z * InputData.PointsStepF);
             PathCoords.Add(point);
-        }
+        }   
 
-        List<StepPoint> SetPriorities()
-        {
-            StepsPriority stepsPriority = new StepsPriority();
-
-            if (Math.Abs(PointsInfo.StartElemPoint.X - PointsInfo.EndElemPoint.X) < 0.01)
-                return stepsPriority.GetPointsList(2);
-            else
-                return stepsPriority.GetPointsList(1);
-        }
-
-        List<StepPoint> SetBackWayPriorities(int x, int y, int z)
-        {
-            StepsPriority stepsPriority = new StepsPriority();
-
-            if (Math.Abs(PointsInfo.StartElemPoint.Z - PointsInfo.EndElemPoint.Z) < 0.01 &&
-            Math.Abs(PointsInfo.StartElemPoint.Y - PointsInfo.EndElemPoint.Y) < 0.01)
-            {
-                if (y != By)
-                    return stepsPriority.GetPointsList(2);
-                else if (z != Bz)
-                    return stepsPriority.GetPointsList(3);
-                else
-                    return stepsPriority.GetPointsList(1);
-            }
-            else if (Math.Abs(PointsInfo.StartElemPoint.Z - PointsInfo.EndElemPoint.Z) < 0.01 &&
-            Math.Abs(PointsInfo.StartElemPoint.X - PointsInfo.EndElemPoint.X) < 0.01)
-            {
-                if (x != Bx)
-                    return stepsPriority.GetPointsList(1);
-                else if (z != Bz)
-                    return stepsPriority.GetPointsList(3);
-                else
-                    return stepsPriority.GetPointsList(2);
-            }
-
-            if (Math.Abs(PointsInfo.StartElemPoint.X - PointsInfo.EndElemPoint.X) < 0.01 && x != Bx)
-                return stepsPriority.GetPointsList(1);
-
-            if (Math.Abs(PointsInfo.StartElemPoint.Y - PointsInfo.EndElemPoint.Y) < 0.01 && y != By)
-                return stepsPriority.GetPointsList(2);
-
-            return stepsPriority.GetPointsList(1);
-        }
+      
 
 
-        bool IsClearanceAvailable(StepPoint stepPoint, StepPoint BackWaystepPoint, Dictionary<StepPoint, int> grid)
-        {
-            //StepPoint nextPoint = new StepPoint(stepPoint.X + BackWaystepPoint.X * (1 + PointClearanceZone.ZoneClearanceInSteps), 
-            //    stepPoint.Y + BackWaystepPoint.Y * (1 + PointClearanceZone.ZoneClearanceInSteps), 
-            //    stepPoint.Z + BackWaystepPoint.Z * (1 + PointClearanceZone.ZoneClearanceInSteps));
-
-            //if (!grid.ContainsKey(nextPoint))
-            //    return false;
-
-            if (StepsPriority.Priority == 1)
-            {
-                for (int i = 0; i <= PointClearanceZone.ZoneClearanceInSteps; i++)
-                {
-                    StepPoint nextPoint = new StepPoint(stepPoint.X + BackWaystepPoint.X * (1 + i), stepPoint.Y, stepPoint.Z);
-                    if (!grid.ContainsKey(nextPoint))
-                        return false;
-                }
-            }
-            else if (StepsPriority.Priority == 2)
-            {
-                for (int i = 0; i <= PointClearanceZone.ZoneClearanceInSteps; i++)
-                {
-                    StepPoint nextPoint = new StepPoint(stepPoint.X, stepPoint.Y + BackWaystepPoint.Y * (1 + i), stepPoint.Z);
-                    if (!grid.ContainsKey(nextPoint))
-                        return false;
-                }
-            }
-            else if (StepsPriority.Priority == 3)
-            {
-                for (int i = 0; i <= PointClearanceZone.ZoneClearanceInSteps; i++)
-                {
-                    StepPoint nextPoint = new StepPoint(stepPoint.X, stepPoint.Y, stepPoint.Z + BackWaystepPoint.Z * (1 + i));
-                    if (!grid.ContainsKey(nextPoint))
-                        return false;
-                }
-            }
-
-            return true;
-        }
+       
     }
 }
