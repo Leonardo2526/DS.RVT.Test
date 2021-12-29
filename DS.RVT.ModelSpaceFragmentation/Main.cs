@@ -49,7 +49,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             //PointClearanceZone pointClearanceZone = new PointClearanceZone();
             //pointClearanceZone.Create(new ZoneByCircle());
             //pointClearanceZone.ShowPoints(PointsInfo.StartElemPoint);
-          
+
 
         }
 

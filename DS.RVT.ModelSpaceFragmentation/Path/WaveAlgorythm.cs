@@ -2,12 +2,13 @@
 using Autodesk.Revit.UI;
 using DS.RVT.ModelSpaceFragmentation.Lines;
 using DS.RVT.ModelSpaceFragmentation.Points;
-using System;
+using DS.RVT.ModelSpaceFragmentation.Visualization;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DS.RVT.ModelSpaceFragmentation.Path
 {
-    class LaunchAlgorythm
+    class WaveAlgorythm
     {
         public List<XYZ> PathCoords = new List<XYZ>();
 
@@ -59,7 +60,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             StepPoint endStepPoint = new StepPoint(Bx, By, Bz);
 
             PointClearanceZone pointClearanceZone = new PointClearanceZone();
-            List<StepPoint> clearancePoints = pointClearanceZone.Create(new ZoneByCircle());
+            //List<StepPoint> clearancePoints = pointClearanceZone.Create(new ZoneByCircle());
+            List<StepPoint> clearancePoints = pointClearanceZone.Create(new ZoneByBox());
 
             if (!pointsCheker.IsStartEndPointAvailable(startStepPoint, clearancePoints) |
                 !pointsCheker.IsStartEndPointAvailable(endStepPoint, clearancePoints))
@@ -131,6 +133,9 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             if (!grid.ContainsKey(endStepPoint))
                 return false;
 
+            List<StepPoint> items = grid.Select(d => d.Key).ToList();
+            ShowPoints(items);
+
             grid[startStepPoint] = 0;
 
             // восстановление пути
@@ -170,16 +175,16 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                          grid[nextPoint] == d)
                     {
 
-                 
+
 
                         //pointClearanceZone.Create(new ZoneByCircle());
 
                         //PointConvertor pointConvertor = new PointConvertor();
                         //pointClearanceZone.ShowPoints(pointConvertor.StepPointToXYZ(nextPoint));
 
-                       //bool clearanceAvailable = FurtherPointChecker.IsClearanceAvailable(nextPoint, BackWayPriorityList[k], grid);
-                       // if (!clearanceAvailable)
-                       //     continue;
+                        //bool clearanceAvailable = FurtherPointChecker.IsClearanceAvailable(nextPoint, BackWayPriorityList[k], grid);
+                        // if (!clearanceAvailable)
+                        //     continue;
 
                         PointConvertor pointConvertor = new PointConvertor();
 
@@ -223,11 +228,27 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                 InputData.ZonePoint1.Y + y * InputData.PointsStepF,
                 InputData.ZonePoint1.Z + z * InputData.PointsStepF);
             PathCoords.Add(point);
-        }   
-
-      
+        }
 
 
-       
+        void ShowPoints(List<StepPoint> points)
+
+        {
+            List<XYZ> XYZpoints = new List<XYZ>();
+
+            foreach (StepPoint stepPoint in points)
+            {
+                PointConvertor pointConvertor = new PointConvertor();
+                XYZ XYZpoint = pointConvertor.StepPointToXYZ(stepPoint);
+
+                XYZpoints.Add(XYZpoint);
+            }
+
+            Visualizator visualizator = new Visualizator(Main.Doc);
+            visualizator.ShowPoints(new SpacePointsVisualization(XYZpoints));
+
+        }
+
+
     }
 }

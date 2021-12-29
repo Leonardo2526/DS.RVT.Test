@@ -66,6 +66,7 @@
     <Compile Include="Path\ClearanceZone\IZonePoints.cs" />
     <Compile Include="Path\ClearanceZone\PointClearanceZone.cs" />
     <Compile Include="Path\ClearanceZone\ClearancePointsConvertor.cs" />
+    <Compile Include="Path\ClearanceZone\ZoneByBox.cs" />
     <Compile Include="Path\PathPointsCheck\FurtherPointChecker.cs" />
     <Compile Include="Path\PrioritiesByPoint.cs" />
     <Compile Include="Path\Priority.cs" />
