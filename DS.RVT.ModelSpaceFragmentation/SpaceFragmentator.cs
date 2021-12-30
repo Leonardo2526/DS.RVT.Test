@@ -25,8 +25,8 @@ namespace DS.RVT.ModelSpaceFragmentation
             Doc = doc;
         }
 
-        public List<XYZ> PassablePoints { get; set; }
-        public List<XYZ> UnpassablePoints { get; set; }
+        public static List<XYZ> PassablePoints { get; set; }
+        public static List<XYZ> UnpassablePoints { get; set; }
 
         public void FragmentSpace(Element element)
         {

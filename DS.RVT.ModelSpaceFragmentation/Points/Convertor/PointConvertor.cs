@@ -10,7 +10,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Points
 {
     class PointConvertor
     {
-        public XYZ StepPointToXYZ(StepPoint stepPoint)
+        public static XYZ StepPointToXYZ(StepPoint stepPoint)
         {
             XYZ refPoint = new XYZ(stepPoint.X * ModelSpacePointsGenerator.PointsStepF,
             stepPoint.Y * ModelSpacePointsGenerator.PointsStepF,
@@ -22,7 +22,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Points
 
         }
 
-        public StepPoint XYZToStepPoint(XYZ point)
+        public static StepPoint XYZToStepPoint(XYZ point)
         {
             XYZ refPoint = new XYZ(point.X - PointsInfo.MinBoundPoint.X,
                 point.Y - PointsInfo.MinBoundPoint.Y,
@@ -33,7 +33,6 @@ namespace DS.RVT.ModelSpaceFragmentation.Points
             (int)Math.Round(refPoint.Z / ModelSpacePointsGenerator.PointsStepF));
 
         }
-
 
     }
 }

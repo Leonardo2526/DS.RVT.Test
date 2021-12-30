@@ -112,9 +112,9 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                                     {
 
                                         bool checkUnpassablePoint = pointsCheker.IsPointPassable(nextPoint);
-                                        bool checkClearancePoint = pointsCheker.IsClearanceZoneAvailable(nextPoint, clearancePoints);
-                                        if (checkUnpassablePoint && checkClearancePoint)
-                                        //if (checkUnpassablePoint)
+                                        //bool checkClearancePoint = pointsCheker.IsClearanceZoneAvailable(nextPoint, clearancePoints);
+                                        //if (checkUnpassablePoint && checkClearancePoint)
+                                        if (checkUnpassablePoint)
                                         {
                                             // распространяем волну
                                             d = currentValue + 1;
@@ -133,8 +133,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             if (!grid.ContainsKey(endStepPoint))
                 return false;
 
-            List<StepPoint> items = grid.Select(d => d.Key).ToList();
-            ShowPoints(items);
+            //List<StepPoint> items = grid.Select(d => d.Key).ToList();
+            //ShowPoints(items);
 
             grid[startStepPoint] = 0;
 

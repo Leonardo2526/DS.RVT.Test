@@ -41,7 +41,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             return true;
         }
 
-        public bool IsClearanceZoneAvailable(StepPoint stepPoint, 
+        public bool IsClearanceZoneAvailableOld(StepPoint stepPoint, 
             List<StepPoint> clearancePoints)
         {
             if (InputData.UnpassStepPoints.Count == 0)
@@ -56,6 +56,26 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                     );
                 if (InputData.UnpassStepPoints.Contains(currentPoint))
                         return false;
+            }
+
+            return true;
+        }
+
+        public bool IsClearanceZoneAvailable(StepPoint stepPoint,
+         List<StepPoint> clearancePoints)
+        {
+            if (InputData.UnpassStepPoints.Count == 0)
+                return true;
+
+            foreach (StepPoint clearancePoint in clearancePoints)
+            {
+                StepPoint currentPoint = new StepPoint(
+                    stepPoint.X + clearancePoint.X,
+                    stepPoint.Y + clearancePoint.Y,
+                    stepPoint.Z + clearancePoint.Z
+                    );
+                if (InputData.UnpassStepPoints.Contains(currentPoint))
+                    return false;
             }
 
             return true;
