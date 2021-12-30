@@ -69,6 +69,8 @@
     <Compile Include="Path\CLZ\ICLZ.cs" />
     <Compile Include="Path\CLZ\CLZCretor.cs" />
     <Compile Include="Path\CLZ\CLZByBox.cs" />
+    <Compile Include="Path\PathPointsCheck\GridPointChecker.cs" />
+    <Compile Include="Path\PointMarker.cs" />
     <Compile Include="Path\PointsCloud.cs" />
     <Compile Include="Path\PrioritiesByPoint.cs" />
     <Compile Include="Path\Priority.cs" />
@@ -96,7 +98,7 @@
     <Compile Include="SpaceFragmentator.cs" />
     <Compile Include="Visualization\GraphicOverwriter.cs" />
     <Compile Include="Visualization\IPointsVisualization.cs" />
-    <Compile Include="Visualization\SpacePointsVisualization.cs" />
+    <Compile Include="Visualization\PointsVisualizator.cs" />
     <Compile Include="Visualization\VisiblePointsCreator.cs" />
     <Compile Include="Transactions\ITransaction.cs" />
     <Compile Include="Transactions\ModelCurveTransaction.cs" />

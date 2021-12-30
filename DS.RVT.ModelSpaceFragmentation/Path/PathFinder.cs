@@ -18,7 +18,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             data.ConvertToPlane();
 
             WaveAlgorythm waveAlgorythm = new WaveAlgorythm();
-            PathCoords = waveAlgorythm.FindPath();
+            PathCoords = waveAlgorythm.Implement();
 
             return PathCoords;
         }

@@ -42,7 +42,8 @@ namespace DS.RVT.ModelSpaceFragmentation
          
             PathFinder pathFinder = new PathFinder();
 
-            List<XYZ> pathCoords = pathFinder.GetPath(PointsInfo.StartElemPoint, PointsInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);
+            List<XYZ> pathCoords = pathFinder.GetPath(
+                PointsInfo.StartElemPoint, PointsInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);
 
             LineCreator lineCreator = new LineCreator();
             lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));

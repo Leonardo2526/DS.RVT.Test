@@ -8,12 +8,12 @@ using DS.RVT.ModelSpaceFragmentation.Path;
 
 namespace DS.RVT.ModelSpaceFragmentation.Visualization
 {
-    class SpacePointsVisualization : IPointsVisualization
+    class PointsVisualizator : IPointsVisualization
     {
         public bool OverwriteGraphic { get; set; }
 
         readonly List<XYZ> Points;
-        public SpacePointsVisualization(List<XYZ> points)
+        public PointsVisualizator(List<XYZ> points)
         {
             Points = points;
         }

@@ -15,7 +15,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path.CLZ
         public static void ShowCLZOfPoint(XYZ basePoint)
         {
             List<XYZ> CLZPoints = PointsConvertor.StepPointsToXYZByBasePoint(basePoint, CLZInfo.Points);
-            Visualizator.ShowPoints(new SpacePointsVisualization(CLZPoints));
+            Visualizator.ShowPoints(new PointsVisualizator(CLZPoints));
         }
     }
 }
