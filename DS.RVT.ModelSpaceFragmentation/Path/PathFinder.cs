@@ -17,7 +17,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             InputData data = new InputData(startPoint, endPoint, unpassablePoints);
             data.ConvertToPlane();
 
-            WaveAlgorythm waveAlgorythm = new WaveAlgorythm(data);
+            WaveAlgorythm waveAlgorythm = new WaveAlgorythm();
             PathCoords = waveAlgorythm.FindPath();
 
             return PathCoords;

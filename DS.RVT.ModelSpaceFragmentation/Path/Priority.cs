@@ -16,7 +16,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         }
 
       
-        public List<StepPoint> GetPrioritiesByPointOld(StepPoint currentPoint, StepPoint endPoint)
+        public List<StepPoint> GetPrioritiesByPoint(StepPoint currentPoint, StepPoint endPoint)
         {
             StepsPriority stepsPriority = new StepsPriority();
 

@@ -23,15 +23,6 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         int By = InputData.By;
         int Bz = InputData.Bz;
 
-        readonly InputData data;
-        public WaveAlgorythm(InputData inputData)
-        {
-            data = inputData;
-        }
-
-        public static int InitialPriority { get; set; }
-        List<StepPoint> InitialPriorityList { get; set; }
-
         public List<XYZ> FindPath()
         {
             if (!LaunchAlgorythm())
@@ -48,20 +39,13 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             PointsCheker pointsCheker = new PointsCheker();
 
             List<StepPoint> StepPointsList = new List<StepPoint>();
-
-            int x = 0;
-            int y = 0;
-            int z = 0;
-            int d = 0;
-            int k;
-            int a;
+            int x, y, z, d, k, a;
 
             // стартовая ячейка
             StepPoint startStepPoint = new StepPoint(Ax, Ay, Az);
             StepPoint endStepPoint = new StepPoint(Bx, By, Bz);
 
             CLZCretor clzCreator = new CLZCretor();
-            //List<StepPoint> clearancePoints = pointClearanceZone.Create(new ZoneByCircle());
             List<StepPoint> clzPoints = clzCreator.Create(new CLZByBoders());
 
             //if (!pointsCheker.IsStartEndPointAvailable(startStepPoint, clzPoints) |
@@ -75,9 +59,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             };
 
             Priority priority = new Priority();
-            InitialPriorityList = priority.GetPriorities();
-
-            InitialPriority = StepsPriority.CurrentPriority;
+            List<StepPoint> initialPriorityList = priority.GetPriorities();
 
             do
             {
@@ -104,9 +86,9 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                             // проходим по всем непомеченным соседям
                             for (k = 0; k < 6; ++k)
                             {
-                                int ix = x + InitialPriorityList[k].X,
-                                    iy = y + InitialPriorityList[k].Y,
-                                    iz = z + InitialPriorityList[k].Z;
+                                int ix = x + initialPriorityList[k].X,
+                                    iy = y + initialPriorityList[k].Y,
+                                    iz = z + initialPriorityList[k].Z;
 
                                 if (ix >= 0 && ix < InputData.Xcount &&
                                     iy >= 0 && iy < InputData.Ycount &&
@@ -118,10 +100,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                                     {
 
                                         bool checkUnpassablePoint = pointsCheker.IsPointPassable(nextPoint);
-                                        //bool checkClearancePoint = pointsCheker.IsClearanceZoneAvailableOld(nextPoint, clzPoints);
                                         bool checkClearancePoint = pointsCheker.IsClearanceZoneAvailable(nextPoint, clzPoints, unpassableByCLZPoints);
                                         if (checkUnpassablePoint && checkClearancePoint)
-                                            //if (checkUnpassablePoint)
                                         {
                                             // распространяем волну
                                             d = currentValue + 1;
@@ -163,7 +143,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                 d--;
 
                 StepPoint currentPoint = new StepPoint(x, y, z);
-                List<StepPoint> BackWayPriorityList = priority.GetPrioritiesByPointOld(currentPoint, endStepPoint);
+                List<StepPoint> BackWayPriorityList = priority.GetPrioritiesByPoint(currentPoint, endStepPoint);
 
                 for (k = 0; k < 6; ++k)
                 {
