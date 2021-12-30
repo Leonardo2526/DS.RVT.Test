@@ -9,18 +9,6 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 {
     class ZoneByCircle : IZonePoints
     {
-        private static double ElemDiameterF { get; } = ElementSize.ElemDiameterF;
-        public static int FullZoneCleranceInSteps { get; set; }
-
-        int GetFullZoneCleranceInSteps()
-        {           
-            double ElemDiameterInSteps = (ElemDiameterF /2) / InputData.PointsStepF;
-            int t = (int)Math.Round(ElemDiameterInSteps);
-            FullZoneCleranceInSteps = PointClearanceZone.ZoneClearanceInSteps + t;
-
-            return FullZoneCleranceInSteps;
-        }
-
         public List<StepPoint> CreateZonePoints()
         {
             int fullZoneCleranceInSteps = GetFullZoneCleranceInSteps();

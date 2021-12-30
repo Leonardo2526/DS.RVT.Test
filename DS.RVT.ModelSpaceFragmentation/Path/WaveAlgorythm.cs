@@ -3,6 +3,7 @@ using Autodesk.Revit.UI;
 using DS.RVT.ModelSpaceFragmentation.Lines;
 using DS.RVT.ModelSpaceFragmentation.Points;
 using DS.RVT.ModelSpaceFragmentation.Visualization;
+using DS.RVT.ModelSpaceFragmentation.Path.CLZ;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -59,12 +60,12 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             StepPoint startStepPoint = new StepPoint(Ax, Ay, Az);
             StepPoint endStepPoint = new StepPoint(Bx, By, Bz);
 
-            PointClearanceZone pointClearanceZone = new PointClearanceZone();
+            CLZCretor clzCreator = new CLZCretor();
             //List<StepPoint> clearancePoints = pointClearanceZone.Create(new ZoneByCircle());
-            List<StepPoint> clearancePoints = pointClearanceZone.Create(new ZoneByBox());
+            List<StepPoint> clzPoints = clzCreator.Create(new CLZByBox());
 
-            if (!pointsCheker.IsStartEndPointAvailable(startStepPoint, clearancePoints) |
-                !pointsCheker.IsStartEndPointAvailable(endStepPoint, clearancePoints))
+            if (!pointsCheker.IsStartEndPointAvailable(startStepPoint, clzPoints) |
+                !pointsCheker.IsStartEndPointAvailable(endStepPoint, clzPoints))
                 return false;
 
             StepPointsList.Add(startStepPoint);
@@ -95,6 +96,9 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                             else
                                 currentValue = grid[currentPoint];
 
+
+                            //PointsCloud.GetByCenterPoint(PointConvertor.StepPointToXYZ(currentPoint), CLZInfo.FullDistanceF);                                
+
                             // проходим по всем непомеченным соседям
                             for (k = 0; k < 6; ++k)
                             {
@@ -112,9 +116,9 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                                     {
 
                                         bool checkUnpassablePoint = pointsCheker.IsPointPassable(nextPoint);
-                                        //bool checkClearancePoint = pointsCheker.IsClearanceZoneAvailable(nextPoint, clearancePoints);
-                                        //if (checkUnpassablePoint && checkClearancePoint)
-                                        if (checkUnpassablePoint)
+                                        bool checkClearancePoint = pointsCheker.IsClearanceZoneAvailable(nextPoint, clzPoints);
+                                        if (checkUnpassablePoint && checkClearancePoint)
+                                            //if (checkUnpassablePoint)
                                         {
                                             // распространяем волну
                                             d = currentValue + 1;
@@ -186,16 +190,15 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                         // if (!clearanceAvailable)
                         //     continue;
 
-                        PointConvertor pointConvertor = new PointConvertor();
 
-                        XYZ p1 = pointConvertor.StepPointToXYZ(new StepPoint(x, y, z));
+                        XYZ p1 = PointConvertor.StepPointToXYZ(new StepPoint(x, y, z));
 
                         // переходим в ячейку, которая на 1 ближе к старту
                         x += BackWayPriorityList[k].X;
                         y += BackWayPriorityList[k].Y;
                         z += BackWayPriorityList[k].Z;
 
-                        XYZ p2 = pointConvertor.StepPointToXYZ(new StepPoint(x, y, z));
+                        XYZ p2 = PointConvertor.StepPointToXYZ(new StepPoint(x, y, z));
 
                         List<XYZ> pathCoords = new List<XYZ>()
                         {
@@ -239,13 +242,12 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             foreach (StepPoint stepPoint in points)
             {
                 PointConvertor pointConvertor = new PointConvertor();
-                XYZ XYZpoint = pointConvertor.StepPointToXYZ(stepPoint);
+                XYZ XYZpoint = PointConvertor.StepPointToXYZ(stepPoint);
 
                 XYZpoints.Add(XYZpoint);
             }
 
-            Visualizator visualizator = new Visualizator(Main.Doc);
-            visualizator.ShowPoints(new SpacePointsVisualization(XYZpoints));
+            Visualizator.ShowPoints(new SpacePointsVisualization(XYZpoints));
 
         }
 

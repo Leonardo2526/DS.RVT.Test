@@ -8,6 +8,7 @@ using DS.RVT.ModelSpaceFragmentation.Path;
 using DS.RVT.ModelSpaceFragmentation.Lines;
 using DS.RVT.ModelSpaceFragmentation.Visualization;
 using DS.RVT.ModelSpaceFragmentation.Points;
+using DS.RVT.ModelSpaceFragmentation.Path.CLZ;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -41,16 +42,12 @@ namespace DS.RVT.ModelSpaceFragmentation
          
             PathFinder pathFinder = new PathFinder();
 
-            List<XYZ> pathCoords = pathFinder.GetPath(PointsInfo.StartElemPoint, PointsInfo.EndElemPoint, spaceFragmentator.UnpassablePoints);
+            List<XYZ> pathCoords = pathFinder.GetPath(PointsInfo.StartElemPoint, PointsInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);
 
             LineCreator lineCreator = new LineCreator();
             lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
 
-            //PointClearanceZone pointClearanceZone = new PointClearanceZone();
-            //pointClearanceZone.Create(new ZoneByCircle());
-            //pointClearanceZone.ShowPoints(PointsInfo.StartElemPoint);
-
-
+            //CLZVisualizator.ShowCLZOfPoint(PointsInfo.StartElemPoint);
         }
 
     }

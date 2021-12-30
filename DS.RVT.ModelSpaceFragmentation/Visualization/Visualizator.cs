@@ -10,16 +10,9 @@ namespace DS.RVT.ModelSpaceFragmentation.Visualization
 {
     class Visualizator
     {
-        readonly Document Doc;
-
-        public Visualizator(Document doc)
+        public static void ShowPoints(IPointsVisualization pointsVisualization)
         {
-            Doc = doc;
-        }
-
-        public void ShowPoints(IPointsVisualization pointsVisualization)
-        {
-            pointsVisualization.Show(Doc);
+            pointsVisualization.Show(Main.Doc);
         }
     }
 }

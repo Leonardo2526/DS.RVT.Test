@@ -10,11 +10,14 @@ namespace DS.RVT.ModelSpaceFragmentation.Points
 {
     class PointConvertor
     {
+        static readonly double PointsStepF = ModelSpacePointsGenerator.PointsStepF;
+
+
         public static XYZ StepPointToXYZ(StepPoint stepPoint)
         {
-            XYZ refPoint = new XYZ(stepPoint.X * ModelSpacePointsGenerator.PointsStepF,
-            stepPoint.Y * ModelSpacePointsGenerator.PointsStepF,
-            stepPoint.Z * ModelSpacePointsGenerator.PointsStepF);
+            XYZ refPoint = new XYZ(stepPoint.X * PointsStepF,
+            stepPoint.Y * PointsStepF,
+            stepPoint.Z * PointsStepF);
 
             return new XYZ(PointsInfo.MinBoundPoint.X + refPoint.X, 
                 PointsInfo.MinBoundPoint.Y + refPoint.Y,
@@ -28,11 +31,19 @@ namespace DS.RVT.ModelSpaceFragmentation.Points
                 point.Y - PointsInfo.MinBoundPoint.Y,
                 point.Z - PointsInfo.MinBoundPoint.Z);
 
-            return new StepPoint((int)Math.Round(refPoint.X / ModelSpacePointsGenerator.PointsStepF),
-            (int)Math.Round(refPoint.Y / ModelSpacePointsGenerator.PointsStepF),
-            (int)Math.Round(refPoint.Z / ModelSpacePointsGenerator.PointsStepF));
+            return new StepPoint((int)Math.Round(refPoint.X / PointsStepF),
+            (int)Math.Round(refPoint.Y / PointsStepF),
+            (int)Math.Round(refPoint.Z / PointsStepF));
 
         }
 
+        public static XYZ StepPointToXYZByPoint(XYZ basePoint, StepPoint stepPoint)
+        {
+             XYZ point = new XYZ(basePoint.X + stepPoint.X * PointsStepF,
+                    basePoint.Y + stepPoint.Y * PointsStepF,
+                    basePoint.Z + stepPoint.Z * PointsStepF);
+
+            return point;
+        }
     }
 }

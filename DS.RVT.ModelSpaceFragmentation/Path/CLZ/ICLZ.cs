@@ -4,6 +4,6 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 {
     interface IZonePoints
     {
-        List<StepPoint> CreateZonePoints();
+        List<StepPoint> Create();
     }
 }

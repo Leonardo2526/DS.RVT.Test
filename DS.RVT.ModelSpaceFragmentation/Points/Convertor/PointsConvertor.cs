@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DS.RVT.ModelSpaceFragmentation.Points
 {
-    class PointsListConvertor
+    class PointsConvertor
     {
         public static List<XYZ> StepPointToXYZ(List<StepPoint> stepPoints)
         {
@@ -28,5 +28,16 @@ namespace DS.RVT.ModelSpaceFragmentation.Points
 
             return stepPoints;
         }
+
+        public static List<XYZ> StepPointToXYZByBasePoint(XYZ basePoint, List<StepPoint> CLZPoints)
+        {
+            List<XYZ> modelSpacePoints = new List<XYZ>();
+
+            foreach (StepPoint stepPoint in CLZPoints)
+                modelSpacePoints.Add(PointConvertor.StepPointToXYZByPoint(basePoint, stepPoint));
+
+            return modelSpacePoints;
+        }
+
     }
 }
