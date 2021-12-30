@@ -62,7 +62,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
             CLZCretor clzCreator = new CLZCretor();
             //List<StepPoint> clearancePoints = pointClearanceZone.Create(new ZoneByCircle());
-            List<StepPoint> clzPoints = clzCreator.Create(new CLZByBox());
+            List<StepPoint> clzPoints = clzCreator.Create(new CLZByBoders());
 
             //if (!pointsCheker.IsStartEndPointAvailable(startStepPoint, clzPoints) |
             //    !pointsCheker.IsStartEndPointAvailable(endStepPoint, clzPoints))

@@ -63,6 +63,7 @@
     <Compile Include="Lines\LineCollision.cs" />
     <Compile Include="Lines\CurvesByPointsCreator.cs" />
     <Compile Include="Lines\RayCreator.cs" />
+    <Compile Include="Path\CLZ\CLZByBoders.cs" />
     <Compile Include="Path\CLZ\CLZInfo.cs" />
     <Compile Include="Path\CLZ\CLZVisualizator.cs" />
     <Compile Include="Path\CLZ\ICLZ.cs" />
