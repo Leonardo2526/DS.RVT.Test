@@ -64,9 +64,9 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             //List<StepPoint> clearancePoints = pointClearanceZone.Create(new ZoneByCircle());
             List<StepPoint> clzPoints = clzCreator.Create(new CLZByBox());
 
-            if (!pointsCheker.IsStartEndPointAvailable(startStepPoint, clzPoints) |
-                !pointsCheker.IsStartEndPointAvailable(endStepPoint, clzPoints))
-                return false;
+            //if (!pointsCheker.IsStartEndPointAvailable(startStepPoint, clzPoints) |
+            //    !pointsCheker.IsStartEndPointAvailable(endStepPoint, clzPoints))
+            //    return false;
 
             StepPointsList.Add(startStepPoint);
             Dictionary<StepPoint, int> grid = new Dictionary<StepPoint, int>
@@ -96,8 +96,10 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                             else
                                 currentValue = grid[currentPoint];
 
-
-                            //PointsCloud.GetByCenterPoint(PointConvertor.StepPointToXYZ(currentPoint), CLZInfo.FullDistanceF);                                
+                            //Create points cloud for next check from unpassible points
+                            PointsCloud pointsCloud = new PointsCloud(SpaceFragmentator.UnpassablePoints);
+                            List <StepPoint> unpassableByCLZPoints =
+                                pointsCloud.GetStepPointByCenterPoint(PointConvertor.StepPointToXYZ(currentPoint));                                
 
                             // проходим по всем непомеченным соседям
                             for (k = 0; k < 6; ++k)
@@ -116,7 +118,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                                     {
 
                                         bool checkUnpassablePoint = pointsCheker.IsPointPassable(nextPoint);
-                                        bool checkClearancePoint = pointsCheker.IsClearanceZoneAvailable(nextPoint, clzPoints);
+                                        //bool checkClearancePoint = pointsCheker.IsClearanceZoneAvailableOld(nextPoint, clzPoints);
+                                        bool checkClearancePoint = pointsCheker.IsClearanceZoneAvailable(nextPoint, clzPoints, unpassableByCLZPoints);
                                         if (checkUnpassablePoint && checkClearancePoint)
                                             //if (checkUnpassablePoint)
                                         {
@@ -179,38 +182,10 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                          grid[nextPoint] == d)
                     {
 
-
-
-                        //pointClearanceZone.Create(new ZoneByCircle());
-
-                        //PointConvertor pointConvertor = new PointConvertor();
-                        //pointClearanceZone.ShowPoints(pointConvertor.StepPointToXYZ(nextPoint));
-
-                        //bool clearanceAvailable = FurtherPointChecker.IsClearanceAvailable(nextPoint, BackWayPriorityList[k], grid);
-                        // if (!clearanceAvailable)
-                        //     continue;
-
-
-                        XYZ p1 = PointConvertor.StepPointToXYZ(new StepPoint(x, y, z));
-
                         // переходим в ячейку, которая на 1 ближе к старту
                         x += BackWayPriorityList[k].X;
                         y += BackWayPriorityList[k].Y;
                         z += BackWayPriorityList[k].Z;
-
-                        XYZ p2 = PointConvertor.StepPointToXYZ(new StepPoint(x, y, z));
-
-                        List<XYZ> pathCoords = new List<XYZ>()
-                        {
-                            p1,
-                            p2
-                        };
-
-                        LineCreator lineCreator = new LineCreator();
-                        lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
-
-                        //PrioritiesByPoint prioritiesByPoint = new PrioritiesByPoint(nextPoint, endStepPoint, BackWayPriorityList[k], grid);
-                        //BackWayPriorityList = prioritiesByPoint.GetPrioritiesByPoint();
 
                         break;
                     }

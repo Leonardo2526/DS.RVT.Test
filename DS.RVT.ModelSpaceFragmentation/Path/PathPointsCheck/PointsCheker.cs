@@ -28,18 +28,18 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             return true;
         }
 
-        public bool IsStartEndPointAvailable(StepPoint point, List<StepPoint> clearancePoints)
-        {
-            bool checkUnpassablePoint = IsPointPassable(point);
-            bool checkClearancePoint = IsClearanceZoneAvailable(point, clearancePoints);
-            if (!checkUnpassablePoint | !checkClearancePoint)
-            {
-                TaskDialog.Show("Error", "Start or end point is unpassible!");
-                return false;
-            }
+        //public bool IsStartEndPointAvailable(StepPoint point, List<StepPoint> clearancePoints)
+        //{
+        //    bool checkUnpassablePoint = IsPointPassable(point);
+        //    bool checkClearancePoint = IsClearanceZoneAvailable(point, clearancePoints,);
+        //    if (!checkUnpassablePoint | !checkClearancePoint)
+        //    {
+        //        TaskDialog.Show("Error", "Start or end point is unpassible!");
+        //        return false;
+        //    }
 
-            return true;
-        }
+        //    return true;
+        //}
 
         public bool IsClearanceZoneAvailableOld(StepPoint stepPoint, 
             List<StepPoint> clearancePoints)
@@ -62,9 +62,9 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         }
 
         public bool IsClearanceZoneAvailable(StepPoint stepPoint,
-         List<StepPoint> clearancePoints)
+         List<StepPoint> clearancePoints, List<StepPoint> unpassableByCLZPoints)
         {
-            if (InputData.UnpassStepPoints.Count == 0)
+            if (unpassableByCLZPoints.Count == 0)
                 return true;
 
             foreach (StepPoint clearancePoint in clearancePoints)
@@ -74,7 +74,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                     stepPoint.Y + clearancePoint.Y,
                     stepPoint.Z + clearancePoint.Z
                     );
-                if (InputData.UnpassStepPoints.Contains(currentPoint))
+                if (unpassableByCLZPoints.Contains(currentPoint))
                     return false;
             }
 

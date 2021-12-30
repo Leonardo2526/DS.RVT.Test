@@ -9,7 +9,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Points
 {
     class PointsConvertor
     {
-        public static List<XYZ> StepPointToXYZ(List<StepPoint> stepPoints)
+        public static List<XYZ> StepPointsToXYZ(List<StepPoint> stepPoints)
         {
             List<XYZ> XYZpoints = new List<XYZ>();
             
@@ -19,9 +19,12 @@ namespace DS.RVT.ModelSpaceFragmentation.Points
             return XYZpoints;
         }
 
-        public static List<StepPoint> XYZToStepPoint(List<XYZ> XYZPoints)
+        public static List<StepPoint> XYZToStepPoints(List<XYZ> XYZPoints)
         {
             List<StepPoint> stepPoints = new List<StepPoint>();
+
+            if (XYZPoints == null)
+                return stepPoints;
 
             foreach (XYZ XYZPoint in XYZPoints)
                 stepPoints.Add(PointConvertor.XYZToStepPoint(XYZPoint));
@@ -29,7 +32,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Points
             return stepPoints;
         }
 
-        public static List<XYZ> StepPointToXYZByBasePoint(XYZ basePoint, List<StepPoint> CLZPoints)
+        public static List<XYZ> StepPointsToXYZByBasePoint(XYZ basePoint, List<StepPoint> CLZPoints)
         {
             List<XYZ> modelSpacePoints = new List<XYZ>();
 
