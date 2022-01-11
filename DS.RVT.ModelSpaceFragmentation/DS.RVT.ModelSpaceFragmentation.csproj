@@ -71,6 +71,7 @@
     <Compile Include="Path\CLZ\CLZByBox.cs" />
     <Compile Include="Path\PathPointsCheck\GridPointChecker.cs" />
     <Compile Include="Path\PointMarker.cs" />
+    <Compile Include="Path\PointsMarkerIterator.cs" />
     <Compile Include="Path\PointsCloud.cs" />
     <Compile Include="Path\PrioritiesByPoint.cs" />
     <Compile Include="Path\Priority.cs" />
