@@ -5,7 +5,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 {
     class PointsMarkerIterator
     {
-        static int x, y, z, d, a;
+        static int d;
     
         public static StepPoint StartStepPoint;
         public static StepPoint EndStepPoint;
@@ -17,7 +17,11 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         public static bool IfWaveReachedEndPoint()
         {
             FillData();
-            Iterate();
+            Iterate(new IteratorByXYPlane());
+
+            if (!Grid.ContainsKey(EndStepPoint))
+                Iterate(new IteratorBy3D());
+
 
             if (!Grid.ContainsKey(EndStepPoint))
                 return false;
@@ -37,34 +41,21 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             List<StepPoint> stepPointsList = new List<StepPoint>();
             stepPointsList.Add(StartStepPoint);
 
-            Grid = new Dictionary<StepPoint, int>
-            {
-                { StartStepPoint, 1 }
-            };
+           
             Priority PriorityInstance = new Priority();
             initialPriorityList = PriorityInstance.GetPriorities();
         }
 
-        static void Iterate()
+        static void Iterate(ISpacePointsIterator iteratorByPlane)
         {
-            do
+            Grid = new Dictionary<StepPoint, int>
             {
-                a = 0;
-                for (z = 0; z < InputData.Zcount; z++)
-                {
-                    for (y = 0; y < InputData.Ycount; y++)
-                    {
-                        for (x = 0; x < InputData.Xcount; x++)
-                        {
-                            if (!Operation())
-                                continue;
-                        }
-                    }
-                }
-            } while (!Grid.ContainsKey(EndStepPoint) && a != 0);
+                { StartStepPoint, 1 }
+            };
+            iteratorByPlane.Iterate();
         }
 
-        static bool Operation()
+        public static bool Operation(int x, int y, int z, ref int a)
         {
             StepPoint currentPoint = new StepPoint(x, y, z);
 

@@ -28,7 +28,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
         bool IfPathExists()
         {
-            PointsMarkerIterator.IfWaveReachedEndPoint();
+            if (!PointsMarkerIterator.IfWaveReachedEndPoint())
+                return false;
            
             //List<StepPoint> items = grid.Select(d => d.Key).ToList();
             //ShowPoints(items);
