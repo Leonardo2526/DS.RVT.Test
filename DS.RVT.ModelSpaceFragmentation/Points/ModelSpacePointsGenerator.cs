@@ -11,7 +11,7 @@ namespace DS.RVT.ModelSpaceFragmentation
     {
         XYZ Point1;
         XYZ Point2;
-        public static int PointsStep { get; } = 100;
+        public static int PointsStep { get; } = 50;
         public static double PointsStepF { get; set; }
 
         public static int Xcount { get; set; }
@@ -46,6 +46,7 @@ namespace DS.RVT.ModelSpaceFragmentation
                     {
                         double xStep = x * PointsStepF;
                         XYZ point = new XYZ(Point1.X + xStep, Point1.Y + yStep, Point1.Z + zStep);
+                        //XYZ point = new XYZ(Point1.X + xStep, Point1.Y + yStep, zStep);
                         spacePoints.Add(point);
                     }
                 }

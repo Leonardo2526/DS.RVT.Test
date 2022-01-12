@@ -30,7 +30,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
                 bool checkUnpassablePoint = pointsCheker.IsPointPassable(NextPoint);
                 bool checkClearancePoint = pointsCheker.IsClearanceZoneAvailable(NextPoint, CLZPoints, UnpassableByCLZPoints);
-                if (checkUnpassablePoint && checkClearancePoint)
+                if (checkUnpassablePoint & checkClearancePoint)
                 {
                     // распространяем волну
                     d = CurrentValue + 1;

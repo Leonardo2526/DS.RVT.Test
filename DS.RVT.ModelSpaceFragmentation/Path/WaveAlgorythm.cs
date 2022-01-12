@@ -12,14 +12,21 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
     class WaveAlgorythm
     {
         public List<XYZ> PathCoords { get; set; } = new List<XYZ>();
+        public int Len { get; set; }
+        public ISpacePointsIterator SpacePointsIterator { get; set; }
 
-        int x, y, z, d, k, len;
+        int x, y, z, d, k;
+
+        public WaveAlgorythm(ISpacePointsIterator spacePointsIterator)
+        {
+            this.SpacePointsIterator = spacePointsIterator;
+        }
 
         public List<XYZ> Implement()
         {
             if (!IfPathExists())
             {
-                TaskDialog.Show("Revit", "Путь не найден!");
+               
                 return new List<XYZ>();
             }
 
@@ -28,7 +35,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
         bool IfPathExists()
         {
-            if (!PointsMarkerIterator.IfWaveReachedEndPoint())
+            if (!PointsMarkerIterator.IfWaveReachedEndPoint(this.SpacePointsIterator))
                 return false;
            
             //List<StepPoint> items = grid.Select(d => d.Key).ToList();
@@ -50,12 +57,12 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
             // восстановление пути
             // длина кратчайшего пути из (ax, ay) в (bx, By)
-            len = PointsMarkerIterator.Grid[PointsMarkerIterator.EndStepPoint];
+            Len = PointsMarkerIterator.Grid[PointsMarkerIterator.EndStepPoint];
 
             x = InputData.Bx;
             y = InputData.By;
             z = InputData.Bz;
-            d = len;
+            d = Len;
 
             while (d >= 0)
             {

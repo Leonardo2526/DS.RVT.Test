@@ -15,6 +15,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path.CLZ
 
         public static int FullDistanceInSteps { get; set; }
         public static double FullDistanceF { get; set; }
+        public static double FullDistanceWithMarkPointF { get; set; }
 
         public static List<StepPoint> Points { get; set; }
 
@@ -27,6 +28,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path.CLZ
 
             FullDistanceF = DistanceF + (ElementSize.ElemDiameterF / 2);
             FullDistanceInSteps = (int)Math.Round((FullDistanceF) / InputData.PointsStepF);
+            FullDistanceWithMarkPointF = FullDistanceF + ModelSpacePointsGenerator.PointsStepF;
 
             Points = new List<StepPoint>();
         }

@@ -39,7 +39,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             SpaceFragmentator spaceFragmentator = new SpaceFragmentator(App, Uiapp, Uidoc, Doc);
             spaceFragmentator.FragmentSpace(CurrentElement);
-         
+
             PathFinder pathFinder = new PathFinder();
 
             List<XYZ> pathCoords = pathFinder.GetPath(

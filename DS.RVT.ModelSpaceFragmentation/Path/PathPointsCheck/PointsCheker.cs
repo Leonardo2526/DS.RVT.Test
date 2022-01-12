@@ -2,6 +2,8 @@
 using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
+using DS.RVT.ModelSpaceFragmentation.Points;
+using DS.RVT.ModelSpaceFragmentation.Path.CLZ;
 
 namespace DS.RVT.ModelSpaceFragmentation.Path
 {
@@ -12,13 +14,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             if (InputData.UnpassStepPoints.Count == 0)
                 return true;
 
-            for (int i = 0; i < InputData.UnpassLocX.Count; i++)
-            {
-                if (InputData.UnpassLocX[i] == point.X &&
-                    InputData.UnpassLocY[i] == point.Y &&
-                    InputData.UnpassLocZ[i] == point.Z)
-                    return false;
-            }
+            if (InputData.UnpassStepPoints.Contains(point))
+                return false;
 
             return true;
         }
@@ -43,5 +40,16 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             return true;
         }
 
+        public static bool IsPointPassableByMark(StepPoint stepPoint)
+        {
+            XYZ XYZpoint = PointConvertor.StepPointToXYZ(stepPoint);
+            foreach (XYZ upassPoint in SpaceFragmentator.UnpassablePoints)
+            {
+                if (XYZpoint.DistanceTo(upassPoint) <= CLZInfo.FullDistanceWithMarkPointF)
+                    return false;
+            }
+
+            return true;
+        }
     }
 }

@@ -70,6 +70,8 @@
     <Compile Include="Path\CLZ\CLZCretor.cs" />
     <Compile Include="Path\CLZ\CLZByBox.cs" />
     <Compile Include="Path\SpacePointsIterator\ISpacePointsIterator.cs" />
+    <Compile Include="Path\SpacePointsIterator\IteratorByYZPlane.cs" />
+    <Compile Include="Path\SpacePointsIterator\IteratorByXZPlane.cs" />
     <Compile Include="Path\SpacePointsIterator\IteratorBy3D.cs" />
     <Compile Include="Path\SpacePointsIterator\IteratorByXYPlane.cs" />
     <Compile Include="Path\PathPointsCheck\GridPointChecker.cs" />

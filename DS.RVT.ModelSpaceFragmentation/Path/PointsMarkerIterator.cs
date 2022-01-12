@@ -6,7 +6,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
     class PointsMarkerIterator
     {
         static int d;
-    
+
         public static StepPoint StartStepPoint;
         public static StepPoint EndStepPoint;
 
@@ -14,14 +14,10 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         private static List<StepPoint> initialPriorityList;
         private static List<StepPoint> clzPoints;
 
-        public static bool IfWaveReachedEndPoint()
+        public static bool IfWaveReachedEndPoint(ISpacePointsIterator spacePointsIterator)
         {
             FillData();
-            Iterate(new IteratorByXYPlane());
-
-            if (!Grid.ContainsKey(EndStepPoint))
-                Iterate(new IteratorBy3D());
-
+            Iterate(spacePointsIterator);
 
             if (!Grid.ContainsKey(EndStepPoint))
                 return false;
@@ -31,17 +27,17 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
         static void FillData()
         {
-         
+
             StartStepPoint = new StepPoint(InputData.Ax, InputData.Ay, InputData.Az);
             EndStepPoint = new StepPoint(InputData.Bx, InputData.By, InputData.Bz);
 
             CLZCretor clzCreator = new CLZCretor();
-            clzPoints = clzCreator.Create(new CLZByBoders());
+            clzPoints = clzCreator.Create(new CLZByBox());
 
             List<StepPoint> stepPointsList = new List<StepPoint>();
             stepPointsList.Add(StartStepPoint);
 
-           
+
             Priority PriorityInstance = new Priority();
             initialPriorityList = PriorityInstance.GetPriorities();
         }
