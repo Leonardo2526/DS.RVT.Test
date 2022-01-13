@@ -53,7 +53,8 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             if (len1 == 1000 && len2 == 1000)
             {
-                waveAlgorythm = new WaveAlgorythm(new IteratorBy3D());
+                spacePointsIterator = new IteratorBy3D();
+                waveAlgorythm = new WaveAlgorythm(spacePointsIterator);
                 PathCoords = waveAlgorythm.Implement();
 
                 if (PathCoords.Count == 0)
