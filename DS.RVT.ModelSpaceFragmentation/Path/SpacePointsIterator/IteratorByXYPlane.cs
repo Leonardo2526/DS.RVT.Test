@@ -10,20 +10,20 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
     {
         public void Iterate()
         {
-            int x, y, z, a;
+            int x, y, z;
             do
             {
-                a = 0;
+                NeighboursPasser.A = 0;
                 z = InputData.Az;
                     for (y = 0; y < InputData.Ycount; y++)
                     {
                         for (x = 0; x < InputData.Xcount; x++)
                         {
-                            if (!PointsMarkerIterator.Operation(x,y,z, ref a))
+                            if (!WaveExpander.Operation(x,y,z))
                                 continue;
                         }
                     }                
-            } while (!PointsMarkerIterator.Grid.ContainsKey(PointsMarkerIterator.EndStepPoint) && a != 0);
+            } while (!WaveExpander.Grid.ContainsKey(WaveExpander.EndStepPoint) && NeighboursPasser.A != 0);
         }
     }
 }

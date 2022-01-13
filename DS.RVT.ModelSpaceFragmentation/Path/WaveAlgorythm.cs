@@ -35,7 +35,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
         bool IfPathExists()
         {
-            if (!PointsMarkerIterator.IfWaveReachedEndPoint(this.SpacePointsIterator))
+            if (!WaveExpander.Expand(this.SpacePointsIterator))
                 return false;
            
             //List<StepPoint> items = grid.Select(d => d.Key).ToList();
@@ -53,11 +53,11 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
         void GetPath()
         {
-            PointsMarkerIterator.Grid[PointsMarkerIterator.StartStepPoint] = 0;
+            WaveExpander.Grid[WaveExpander.StartStepPoint] = 0;
 
             // восстановление пути
             // длина кратчайшего пути из (ax, ay) в (bx, By)
-            Len = PointsMarkerIterator.Grid[PointsMarkerIterator.EndStepPoint];
+            Len = WaveExpander.Grid[WaveExpander.EndStepPoint];
 
             x = InputData.Bx;
             y = InputData.By;
@@ -74,7 +74,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                 StepPoint currentPoint = new StepPoint(x, y, z);
                 Priority PriorityInstance = new Priority();
                 List<StepPoint> BackWayPriorityList = 
-                    PriorityInstance.GetPrioritiesByPoint(currentPoint, PointsMarkerIterator.EndStepPoint);
+                    PriorityInstance.GetPrioritiesByPoint(currentPoint, WaveExpander.EndStepPoint);
 
                 for (k = 0; k < 6; ++k)
                 {
@@ -84,13 +84,13 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
                     StepPoint nextPoint = new StepPoint(ix, iy, iz);
 
-                    if (!PointsMarkerIterator.Grid.ContainsKey(nextPoint))
+                    if (!WaveExpander.Grid.ContainsKey(nextPoint))
                         continue;
 
                     if (ix >= 0 && ix < InputData.Xcount &&
                         iy >= 0 && iy < InputData.Ycount &&
                         iz >= 0 && iz < InputData.Zcount &&
-                         PointsMarkerIterator.Grid[nextPoint] == d)
+                         WaveExpander.Grid[nextPoint] == d)
                     {
 
                         // переходим в ячейку, которая на 1 ближе к старту

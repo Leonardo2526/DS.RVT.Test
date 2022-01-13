@@ -20,20 +20,19 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             return true;
         }
 
-        public bool IsClearanceZoneAvailable(StepPoint stepPoint,
-         List<StepPoint> clearancePoints, List<StepPoint> unpassableByCLZPoints)
+        public bool IsClearanceZoneAvailable(StepPoint stepPoint)
         {
-            if (unpassableByCLZPoints.Count == 0)
+            if (NeighboursPasser.UnpassableByCLZPoints.Count == 0)
                 return true;
 
-            foreach (StepPoint clearancePoint in clearancePoints)
+            foreach (StepPoint clearancePoint in NeighboursPasser.CLZPoints)
             {
                 StepPoint currentPoint = new StepPoint(
                     stepPoint.X + clearancePoint.X,
                     stepPoint.Y + clearancePoint.Y,
                     stepPoint.Z + clearancePoint.Z
                     );
-                if (unpassableByCLZPoints.Contains(currentPoint))
+                if (NeighboursPasser.UnpassableByCLZPoints.Contains(currentPoint))
                     return false;
             }
 

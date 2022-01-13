@@ -3,18 +3,16 @@ using System.Collections.Generic;
 
 namespace DS.RVT.ModelSpaceFragmentation.Path
 {
-    class PointsMarkerIterator
-    {
-        static int d;
-
+    class WaveExpander
+    {       
         public static StepPoint StartStepPoint;
         public static StepPoint EndStepPoint;
 
-        public static Dictionary<StepPoint, int> Grid;
+        public static Dictionary<StepPoint, int> Grid { get; set; }
         private static List<StepPoint> initialPriorityList;
         private static List<StepPoint> clzPoints;
 
-        public static bool IfWaveReachedEndPoint(ISpacePointsIterator spacePointsIterator)
+        public static bool Expand(ISpacePointsIterator spacePointsIterator)
         {
             FillData();
             Iterate(spacePointsIterator);
@@ -51,7 +49,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             iteratorByPlane.Iterate();
         }
 
-        public static bool Operation(int x, int y, int z, ref int a)
+        public static bool Operation(int x, int y, int z)
         {
             StepPoint currentPoint = new StepPoint(x, y, z);
 
@@ -66,9 +64,9 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
             List<StepPoint> unpassableByCLZPoints =
                 pointsCloud.GetStepPointByCenterPoint(PointConvertor.StepPointToXYZ(currentPoint));
 
-            PointMarker pointMarker =
-                new PointMarker(currentPoint, clzPoints, unpassableByCLZPoints, initialPriorityList, currentD);
-            pointMarker.Mark(ref Grid, ref d, ref a);
+            NeighboursPasser neighboursPasser =
+                new NeighboursPasser(currentPoint, clzPoints, unpassableByCLZPoints, initialPriorityList, currentD);
+            neighboursPasser.Pass();
 
             return true;
         }

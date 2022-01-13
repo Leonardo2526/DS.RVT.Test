@@ -8,34 +8,28 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 {
     class GridPointChecker
     {
-        public GridPointChecker(StepPoint nextPoint, List<StepPoint> cLZPoints, List<StepPoint> unpassableByCLZPoints, int currentValue)
+        public GridPointChecker(StepPoint nextPoint)
         {
             NextPoint = nextPoint;
-            CLZPoints = cLZPoints;
-            UnpassableByCLZPoints = unpassableByCLZPoints;
-            CurrentValue = currentValue;
         }
 
         public StepPoint NextPoint { get; set; }
-        public List<StepPoint> CLZPoints { get; set; }
-        public List<StepPoint> UnpassableByCLZPoints { get; set; }
-        public int CurrentValue { get; set; }
 
-        public void Check(ref Dictionary<StepPoint, int> Grid, ref int d, ref int a)
+        public void Check()
         {
             PointsCheker pointsCheker = new PointsCheker();
 
-            if (!Grid.ContainsKey(NextPoint))
+            if (!WaveExpander.Grid.ContainsKey(NextPoint))
             {
 
                 bool checkUnpassablePoint = pointsCheker.IsPointPassable(NextPoint);
-                bool checkClearancePoint = pointsCheker.IsClearanceZoneAvailable(NextPoint, CLZPoints, UnpassableByCLZPoints);
-                if (checkUnpassablePoint & checkClearancePoint)
-                {
+                bool checkClearancePoint = pointsCheker.IsClearanceZoneAvailable(NextPoint);
+                if (checkUnpassablePoint && checkClearancePoint)
+                    {
                     // распространяем волну
-                    d = CurrentValue + 1;
-                    Grid.Add(NextPoint, d);
-                    a++;
+                    NeighboursPasser.D = NeighboursPasser.CurrentD + 1;
+                    WaveExpander.Grid.Add(NextPoint, NeighboursPasser.D);
+                    NeighboursPasser.A++;
                 }
             }
         }
