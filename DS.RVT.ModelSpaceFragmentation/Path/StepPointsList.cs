@@ -26,17 +26,49 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                 new StepPoint(0, 0, 1)
             };
 
-        private static List<StepPoint> allPoints;
+        private static List<StepPoint> stepPoints;
+        public static List<StepPoint> XYPoints
+        {
+            get
+            {
+                stepPoints = new List<StepPoint>();
+                stepPoints.AddRange(XPoints);
+                stepPoints.AddRange(YPoints);
+                return stepPoints;
+            }
 
+        }
+        public static List<StepPoint> XZPoints
+        {
+            get
+            {
+                stepPoints = new List<StepPoint>();
+                stepPoints.AddRange(XPoints);
+                stepPoints.AddRange(ZPoints);
+                return stepPoints;
+            }
+
+        }
+        public static List<StepPoint> YZPoints
+        {
+            get
+            {
+                stepPoints = new List<StepPoint>();
+                stepPoints.AddRange(YPoints);
+                stepPoints.AddRange(ZPoints);
+                return stepPoints;
+            }
+
+        }
         public static List<StepPoint> AllPoints
         {
             get
             {
-                allPoints = new List<StepPoint>();
-                allPoints.AddRange(XPoints);
-                allPoints.AddRange(YPoints);
-                allPoints.AddRange(ZPoints);
-                return allPoints;
+                stepPoints = new List<StepPoint>();
+                stepPoints.AddRange(XPoints);
+                stepPoints.AddRange(YPoints);
+                stepPoints.AddRange(ZPoints);
+                return stepPoints;
             }
 
         }

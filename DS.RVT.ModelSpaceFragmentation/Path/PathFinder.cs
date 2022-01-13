@@ -9,6 +9,9 @@ namespace DS.RVT.ModelSpaceFragmentation
     class PathFinder
     {
         public List<XYZ> PathCoords { get; set; }
+
+        public static ISpacePointsIterator spacePointsIterator { get; set; }
+
         public List<XYZ> GetPath(XYZ startPoint, XYZ endPoint, List<XYZ> unpassablePoints)
         {
             InputData data = new InputData(startPoint, endPoint, unpassablePoints);
@@ -21,7 +24,8 @@ namespace DS.RVT.ModelSpaceFragmentation
             WaveAlgorythm waveAlgorythm;
             if (InputData.Ax == InputData.Bx)
             {
-                waveAlgorythm = new WaveAlgorythm(new IteratorByYZPlane());
+                spacePointsIterator = new IteratorByYZPlane();
+                waveAlgorythm = new WaveAlgorythm(spacePointsIterator);
                 pathCoords1 = waveAlgorythm.Implement();
 
                 if (pathCoords1.Count > 0)
@@ -29,7 +33,8 @@ namespace DS.RVT.ModelSpaceFragmentation
             }
             else if (InputData.Ay == InputData.By)
             {
-                waveAlgorythm = new WaveAlgorythm(new IteratorByXZPlane());
+                spacePointsIterator = new IteratorByXZPlane();
+                waveAlgorythm = new WaveAlgorythm(spacePointsIterator);
                 pathCoords1 = waveAlgorythm.Implement();
 
                 if (pathCoords1.Count > 0)
@@ -38,7 +43,8 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             if (InputData.Az == InputData.Bz)
             {
-                waveAlgorythm = new WaveAlgorythm(new IteratorByXYPlane());
+                spacePointsIterator = new IteratorByXYPlane();
+                waveAlgorythm = new WaveAlgorythm(spacePointsIterator);
                 pathCoords2 = waveAlgorythm.Implement();
 
                 if (pathCoords2.Count > 0)
@@ -47,7 +53,8 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             if (len1 == 1000 && len2 == 1000)
             {
-                waveAlgorythm = new WaveAlgorythm(new IteratorBy3D());
+                spacePointsIterator = new IteratorBy3D();
+                waveAlgorythm = new WaveAlgorythm(spacePointsIterator);
                 PathCoords = waveAlgorythm.Implement();
 
                 if (PathCoords.Count == 0)
