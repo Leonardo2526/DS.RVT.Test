@@ -70,8 +70,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 
         public void ConvertToPlane()
         {
-            ZonePoint1 = PointsInfo.MinBoundPoint;
-            ZonePoint2 = PointsInfo.MaxBoundPoint;
+            ZonePoint1 = ElementInfo.MinBoundPoint;
+            ZonePoint2 = ElementInfo.MaxBoundPoint;
             PointsStepF = ModelSpacePointsGenerator.PointsStepF;
 
             UnpassLocX = new List<int>();

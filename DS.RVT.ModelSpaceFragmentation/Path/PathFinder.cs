@@ -29,7 +29,7 @@ namespace DS.RVT.ModelSpaceFragmentation
                 pathCoords1 = waveAlgorythm.Implement();
 
                 if (pathCoords1.Count > 0)
-                    len1 = waveAlgorythm.Len;
+                    return PathCoords=pathCoords1;
             }
             else if (InputData.Ay == InputData.By)
             {
@@ -38,7 +38,7 @@ namespace DS.RVT.ModelSpaceFragmentation
                 pathCoords1 = waveAlgorythm.Implement();
 
                 if (pathCoords1.Count > 0)
-                    len1 = waveAlgorythm.Len;
+                    return PathCoords=pathCoords1;
             }
 
             if (InputData.Az == InputData.Bz)
@@ -48,10 +48,10 @@ namespace DS.RVT.ModelSpaceFragmentation
                 pathCoords2 = waveAlgorythm.Implement();
 
                 if (pathCoords2.Count > 0)
-                    len2 = waveAlgorythm.Len;
+                    return PathCoords=pathCoords2;
             }
 
-            if (len1 == 1000 && len2 == 1000)
+            if (pathCoords1.Count == 0 && pathCoords2.Count == 0)
             {
                 spacePointsIterator = new IteratorBy3D();
                 waveAlgorythm = new WaveAlgorythm(spacePointsIterator);
@@ -65,10 +65,10 @@ namespace DS.RVT.ModelSpaceFragmentation
 
 
 
-            if (len1 > len2)
-                PathCoords = pathCoords2;
-            else
-                PathCoords = pathCoords1;
+            //if (len1 > len2)
+            //    PathCoords = pathCoords2;
+            //else
+            //    PathCoords = pathCoords1;
 
 
             return PathCoords;

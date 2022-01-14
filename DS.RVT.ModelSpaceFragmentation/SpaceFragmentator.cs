@@ -31,11 +31,11 @@ namespace DS.RVT.ModelSpaceFragmentation
         public void FragmentSpace(Element element)
         {
             
-            PointsInfo pointsInfo = new PointsInfo();
+            ElementInfo pointsInfo = new ElementInfo();
             pointsInfo.GetPoints(element);
 
             ModelSpacePointsGenerator modelSpacePointsGenerator =
-            new ModelSpacePointsGenerator(PointsInfo.MinBoundPoint, PointsInfo.MaxBoundPoint);
+            new ModelSpacePointsGenerator(ElementInfo.MinBoundPoint, ElementInfo.MaxBoundPoint);
             List<XYZ> spacePoints = modelSpacePointsGenerator.Generate();
 
             ModelSolid modelSolid = new ModelSolid(Doc);

@@ -93,7 +93,7 @@
     <Compile Include="Path\StepPointsList.cs" />
     <Compile Include="Path\StepsPriority.cs" />
     <Compile Include="Points\Convertor\PointConvertor.cs" />
-    <Compile Include="Points\PointsInfo.cs" />
+    <Compile Include="ElementInfo.cs" />
     <Compile Include="ElementUtils.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="Interfaces\Interfaces.cs" />

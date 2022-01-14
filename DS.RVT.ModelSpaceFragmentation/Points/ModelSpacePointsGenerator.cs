@@ -46,7 +46,6 @@ namespace DS.RVT.ModelSpaceFragmentation
                     {
                         double xStep = x * PointsStepF;
                         XYZ point = new XYZ(Point1.X + xStep, Point1.Y + yStep, Point1.Z + zStep);
-                        //XYZ point = new XYZ(Point1.X + xStep, Point1.Y + yStep, zStep);
                         spacePoints.Add(point);
                     }
                 }

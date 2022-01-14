@@ -9,7 +9,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         {
             StepsPriority stepsPriority = new StepsPriority();
 
-            if (Math.Abs(PointsInfo.StartElemPoint.X - PointsInfo.EndElemPoint.X) < 0.01)
+            if (Math.Abs(ElementInfo.StartElemPoint.X - ElementInfo.EndElemPoint.X) < 0.01)
                 return stepsPriority.GetPointsList(2);
             else
                 return stepsPriority.GetPointsList(1);
@@ -20,8 +20,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
         {
             StepsPriority stepsPriority = new StepsPriority();
 
-            if (Math.Abs(PointsInfo.StartElemPoint.Z - PointsInfo.EndElemPoint.Z) < 0.01 &&
-            Math.Abs(PointsInfo.StartElemPoint.Y - PointsInfo.EndElemPoint.Y) < 0.01)
+            if (Math.Abs(ElementInfo.StartElemPoint.Z - ElementInfo.EndElemPoint.Z) < 0.01 &&
+            Math.Abs(ElementInfo.StartElemPoint.Y - ElementInfo.EndElemPoint.Y) < 0.01)
             {
                 if (currentPoint.Y != endPoint.Y)
                     return stepsPriority.GetPointsList(2);
@@ -30,8 +30,8 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                 else
                     return stepsPriority.GetPointsList(1);
             }
-            else if (Math.Abs(PointsInfo.StartElemPoint.Z - PointsInfo.EndElemPoint.Z) < 0.01 &&
-            Math.Abs(PointsInfo.StartElemPoint.X - PointsInfo.EndElemPoint.X) < 0.01)
+            else if (Math.Abs(ElementInfo.StartElemPoint.Z - ElementInfo.EndElemPoint.Z) < 0.01 &&
+            Math.Abs(ElementInfo.StartElemPoint.X - ElementInfo.EndElemPoint.X) < 0.01)
             {
                 if (currentPoint.X != endPoint.X)
                     return stepsPriority.GetPointsList(1);
@@ -41,10 +41,10 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
                     return stepsPriority.GetPointsList(2);
             }
 
-            if (Math.Abs(PointsInfo.StartElemPoint.X - PointsInfo.EndElemPoint.X) < 0.01 && currentPoint.X != endPoint.X)
+            if (Math.Abs(ElementInfo.StartElemPoint.X - ElementInfo.EndElemPoint.X) < 0.01 && currentPoint.X != endPoint.X)
                 return stepsPriority.GetPointsList(1);
 
-            if (Math.Abs(PointsInfo.StartElemPoint.Y - PointsInfo.EndElemPoint.Y) < 0.01 && currentPoint.Y != endPoint.Y)
+            if (Math.Abs(ElementInfo.StartElemPoint.Y - ElementInfo.EndElemPoint.Y) < 0.01 && currentPoint.Y != endPoint.Y)
                 return stepsPriority.GetPointsList(2);
 
             return stepsPriority.GetPointsList(1);

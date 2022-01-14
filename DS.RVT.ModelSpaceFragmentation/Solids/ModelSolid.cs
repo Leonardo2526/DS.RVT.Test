@@ -35,7 +35,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             ElementMulticategoryFilter elementMulticategoryFilter = new ElementMulticategoryFilter(elementCategoryFilters);
 
-            Outline myOutLn = new Outline(PointsInfo.MinBoundPoint, PointsInfo.MaxBoundPoint);
+            Outline myOutLn = new Outline(ElementInfo.MinBoundPoint, ElementInfo.MaxBoundPoint);
             BoundingBoxIntersectsFilter boundingBoxFilter = new BoundingBoxIntersectsFilter(myOutLn);
 
 

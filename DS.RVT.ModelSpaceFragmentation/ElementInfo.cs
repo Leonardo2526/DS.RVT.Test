@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using DS.RVT.ModelSpaceFragmentation.Path.CLZ;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
-    class PointsInfo
+    class ElementInfo
     {
         /// <summary>
         /// Minimum point of zone for fragmentation
@@ -17,15 +18,17 @@ namespace DS.RVT.ModelSpaceFragmentation
         /// Maximium point of zone for fragmentation
         /// </summary>
         public static XYZ MaxBoundPoint { get; set; }
+        public static double OffsetFromOriginByX { get; } = 1000;
+        public static double OffsetFromOriginByY { get; } = 1000;
         public static double OffsetFromOriginByZ { get; } = 1000;
-        public static double OffsetFromOriginByXY { get; } = 1000;
 
         public static XYZ CenterElemPoint { get; set; }
         public static XYZ StartElemPoint { get; set; }
         public static XYZ EndElemPoint { get; set; }
 
+        double OffsetFromOriginByXInFeets;
+        double OffsetFromOriginByYInFeets;
         double OffsetFromOriginByZInFeets;
-        double OffsetFromOriginByXYInFeets;
 
         public List<XYZ> GetPoints(Element element)
         {
@@ -43,13 +46,15 @@ namespace DS.RVT.ModelSpaceFragmentation
             StartElemPoint = startPoint;
             EndElemPoint = endPoint;
 
+            GetOffset();
+
             PointUtils pointUtils = new PointUtils();
             pointUtils.FindMinMaxPointByPoints(elementPoints, out XYZ minPoint, out XYZ maxPoint);
 
             List<XYZ> boundPoints = new List<XYZ>();
 
-            minPoint = new XYZ(minPoint.X - OffsetFromOriginByXYInFeets, minPoint.Y - OffsetFromOriginByXYInFeets, minPoint.Z - OffsetFromOriginByZInFeets);
-            maxPoint = new XYZ(maxPoint.X + OffsetFromOriginByXYInFeets, maxPoint.Y + OffsetFromOriginByXYInFeets, maxPoint.Z + OffsetFromOriginByZInFeets);
+            minPoint = new XYZ(minPoint.X - OffsetFromOriginByXInFeets, minPoint.Y - OffsetFromOriginByYInFeets, minPoint.Z - OffsetFromOriginByZInFeets);
+            maxPoint = new XYZ(maxPoint.X + OffsetFromOriginByXInFeets, maxPoint.Y + OffsetFromOriginByYInFeets, maxPoint.Z + OffsetFromOriginByZInFeets);
 
             boundPoints.Add(minPoint);
             boundPoints.Add(maxPoint);
@@ -62,12 +67,28 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         void ConvertToFeets()
         {
-            OffsetFromOriginByZInFeets = UnitUtils.Convert((double)OffsetFromOriginByZ / 1000,
+            OffsetFromOriginByXInFeets = UnitUtils.Convert((double)OffsetFromOriginByX / 1000,
                                           DisplayUnitType.DUT_METERS,
                                           DisplayUnitType.DUT_DECIMAL_FEET);
-            OffsetFromOriginByXYInFeets = UnitUtils.Convert((double)OffsetFromOriginByXY / 1000,
-                               DisplayUnitType.DUT_METERS,
-                               DisplayUnitType.DUT_DECIMAL_FEET);
+            OffsetFromOriginByYInFeets = UnitUtils.Convert((double)OffsetFromOriginByY / 1000,
+                                          DisplayUnitType.DUT_METERS,
+                                          DisplayUnitType.DUT_DECIMAL_FEET); 
+            OffsetFromOriginByZInFeets = UnitUtils.Convert((double)OffsetFromOriginByZ / 1000,
+                                           DisplayUnitType.DUT_METERS,
+                                           DisplayUnitType.DUT_DECIMAL_FEET);
+        }
+
+        void GetOffset()
+        {
+            CLZInfo.GetInfo();
+
+            if (Math.Abs(StartElemPoint.X - EndElemPoint.X)<0.01)
+                OffsetFromOriginByYInFeets = CLZInfo.FullDistanceF;
+            else if (Math.Abs(StartElemPoint.Y - EndElemPoint.Y) < 0.01)
+                OffsetFromOriginByXInFeets = CLZInfo.FullDistanceF;
+            else if (Math.Abs(StartElemPoint.X - EndElemPoint.X) < 0.01 && 
+                Math.Abs(StartElemPoint.Y - EndElemPoint.Y) < 0.01)
+                OffsetFromOriginByZInFeets = CLZInfo.FullDistanceF;
         }
     }
 }
