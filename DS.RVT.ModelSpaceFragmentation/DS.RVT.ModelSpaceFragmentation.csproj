@@ -36,6 +36,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AStarAlgorythm">
+      <HintPath>..\..\PathSearchAlgorythms\AStarAlgorythm\bin\Debug\AStarAlgorythm.dll</HintPath>
+    </Reference>
+    <Reference Include="DS.System">
+      <HintPath>..\..\DS.System\DS.System\bin\Release\DS.System.dll</HintPath>
+    </Reference>
     <Reference Include="RevitAPI">
       <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
       <Private>False</Private>
@@ -122,6 +128,6 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y  "$(TargetDir)$(TargetName).dll" "$(AppData)\Autodesk\Revit\Addins\2020\$(TargetName)\"</PostBuildEvent>
+    <PostBuildEvent>xcopy /Y  "$(TargetDir)*.*" "C:\ProgramData\Autodesk\Revit\Addins\2020\$(TargetName)\"</PostBuildEvent>
   </PropertyGroup>
 </Project>

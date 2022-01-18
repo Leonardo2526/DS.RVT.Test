@@ -9,11 +9,14 @@ using DS.RVT.ModelSpaceFragmentation.Lines;
 using DS.RVT.ModelSpaceFragmentation.Visualization;
 using DS.RVT.ModelSpaceFragmentation.Points;
 using DS.RVT.ModelSpaceFragmentation.Path.CLZ;
+using Location = DS.System.Location;
+
+//using Location = DS.System.Location;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
     class Main
-    {
+    {       
         readonly Application App;
         readonly UIDocument Uidoc;
         public static Document Doc { get; set; }
@@ -42,13 +45,23 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             PathFinder pathFinder = new PathFinder();
 
-            List<XYZ> pathCoords = pathFinder.GetPath(
-                ElementInfo.StartElemPoint, ElementInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);
+            //List<XYZ> pathCoords = pathFinder.GetPath(
+            //    ElementInfo.StartElemPoint, ElementInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);
+
+            List<Location> path = pathFinder.AStarPath();
+
+            List<XYZ> pathCoords = new List<XYZ>();
+            foreach (DS.System.Location item in path)
+            {
+                XYZ point = new XYZ(item.X, item.Y, item.Z);
+                pathCoords.Add(point);
+            }
+
 
             LineCreator lineCreator = new LineCreator();
             lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
 
-            //CLZVisualizator.ShowCLZOfPoint(PointsInfo.StartElemPoint);
+            //CLZVisualizator.ShowCLZOfPoint(PointsInfo.StartElemPoint); 
         }
 
     }

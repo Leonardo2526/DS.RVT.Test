@@ -21,7 +21,7 @@ namespace DS.RVT.RibbonForTest
             Button button = new Button();
             button.AddButtons();
 
-            // Create a custom ribbon tab  
+            // Create a custom ribbon tab   
             string tabName = "DS.RVT.Test";
             application.CreateRibbonTab(tabName); 
 
