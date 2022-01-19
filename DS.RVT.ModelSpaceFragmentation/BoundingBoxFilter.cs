@@ -48,4 +48,29 @@ namespace DS.RVT.ModelSpaceFragmentation
         }
     }
 
+    class BoundingBoxByPoint : IBoundingBoxFilter
+    {
+        public XYZ point;
+
+        public BoundingBoxByPoint(XYZ _point)
+        {
+            point = _point;
+        }
+
+        /// <summary>
+        /// Get bounding box by list of lines
+        /// </summary>
+        public BoundingBoxIntersectsFilter GetBoundingBoxFilter()
+        {
+            double offset = 3;
+
+            XYZ minRefPoint = new XYZ(point.X - offset, point.Y - offset, point.Z - offset);
+            XYZ maxRefPoint = new XYZ(point.X + offset, point.Y + offset, point.Z + offset);
+
+            Outline myOutLn = new Outline(minRefPoint, maxRefPoint);
+
+            return new BoundingBoxIntersectsFilter(myOutLn);
+        }
+    }
+
 }

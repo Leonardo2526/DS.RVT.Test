@@ -1,9 +1,7 @@
 ﻿using Autodesk.Revit.DB;
-using System;
+using DS.RVT.ModelSpaceFragmentation.Lines;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -21,9 +19,11 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         public void Separate()
         {
+            LineCreator lineCreator = new LineCreator();
+            PointInSolidChecker pointInSolidChecker = new PointInSolidChecker(lineCreator);
+
             foreach (XYZ point in SpacePoints)
             {
-                PointInSolidChecker pointInSolidChecker = new PointInSolidChecker();
                 if (pointInSolidChecker.IsPointInSolid(point))
                 {
                     UnpassablePoints.Add(point);

@@ -76,30 +76,38 @@ namespace DS.RVT.ModelSpaceFragmentation
             return PathCoords;
         }
 
-        public List<Location> AStarPath()
+        public List<Location> AStarPath(XYZ startPoint, XYZ endPoint, List<XYZ> unpassablePoints)
         {
+            InputData data = new InputData(startPoint, endPoint, unpassablePoints);
+            data.ConvertToPlane();
+
             int z = 0;
 
-            Location start = new Location(0, 0, 0);
-            Location goal = new Location(9, 9, 9);
-            Location maxGridPoint = new Location(10, 10, 10);
+            Location start = new Location(InputData.Ax, InputData.Ay, InputData.Az); 
+            Location goal = new Location(InputData.Bx, InputData.By, InputData.Bz);
+            Location maxGridPoint = new Location(InputData.Xcount, InputData.Ycount, InputData.Zcount);
 
-            int middleY = (int)Math.Round((double)(maxGridPoint.Y / 2));
-            int smesh = 2;
+            //int middleY = (int)Math.Round((double)(maxGridPoint.Y / 2)); 
+            //int smesh = 2;
 
             List<Location> unpassablelocations = new List<Location>();
-            for (var x = 1; x < 4; x++)
-            {
-                for (var y = 0; y < middleY + smesh; y++)
-                    unpassablelocations.Add(new Location(x, y, z));
-            }
+            //for (var x = 1; x < 4; x++)
+            //{
+            //    for (var y = 0; y < middleY + smesh; y++)
+            //        unpassablelocations.Add(new Location(x, y, z));
+            //}
 
-            for (var x = 6; x < 9; x++)
-            {
-                for (var y = middleY - smesh; y < maxGridPoint.Y; y++)
-                    unpassablelocations.Add(new Location(x, y, z));
-            }
+            //for (var x = 6; x < 9; x++)
+            //{
+            //    for (var y = middleY - smesh; y < maxGridPoint.Y; y++)
+            //        unpassablelocations.Add(new Location(x, y, z));
+            //}
 
+            foreach (StepPoint unpass in InputData.UnpassStepPoints)
+            {
+                Location point = new Location(unpass.X, unpass.Y, unpass.Z);
+                unpassablelocations.Add(point);
+            }
 
             AStar aStar = new AStar(start, goal, maxGridPoint, unpassablelocations);
             //List<Location> AStarPath = aStar.GetPathWithVisualizition();

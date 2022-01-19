@@ -5,12 +5,10 @@ using System.Collections.Generic;
 namespace DS.RVT.ModelSpaceFragmentation
 {
     class LineCollision
-    {       
-        public List<CurveExtents> CurvesExtIntersection { get; set; } = new List<CurveExtents>();
-
-        public IList<Element> GetElementsCurveCollisions(Curve curve, Dictionary<Element, List<Solid>> elementsSolids)
+    {   
+        public List<CurveExtents> GetElementsCurveCollisions(Curve curve, Dictionary<Element, List<Solid>> elementsSolids)
         {
-            IList<Element> intersectedElements = new List<Element>();
+            List<CurveExtents> CurvesExtIntersection = new List<CurveExtents>();
 
             foreach (KeyValuePair<Element, List<Solid>> keyValue in elementsSolids)
             {
@@ -19,20 +17,12 @@ namespace DS.RVT.ModelSpaceFragmentation
                     SolidCurveIntersectionOptions intersectOptions = new SolidCurveIntersectionOptions();
 
                     //Get intersections with curve
-                    SolidCurveIntersection intersection = solid.IntersectWithCurve(curve, intersectOptions);
+                    SolidCurveIntersection intersection = solid.IntersectWithCurve(curve, intersectOptions);                  
                     if (intersection.SegmentCount != 0)
-                    {
                         CurvesExtIntersection.Add(intersection.GetCurveSegmentExtents(0));
-
-                        intersectedElements.Add(keyValue.Key);
-                    }
                 }
             }
-
-            return intersectedElements;
+            return CurvesExtIntersection;
         }
-
-       
-
     }
 }

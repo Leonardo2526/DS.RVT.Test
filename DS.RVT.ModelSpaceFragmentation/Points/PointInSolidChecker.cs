@@ -6,24 +6,30 @@ namespace DS.RVT.ModelSpaceFragmentation
 {
     class PointInSolidChecker
     {
+        readonly LineCreator lineCreator;
+
+        public PointInSolidChecker(LineCreator lineCreator)
+        {
+            this.lineCreator = lineCreator;
+        }
+
         public List<int> Count { get; set; } = new List<int>();
 
         public bool IsPointInSolid(XYZ point)
         {
-            LineCreator lineCreator = new LineCreator();
             RayCreator ray = new RayCreator(point);
             Line rayLine = lineCreator.Create(ray);         
 
             LineCollision lineCollision = new LineCollision();
 
-            IList<Element> CheckCollisions = lineCollision.GetElementsCurveCollisions(rayLine, ModelSolid.SolidsInModel);
+            List<CurveExtents> CurvesExtIntersection = lineCollision.GetElementsCurveCollisions(rayLine, ModelSolid.SolidsInModel);
 
-            foreach (CurveExtents curveExt in lineCollision.CurvesExtIntersection)
-            {                
-                if (curveExt.StartParameter == 0 || curveExt.EndParameter == 0)
+            foreach (CurveExtents curveExt in CurvesExtIntersection)
+            {
+                if (curveExt.StartParameter == 0)
                     return true;
             }
-          
+
             return false;
         }
 
