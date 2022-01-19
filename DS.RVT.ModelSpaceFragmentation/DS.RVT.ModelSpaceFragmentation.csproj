@@ -69,33 +69,11 @@
     <Compile Include="Lines\LineCollision.cs" />
     <Compile Include="Lines\CurvesByPointsCreator.cs" />
     <Compile Include="Lines\RayCreator.cs" />
-    <Compile Include="Path\CLZ\CLZByBoders.cs" />
     <Compile Include="Path\CLZ\CLZInfo.cs" />
-    <Compile Include="Path\CLZ\CLZVisualizator.cs" />
-    <Compile Include="Path\CLZ\ICLZ.cs" />
-    <Compile Include="Path\CLZ\CLZCretor.cs" />
-    <Compile Include="Path\CLZ\CLZByBox.cs" />
-    <Compile Include="Path\Neighbours\NeighboursMarker.cs" />
-    <Compile Include="Path\Neighbours\NeighboursPassers\INeighboursPasser.cs" />
-    <Compile Include="Path\Neighbours\NeighboursPassers\AllNeighboursPasser.cs" />
-    <Compile Include="Path\Neighbours\NeighboursPassers\YZNeighboursPasser.cs" />
-    <Compile Include="Path\Neighbours\NeighboursPassers\XZNeighboursPasser.cs" />
-    <Compile Include="Path\Neighbours\NeighboursPassers\XYINeighboursPasser.cs" />
-    <Compile Include="Path\SpacePointsIterator\ISpacePointsIterator.cs" />
-    <Compile Include="Path\SpacePointsIterator\IteratorByYZPlane.cs" />
-    <Compile Include="Path\SpacePointsIterator\IteratorByXZPlane.cs" />
-    <Compile Include="Path\SpacePointsIterator\IteratorBy3D.cs" />
-    <Compile Include="Path\SpacePointsIterator\IteratorByXYPlane.cs" />
-    <Compile Include="Path\PathPointsCheck\GridPointChecker.cs" />
-    <Compile Include="Path\Neighbours\NeighboursPasser.cs" />
-    <Compile Include="Path\WaveExpander.cs" />
-    <Compile Include="Path\PointsCloud.cs" />
-    <Compile Include="Path\PrioritiesByPoint.cs" />
     <Compile Include="Path\Priority.cs" />
     <Compile Include="Points\Convertor\PointsConvertor.cs" />
     <Compile Include="Points\StepPoint.cs" />
     <Compile Include="Path\PathFinder.cs" />
-    <Compile Include="Path\PathPointsCheck\PointsCheker.cs" />
     <Compile Include="Path\StepPointsList.cs" />
     <Compile Include="Path\StepsPriority.cs" />
     <Compile Include="Points\Convertor\PointConvertor.cs" />
@@ -122,7 +100,6 @@
     <Compile Include="Transactions\ModelCurveTransaction.cs" />
     <Compile Include="Transactions\Transactions.cs" />
     <Compile Include="Path\InputData.cs" />
-    <Compile Include="Path\WaveAlgorythm.cs" />
     <Compile Include="Visualization\Visualizator.cs" />
   </ItemGroup>
   <ItemGroup />

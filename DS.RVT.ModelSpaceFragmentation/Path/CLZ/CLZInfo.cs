@@ -5,33 +5,44 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DS.RVT.ModelSpaceFragmentation.Path.CLZ
+namespace DS.RVT.ModelSpaceFragmentation.CLZ
 {
     class CLZInfo
     {
-        private static readonly double Distance = 100;
-        private static double DistanceF { get; set; }
-        private static int DistanceInSteps { get; set; }
+        static double ElementWidthHalf = (ElementSize.ElemDiameterF / 2);
+        static double ElementHeghtHalf = (ElementSize.ElemDiameterF / 2);
 
-        public static int FullDistanceInSteps { get; set; }
-        public static double FullDistanceF { get; set; }
-        public static double FullDistanceWithMarkPointF { get; set; }
+        static double Clearance = 100;
 
-        public static List<StepPoint> Points { get; set; }
 
-        public static void GetInfo()
+        /// <summary>
+        /// Clerance between elements in reference coordinate system by width
+        /// </summary>
+        public static int WidthClearanceRCS { get; set; } = 0;
+
+        ///// <summary>
+        ///// Clerance between elements in reference coordinate system by height
+        ///// </summary>
+        public static int HeightClearanceRCS { get; set; } = 0;
+
+        public static double WidthClearanceF { get; set; }
+        public static double HeightClearanceF { get; set; }
+
+        public CLZInfo()
         {
-            DistanceF = UnitUtils.Convert(Distance / 1000,
-                                DisplayUnitType.DUT_METERS,
-                                DisplayUnitType.DUT_DECIMAL_FEET);
-            DistanceInSteps = (int)Math.Ceiling(DistanceF / InputData.PointsStepF);
+            double ClearanceF = UnitUtils.Convert(Clearance,
+                               DisplayUnitType.DUT_MILLIMETERS,
+                               DisplayUnitType.DUT_DECIMAL_FEET);
 
-            FullDistanceF = DistanceF + (ElementSize.ElemDiameterF / 2);
-            FullDistanceInSteps = (int)Math.Round((FullDistanceF) / InputData.PointsStepF);
-            FullDistanceWithMarkPointF = FullDistanceF + ModelSpacePointsGenerator.PointsStepF;
+            WidthClearanceF = ClearanceF + ElementWidthHalf;
+            WidthClearanceRCS = (int)Math.Round(WidthClearanceF / Main.PointsStepF);
 
-            Points = new List<StepPoint>();
+            HeightClearanceF = ClearanceF + ElementHeghtHalf;
+            HeightClearanceRCS = (int)Math.Round(HeightClearanceF / Main.PointsStepF);
+
         }
+
+
 
     }
 }

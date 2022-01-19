@@ -1,10 +1,11 @@
 ﻿using Autodesk.Revit.DB;
-using DS.RVT.ModelSpaceFragmentation.Path.CLZ;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DS.RVT.ModelSpaceFragmentation.CLZ;
+
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -80,15 +81,15 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         void GetOffset()
         {
-            CLZInfo.GetInfo();
+            CLZInfo cLZInfo = new CLZInfo();
 
             if (Math.Abs(StartElemPoint.X - EndElemPoint.X)<0.01)
-                OffsetFromOriginByYInFeets = CLZInfo.FullDistanceF;
+                OffsetFromOriginByYInFeets = CLZInfo.WidthClearanceF;
             else if (Math.Abs(StartElemPoint.Y - EndElemPoint.Y) < 0.01)
-                OffsetFromOriginByXInFeets = CLZInfo.FullDistanceF;
+                OffsetFromOriginByXInFeets = CLZInfo.WidthClearanceF;
             else if (Math.Abs(StartElemPoint.X - EndElemPoint.X) < 0.01 && 
                 Math.Abs(StartElemPoint.Y - EndElemPoint.Y) < 0.01)
-                OffsetFromOriginByZInFeets = CLZInfo.FullDistanceF;
+                OffsetFromOriginByZInFeets = CLZInfo.HeightClearanceF;
         }
     }
 }
