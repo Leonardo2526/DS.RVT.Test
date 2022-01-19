@@ -45,24 +45,24 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             PathFinder pathFinder = new PathFinder();
 
-            ////List<XYZ> pathCoords = pathFinder.GetPath(
-            ////    ElementInfo.StartElemPoint, ElementInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);
+            //List<XYZ> pathCoords = pathFinder.GetPath(
+            //    ElementInfo.StartElemPoint, ElementInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);
 
-            //List<Location> path = pathFinder.AStarPath(ElementInfo.StartElemPoint, 
-            //    ElementInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);
+            List<Location> path = pathFinder.AStarPath(ElementInfo.StartElemPoint,
+                ElementInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);
 
-            //List<XYZ> pathCoords = new List<XYZ>();
-            //foreach (DS.System.Location item in path)
-            //{
-            //    XYZ point = new XYZ(item.X, item.Y, item.Z);
-            //    point = point.Multiply(InputData.PointsStepF);
-            //    point += InputData.ZonePoint1;
-            //    pathCoords.Add(point);
-            //}
+            List<XYZ> pathCoords = new List<XYZ>();
+            foreach (DS.System.Location item in path)
+            {
+                XYZ point = new XYZ(item.X, item.Y, item.Z);
+                point = point.Multiply(InputData.PointsStepF);
+                point += InputData.ZonePoint1;
+                pathCoords.Add(point);
+            }
 
 
-            //LineCreator lineCreator = new LineCreator();
-            //lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
+            LineCreator lineCreator = new LineCreator();
+            lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
 
             //CLZVisualizator.ShowCLZOfPoint(PointsInfo.StartElemPoint); 
         }

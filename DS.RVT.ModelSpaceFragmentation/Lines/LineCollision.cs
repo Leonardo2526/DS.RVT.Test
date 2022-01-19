@@ -5,7 +5,14 @@ using System.Collections.Generic;
 namespace DS.RVT.ModelSpaceFragmentation
 {
     class LineCollision
-    {   
+    {
+        SolidCurveIntersectionOptions intersectOptions;
+
+        public LineCollision(SolidCurveIntersectionOptions intersectOptions)
+        {
+            this.intersectOptions = intersectOptions;
+        }
+
         public List<CurveExtents> GetElementsCurveCollisions(Curve curve, Dictionary<Element, List<Solid>> elementsSolids)
         {
             List<CurveExtents> CurvesExtIntersection = new List<CurveExtents>();
@@ -14,7 +21,6 @@ namespace DS.RVT.ModelSpaceFragmentation
             {
                 foreach (Solid solid in keyValue.Value)
                 {
-                    SolidCurveIntersectionOptions intersectOptions = new SolidCurveIntersectionOptions();
 
                     //Get intersections with curve
                     SolidCurveIntersection intersection = solid.IntersectWithCurve(curve, intersectOptions);                  
@@ -23,6 +29,27 @@ namespace DS.RVT.ModelSpaceFragmentation
                 }
             }
             return CurvesExtIntersection;
+        }
+
+        public bool NewGetElementsCurveCollisions(Curve curve, Dictionary<Element, List<Solid>> elementsSolids)
+        {
+            List<CurveExtents> CurvesExtIntersection = new List<CurveExtents>();
+
+            foreach (KeyValuePair<Element, List<Solid>> keyValue in elementsSolids)
+            {
+                foreach (Solid solid in keyValue.Value)
+                {
+                    //Get intersections with curve
+                    SolidCurveIntersection intersection = solid.IntersectWithCurve(curve, intersectOptions);
+                    if (intersection.SegmentCount != 0)
+                    {
+                        CurveExtents curveExt = intersection.GetCurveSegmentExtents(0);
+                        if (curveExt.StartParameter == 0)
+                            return true;
+                    }                   
+                }
+            }
+            return false;
         }
     }
 }
