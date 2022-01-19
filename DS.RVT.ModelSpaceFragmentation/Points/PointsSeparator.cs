@@ -25,6 +25,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             PointInSolidChecker pointInSolidChecker = new PointInSolidChecker(lineCreator, lineCollision);
 
+
             foreach (XYZ point in SpacePoints)
             {
                 if (pointInSolidChecker.IsPointInSolid(point))
