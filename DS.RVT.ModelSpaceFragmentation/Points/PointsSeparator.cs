@@ -20,7 +20,11 @@ namespace DS.RVT.ModelSpaceFragmentation
         public void Separate()
         {
             LineCreator lineCreator = new LineCreator();
-            PointInSolidChecker pointInSolidChecker = new PointInSolidChecker(lineCreator);
+            SolidCurveIntersectionOptions intersectOptions = new SolidCurveIntersectionOptions();
+            LineCollision lineCollision = new LineCollision(intersectOptions);
+
+            PointInSolidChecker pointInSolidChecker = new PointInSolidChecker(lineCreator, lineCollision);
+
 
             foreach (XYZ point in SpacePoints)
             {
