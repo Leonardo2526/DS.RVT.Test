@@ -38,6 +38,7 @@
   <ItemGroup>
     <Reference Include="AStarAlgorythm">
       <HintPath>..\..\PathSearchAlgorythms\AStarAlgorythm\bin\Debug\AStarAlgorythm.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="DS.System">
       <HintPath>..\..\DS.System\DS.System\bin\Release\DS.System.dll</HintPath>

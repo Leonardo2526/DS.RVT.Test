@@ -99,6 +99,8 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             AStar.WidthClearanceRCS = CLZInfo.WidthClearanceRCS;
             AStar.HeightClearanceRCS = CLZInfo.HeightClearanceRCS;
+            //AStar.WidthClearanceRCS = 0;
+            //AStar.HeightClearanceRCS = 0;
 
             List<Location> AStarPath = aStar.GetPath();
 
