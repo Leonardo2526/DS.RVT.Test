@@ -1,23 +1,16 @@
 ﻿using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
-using System.Collections.Generic;
-using System.Linq;
-using DS.RVT.ModelSpaceFragmentation.Path;
 using DS.RVT.ModelSpaceFragmentation.Lines;
-using DS.RVT.ModelSpaceFragmentation.Visualization;
-using DS.RVT.ModelSpaceFragmentation.Points;
-using DSUtils;
-
-using Location = DSUtils.Location;
+using DS.RVT.ModelSpaceFragmentation.Path;
 using FrancoGustavo;
+using System.Collections.Generic;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
     class Main
-    {       
-        readonly Application App;  
+    {
+        readonly Application App;
         readonly UIDocument Uidoc;
         public static Document Doc { get; set; }
         readonly UIApplication Uiapp;
@@ -39,8 +32,8 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         public void Implement()
         {
-            PointsStepF = UnitUtils.Convert((double)PointsStep / 1000,
-                                DisplayUnitType.DUT_METERS,
+            PointsStepF = UnitUtils.Convert(PointsStep,
+                                DisplayUnitType.DUT_MILLIMETERS,
                                 DisplayUnitType.DUT_DECIMAL_FEET);
 
             ElementUtils elementUtils = new ElementUtils();
@@ -52,14 +45,12 @@ namespace DS.RVT.ModelSpaceFragmentation
             SpaceFragmentator spaceFragmentator = new SpaceFragmentator(App, Uiapp, Uidoc, Doc);
             spaceFragmentator.FragmentSpace(CurrentElement);
 
+            //Path finding initiation
             PathFinder pathFinder = new PathFinder();
-
-            //List<XYZ> pathCoords = pathFinder.GetPath(
-            //    ElementInfo.StartElemPoint, ElementInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);
-
             List<PathFinderNode> path = pathFinder.AStarPath(ElementInfo.StartElemPoint,
                 ElementInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);
 
+            //Convert path to revit coordinates
             List<XYZ> pathCoords = new List<XYZ>();
             foreach (PathFinderNode item in path)
             {
@@ -69,7 +60,7 @@ namespace DS.RVT.ModelSpaceFragmentation
                 pathCoords.Add(point);
             }
 
-
+            //Path visualization
             LineCreator lineCreator = new LineCreator();
             lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
 
