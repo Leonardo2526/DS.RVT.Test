@@ -20,7 +20,7 @@ namespace DS.RVT.RibbonForTest
         public void AddButtons()
         {
             //Create button1
-            string button1Name = "DS.PipesCollisionsElliminator";
+            string button1Name = "DS.RVT.ModelSpaceFragmentation";
             AddButton1(button1Name);
 
             //Create button2
