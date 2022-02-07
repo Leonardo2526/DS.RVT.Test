@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DS.RVT.ModelSpaceFragmentation.CLZ;
 
 
 namespace DS.RVT.ModelSpaceFragmentation
@@ -47,7 +46,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             StartElemPoint = startPoint;
             EndElemPoint = endPoint;
 
-            GetOffset();
+            //GetOffset();
 
             PointUtils pointUtils = new PointUtils();
             pointUtils.FindMinMaxPointByPoints(elementPoints, out XYZ minPoint, out XYZ maxPoint);
@@ -79,17 +78,17 @@ namespace DS.RVT.ModelSpaceFragmentation
                                            DisplayUnitType.DUT_DECIMAL_FEET);
         }
 
-        void GetOffset()
-        {
-            CLZInfo cLZInfo = new CLZInfo();
+        //void GetOffset()
+        //{
+        //    CLZInfo cLZInfo = new CLZInfo();
 
-            if (Math.Abs(StartElemPoint.X - EndElemPoint.X)<0.01)
-                OffsetFromOriginByYInFeets = CLZInfo.WidthClearanceF;
-            else if (Math.Abs(StartElemPoint.Y - EndElemPoint.Y) < 0.01)
-                OffsetFromOriginByXInFeets = CLZInfo.WidthClearanceF;
-            else if (Math.Abs(StartElemPoint.X - EndElemPoint.X) < 0.01 && 
-                Math.Abs(StartElemPoint.Y - EndElemPoint.Y) < 0.01)
-                OffsetFromOriginByZInFeets = CLZInfo.HeightClearanceF;
-        }
+        //    if (Math.Abs(StartElemPoint.X - EndElemPoint.X)<0.01)
+        //        OffsetFromOriginByYInFeets = CLZInfo.WidthClearanceF;
+        //    else if (Math.Abs(StartElemPoint.Y - EndElemPoint.Y) < 0.01)
+        //        OffsetFromOriginByXInFeets = CLZInfo.WidthClearanceF;
+        //    else if (Math.Abs(StartElemPoint.X - EndElemPoint.X) < 0.01 && 
+        //        Math.Abs(StartElemPoint.Y - EndElemPoint.Y) < 0.01)
+        //        OffsetFromOriginByZInFeets = CLZInfo.HeightClearanceF;
+        //}
     }
 }

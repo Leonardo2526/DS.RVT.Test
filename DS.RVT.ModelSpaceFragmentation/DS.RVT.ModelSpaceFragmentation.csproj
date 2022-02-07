@@ -39,7 +39,8 @@
     <Reference Include="DSUtils">
       <HintPath>..\..\DSUtils\DSUtils\bin\Release\DSUtils.dll</HintPath>
     </Reference>
-    <Reference Include="FrancoGustavo">
+    <Reference Include="FrancoGustavo, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\PathSearchAlgorythms\FrancoGustavo\bin\Release\FrancoGustavo.dll</HintPath>
     </Reference>
     <Reference Include="RevitAPI">
@@ -69,7 +70,7 @@
     <Compile Include="Lines\CurvesByPointsCreator.cs" />
     <Compile Include="Lines\RayCreator.cs" />
     <Compile Include="MapCreator.cs" />
-    <Compile Include="Path\CLZ\CLZInfo.cs" />
+    <Compile Include="Path\PathRequiment.cs" />
     <Compile Include="Path\Priority.cs" />
     <Compile Include="Points\Convertor\PointsConvertor.cs" />
     <Compile Include="Points\StepPoint.cs" />

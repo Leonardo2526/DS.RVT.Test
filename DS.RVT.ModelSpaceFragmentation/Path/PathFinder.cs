@@ -1,12 +1,8 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using DS.RVT.ModelSpaceFragmentation.Path;
-using System;
-using System.Collections.Generic;
-using FrancoGustavo;
-using DSUtils;
 using DSUtils.GridMap;
-using DS.RVT.ModelSpaceFragmentation.CLZ;
+using FrancoGustavo;
+using System.Collections.Generic;
 using Location = DSUtils.Location;
 
 namespace DS.RVT.ModelSpaceFragmentation
@@ -28,18 +24,8 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             foreach (StepPoint unpass in InputData.UnpassStepPoints)
                 map.Matrix[unpass.X, unpass.Y, unpass.Z] = 1;
-           
-            List<PathFinderNode> pathNodes = FrancoGustavo.FGAlgorythm.GetPathByMap(map);
 
-            //AStar aStar = new AStar(start, goal, maxGridPoint, unpassablelocations);
-
-
-            //AStar.WidthClearanceRCS = CLZInfo.WidthClearanceRCS;
-            //AStar.HeightClearanceRCS = CLZInfo.HeightClearanceRCS;
-            //AStar.WidthClearanceRCS = 0;
-            //AStar.HeightClearanceRCS = 0;
-
-            //List<Location> AStarPath = ConvertPath(pathNodes);
+            List<PathFinderNode> pathNodes = FGAlgorythm.GetPathByMap(map, new PathRequiment());
 
             return pathNodes;
         }
