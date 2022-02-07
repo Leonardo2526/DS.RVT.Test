@@ -8,15 +8,16 @@ using DS.RVT.ModelSpaceFragmentation.Path;
 using DS.RVT.ModelSpaceFragmentation.Lines;
 using DS.RVT.ModelSpaceFragmentation.Visualization;
 using DS.RVT.ModelSpaceFragmentation.Points;
-using Location = DS.System.Location;
+using DSUtils;
 
-//using Location = DS.System.Location;
+using Location = DSUtils.Location;
+using FrancoGustavo;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
     class Main
     {       
-        readonly Application App; 
+        readonly Application App;  
         readonly UIDocument Uidoc;
         public static Document Doc { get; set; }
         readonly UIApplication Uiapp;
@@ -56,11 +57,11 @@ namespace DS.RVT.ModelSpaceFragmentation
             //List<XYZ> pathCoords = pathFinder.GetPath(
             //    ElementInfo.StartElemPoint, ElementInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);
 
-            List<Location> path = pathFinder.AStarPath(ElementInfo.StartElemPoint,
+            List<PathFinderNode> path = pathFinder.AStarPath(ElementInfo.StartElemPoint,
                 ElementInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);
 
             List<XYZ> pathCoords = new List<XYZ>();
-            foreach (DS.System.Location item in path)
+            foreach (PathFinderNode item in path)
             {
                 XYZ point = new XYZ(item.X, item.Y, item.Z);
                 point = point.Multiply(InputData.PointsStepF);

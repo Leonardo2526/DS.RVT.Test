@@ -36,12 +36,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AStarAlgorythm">
-      <HintPath>..\..\PathSearchAlgorythms\AStarAlgorythm\bin\Debug\AStarAlgorythm.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="DSUtils">
+      <HintPath>..\..\DSUtils\DSUtils\bin\Release\DSUtils.dll</HintPath>
     </Reference>
-    <Reference Include="DS.System">
-      <HintPath>..\..\DS.System\DS.System\bin\Release\DS.System.dll</HintPath>
+    <Reference Include="FrancoGustavo">
+      <HintPath>..\..\PathSearchAlgorythms\FrancoGustavo\bin\Release\FrancoGustavo.dll</HintPath>
     </Reference>
     <Reference Include="RevitAPI">
       <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
@@ -53,7 +52,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -70,6 +68,7 @@
     <Compile Include="Lines\LineCollision.cs" />
     <Compile Include="Lines\CurvesByPointsCreator.cs" />
     <Compile Include="Lines\RayCreator.cs" />
+    <Compile Include="MapCreator.cs" />
     <Compile Include="Path\CLZ\CLZInfo.cs" />
     <Compile Include="Path\Priority.cs" />
     <Compile Include="Points\Convertor\PointsConvertor.cs" />
@@ -106,6 +105,6 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y  "$(TargetDir)$(TargetName).dll" "$(AppData)\Autodesk\Revit\Addins\2020\$(TargetName)\"</PostBuildEvent>
+    <PostBuildEvent>xcopy /Y  "$(TargetDir)" "$(AppData)\Autodesk\Revit\Addins\2020\$(TargetName)\"</PostBuildEvent>
   </PropertyGroup>
 </Project>
