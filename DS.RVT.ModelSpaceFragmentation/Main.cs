@@ -4,6 +4,7 @@ using Autodesk.Revit.UI;
 using DS.RVT.ModelSpaceFragmentation.Lines;
 using DS.RVT.ModelSpaceFragmentation.Path;
 using FrancoGustavo;
+using System;
 using System.Collections.Generic;
 
 namespace DS.RVT.ModelSpaceFragmentation
@@ -36,7 +37,7 @@ namespace DS.RVT.ModelSpaceFragmentation
                                 DisplayUnitType.DUT_MILLIMETERS,
                                 DisplayUnitType.DUT_DECIMAL_FEET);
 
-            ElementUtils elementUtils = new ElementUtils(); 
+            ElementUtils elementUtils = new ElementUtils();
             CurrentElement = elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
 
             ElementSize elementSize = new ElementSize();
@@ -44,7 +45,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             SpaceFragmentator spaceFragmentator = new SpaceFragmentator(App, Uiapp, Uidoc, Doc);
             spaceFragmentator.FragmentSpace(CurrentElement);
-             
+
             //Path finding initiation
             PathFinder pathFinder = new PathFinder();
             List<PathFinderNode> path = pathFinder.AStarPath(ElementInfo.StartElemPoint,
@@ -54,15 +55,25 @@ namespace DS.RVT.ModelSpaceFragmentation
                 TaskDialog.Show("Error", "No available path exist!");
             else
             {
-                //Convert path to revit coordinates
+                //Convert path to revit coordinates                
                 List<XYZ> pathCoords = new List<XYZ>();
+                pathCoords.Add(ElementInfo.StartElemPoint);
+
                 foreach (PathFinderNode item in path)
                 {
-                    XYZ point = new XYZ(item.X, item.Y, item.Z);
-                    point = point.Multiply(InputData.PointsStepF);
-                    point += InputData.ZonePoint1;
-                    pathCoords.Add(point);
+                    XYZ point = new XYZ(item.ANX, item.ANY, item.ANZ);
+                    XYZ pathpoint = ConvertToModel(point);
+
+                    double xx = Math.Abs(pathCoords[pathCoords.Count - 1].X - point.X);
+                    double xy = Math.Abs(pathCoords[pathCoords.Count - 1].Y - point.Y);
+                    double xz = Math.Abs(pathCoords[pathCoords.Count - 1].Z - point.Z);
+
+                    if (xx > 0.01 || xy > 0.01 || xz > 0.01)
+                        pathCoords.Add(pathpoint);
+
                 }
+
+                pathCoords.Add(ElementInfo.EndElemPoint);
 
                 //Path visualization
                 LineCreator lineCreator = new LineCreator();
@@ -70,6 +81,14 @@ namespace DS.RVT.ModelSpaceFragmentation
 
                 //CLZVisualizator.ShowCLZOfPoint(PointsInfo.StartElemPoint); 
             }
+        }
+
+        private XYZ ConvertToModel(XYZ point)
+        {
+            XYZ newpoint = point.Multiply(InputData.PointsStepF);
+            newpoint += InputData.ZonePoint1;
+
+            return newpoint;
         }
 
     }
