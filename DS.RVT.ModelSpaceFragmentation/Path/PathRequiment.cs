@@ -6,24 +6,33 @@ namespace DS.RVT.ModelSpaceFragmentation.Path
 {
     class PathRequiment : IPathRequiment
     {
+        static double ClearanceDistance = 100;
+
         public byte Clearance
-        {
+        { 
+            //get { return 0; }
             get
             {
                 double ClearanceF = UnitUtils.Convert(ClearanceDistance,
                              DisplayUnitType.DUT_MILLIMETERS,
                              DisplayUnitType.DUT_DECIMAL_FEET);
 
+                double ElementWidthHalf = ElementSize.ElemDiameterF;
+                //double ElementHeghtHalf = (ElementSize.ElemDiameterF / 2);
+
                 double clearanceFull = ClearanceF + ElementWidthHalf;
 
                 return (byte)Math.Round(clearanceFull / Main.PointsStepF);
             }
         }
-        public byte MinAngleDistance { get; }
-
-        static double ElementWidthHalf = (ElementSize.ElemDiameterF / 2);
-        static double ElementHeghtHalf = (ElementSize.ElemDiameterF / 2);
-
-        static double ClearanceDistance = 100;
+        public byte MinAngleDistance 
+        {
+            //get { return 0; }
+            get
+            {
+                double Rad = 1.5 * ElementSize.ElemDiameterF;
+                return (byte)Math.Round(Rad / Main.PointsStepF);
+            }
+        }
     }
 }

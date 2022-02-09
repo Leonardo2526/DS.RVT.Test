@@ -36,7 +36,7 @@ namespace DS.RVT.ModelSpaceFragmentation
                                 DisplayUnitType.DUT_MILLIMETERS,
                                 DisplayUnitType.DUT_DECIMAL_FEET);
 
-            ElementUtils elementUtils = new ElementUtils();
+            ElementUtils elementUtils = new ElementUtils(); 
             CurrentElement = elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
 
             ElementSize elementSize = new ElementSize();
@@ -44,27 +44,32 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             SpaceFragmentator spaceFragmentator = new SpaceFragmentator(App, Uiapp, Uidoc, Doc);
             spaceFragmentator.FragmentSpace(CurrentElement);
-
+             
             //Path finding initiation
             PathFinder pathFinder = new PathFinder();
             List<PathFinderNode> path = pathFinder.AStarPath(ElementInfo.StartElemPoint,
                 ElementInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);
 
-            //Convert path to revit coordinates
-            List<XYZ> pathCoords = new List<XYZ>();
-            foreach (PathFinderNode item in path)
+            if (path == null)
+                TaskDialog.Show("Error", "No available path exist!");
+            else
             {
-                XYZ point = new XYZ(item.X, item.Y, item.Z);
-                point = point.Multiply(InputData.PointsStepF);
-                point += InputData.ZonePoint1;
-                pathCoords.Add(point);
+                //Convert path to revit coordinates
+                List<XYZ> pathCoords = new List<XYZ>();
+                foreach (PathFinderNode item in path)
+                {
+                    XYZ point = new XYZ(item.X, item.Y, item.Z);
+                    point = point.Multiply(InputData.PointsStepF);
+                    point += InputData.ZonePoint1;
+                    pathCoords.Add(point);
+                }
+
+                //Path visualization
+                LineCreator lineCreator = new LineCreator();
+                lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
+
+                //CLZVisualizator.ShowCLZOfPoint(PointsInfo.StartElemPoint); 
             }
-
-            //Path visualization
-            LineCreator lineCreator = new LineCreator();
-            lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
-
-            //CLZVisualizator.ShowCLZOfPoint(PointsInfo.StartElemPoint); 
         }
 
     }
