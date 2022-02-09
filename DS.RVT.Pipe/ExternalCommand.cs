@@ -2,6 +2,7 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System;
+using System.Collections.Generic;
 
 namespace DS.RVT.PipeTest
 {
@@ -17,10 +18,32 @@ namespace DS.RVT.PipeTest
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            DSPipe pipe = new DSPipe(uiapp, uidoc, doc);
-            pipe.CreatePipeSystem();
-            //pipe.DeleteElement();
-            //pipe.SplitElement();
+            List<XYZ> points = new List<XYZ>()
+            {
+                new XYZ(0,0,0),
+                new XYZ(3,0,0),
+                new XYZ(3,3,0),
+                new XYZ(6,3,0),
+                new XYZ(6,0,0),
+                new XYZ(9,0,0)
+            };
+
+            List<XYZ> points0 = new List<XYZ>()
+            {
+                new XYZ(0,0,0),
+                new XYZ(3,0,0),
+                new XYZ(3,3,0),
+                new XYZ(6,3,0)
+            };
+
+            PypeSystem pypeSystem = new PypeSystem(uiapp, uidoc, doc);
+            pypeSystem.CreatePipeSystem(points);
+
+            //DSPipe pipe = new DSPipe(uiapp, uidoc, doc);
+            //pipe.CreatePipeSystem();
+
+            ////pipe.DeleteElement();
+            //pipe.SplitElement(); 
 
 
             TaskDialog.Show("Revit", "Pipe created!");
