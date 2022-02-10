@@ -36,6 +36,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DS.RevitUtils.MEP">
+      <HintPath>..\..\DS.RevitUtils\DS.RevitUtilsTools\DS.RevitUtils.MEP\bin\Release\DS.RevitUtils.MEP.dll</HintPath>
+    </Reference>
     <Reference Include="DSUtils">
       <HintPath>..\..\DSUtils\DSUtils\bin\Release\DSUtils.dll</HintPath>
     </Reference>
