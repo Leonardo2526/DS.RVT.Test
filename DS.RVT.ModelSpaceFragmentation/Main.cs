@@ -4,7 +4,9 @@ using Autodesk.Revit.UI;
 using DS.RVT.ModelSpaceFragmentation.Lines;
 using DS.RVT.ModelSpaceFragmentation.Path;
 using FrancoGustavo;
+using System;
 using System.Collections.Generic;
+using DS.RevitUtils;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -17,7 +19,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         public Main(Application app, UIApplication uiapp, UIDocument uidoc, Document doc)
         {
-            App = app;
+            App = app; 
             Uiapp = uiapp;
             Uidoc = uidoc;
             Doc = doc;
@@ -36,7 +38,7 @@ namespace DS.RVT.ModelSpaceFragmentation
                                 DisplayUnitType.DUT_MILLIMETERS,
                                 DisplayUnitType.DUT_DECIMAL_FEET);
 
-            ElementUtils elementUtils = new ElementUtils(); 
+            ElementUtils elementUtils = new ElementUtils();
             CurrentElement = elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
 
             ElementSize elementSize = new ElementSize();
@@ -44,32 +46,57 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             SpaceFragmentator spaceFragmentator = new SpaceFragmentator(App, Uiapp, Uidoc, Doc);
             spaceFragmentator.FragmentSpace(CurrentElement);
-             
+
             //Path finding initiation
             PathFinder pathFinder = new PathFinder();
             List<PathFinderNode> path = pathFinder.AStarPath(ElementInfo.StartElemPoint,
                 ElementInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);
 
             if (path == null)
-                TaskDialog.Show("Error", "No available path exist!");
+                TaskDialog.Show("Error", "No available path exist!"); 
             else
             {
-                //Convert path to revit coordinates
+                //Convert path to revit coordinates                
                 List<XYZ> pathCoords = new List<XYZ>();
+                pathCoords.Add(ElementInfo.StartElemPoint);
+
                 foreach (PathFinderNode item in path)
                 {
-                    XYZ point = new XYZ(item.X, item.Y, item.Z);
-                    point = point.Multiply(InputData.PointsStepF);
-                    point += InputData.ZonePoint1;
-                    pathCoords.Add(point);
-                }
+                    XYZ point = new XYZ(item.ANX, item.ANY, item.ANZ); 
+                    XYZ pathpoint = ConvertToModel(point);
 
-                //Path visualization
+                    double xx = Math.Abs(pathCoords[pathCoords.Count - 1].X - pathpoint.X);
+                    double xy = Math.Abs(pathCoords[pathCoords.Count - 1].Y - pathpoint.Y);
+                    double xz = Math.Abs(pathCoords[pathCoords.Count - 1].Z - pathpoint.Z);
+
+                    if (xx > 0.01 || xy > 0.01 || xz > 0.01)
+                        pathCoords.Add(pathpoint);  
+
+                } 
+
+                pathCoords.Add(ElementInfo.EndElemPoint);
+
+                //Path visualization 
                 LineCreator lineCreator = new LineCreator();
                 lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
+                
+                //MEP system changing
+                RevitUtils.MEP.PypeSystem pypeSystem = new RevitUtils.MEP.PypeSystem(Uiapp, Uidoc, Doc , CurrentElement);
+                pypeSystem.CreatePipeSystem(pathCoords);
+
+                RevitUtils.MEP.ElementEraser elementEraser = new RevitUtils.MEP.ElementEraser(Doc);
+                elementEraser.DeleteElement(CurrentElement);
 
                 //CLZVisualizator.ShowCLZOfPoint(PointsInfo.StartElemPoint); 
             }
+        }
+
+        private XYZ ConvertToModel(XYZ point)
+        {
+            XYZ newpoint = point.Multiply(InputData.PointsStepF);
+            newpoint += InputData.ZonePoint1;
+
+            return newpoint;
         }
 
     }
