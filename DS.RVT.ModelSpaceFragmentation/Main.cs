@@ -10,9 +10,9 @@ using DS.RevitUtils;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
-    class Main
+    class Main 
     {
-        readonly Application App;
+        readonly Application App; 
         readonly UIDocument Uidoc;
         public static Document Doc { get; set; }
         readonly UIApplication Uiapp;
@@ -31,7 +31,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         public static double PointsStepF { get; set; }
 
-
+         
         public void Implement()
         {
             PointsStepF = UnitUtils.Convert(PointsStep,
@@ -41,12 +41,12 @@ namespace DS.RVT.ModelSpaceFragmentation
             ElementUtils elementUtils = new ElementUtils();
             CurrentElement = elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
 
-            ElementSize elementSize = new ElementSize();
+            ElementSize elementSize = new ElementSize(); 
             elementSize.GetElementSizes(CurrentElement as MEPCurve);
 
             SpaceFragmentator spaceFragmentator = new SpaceFragmentator(App, Uiapp, Uidoc, Doc);
             spaceFragmentator.FragmentSpace(CurrentElement);
-
+             
             //Path finding initiation
             PathFinder pathFinder = new PathFinder();
             List<PathFinderNode> path = pathFinder.AStarPath(ElementInfo.StartElemPoint,
@@ -60,7 +60,7 @@ namespace DS.RVT.ModelSpaceFragmentation
                 List<XYZ> pathCoords = new List<XYZ>();
                 pathCoords.Add(ElementInfo.StartElemPoint);
 
-                foreach (PathFinderNode item in path)
+                foreach (PathFinderNode item in path) 
                 {
                     XYZ point = new XYZ(item.ANX, item.ANY, item.ANZ); 
                     XYZ pathpoint = ConvertToModel(point);
@@ -72,8 +72,8 @@ namespace DS.RVT.ModelSpaceFragmentation
                     if (xx > 0.01 || xy > 0.01 || xz > 0.01)
                         pathCoords.Add(pathpoint);  
 
-                } 
-
+                }
+              
                 pathCoords.Add(ElementInfo.EndElemPoint);
 
                 //Path visualization 
@@ -82,7 +82,15 @@ namespace DS.RVT.ModelSpaceFragmentation
                 
                 //MEP system changing
                 RevitUtils.MEP.PypeSystem pypeSystem = new RevitUtils.MEP.PypeSystem(Uiapp, Uidoc, Doc , CurrentElement);
-                pypeSystem.CreatePipeSystem(pathCoords);
+
+                //check min distance
+                double minDist = 1.5 * ElementSize.ElemDiameterF / 2;
+                if (Math.Abs(pathCoords[pathCoords.Count - 1].X - ElementInfo.EndElemPoint.X) <= minDist &&
+                    Math.Abs(pathCoords[pathCoords.Count - 1].Y - ElementInfo.EndElemPoint.Y) <= minDist &&
+                    Math.Abs(pathCoords[pathCoords.Count - 1].Z - ElementInfo.EndElemPoint.Z) <= minDist)
+                    pathCoords.RemoveAt(pathCoords.Count -1);
+
+                    pypeSystem.CreatePipeSystem(pathCoords);
 
                 RevitUtils.MEP.ElementEraser elementEraser = new RevitUtils.MEP.ElementEraser(Doc);
                 elementEraser.DeleteElement(CurrentElement);

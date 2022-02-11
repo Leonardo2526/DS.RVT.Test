@@ -2,7 +2,7 @@
 using DSUtils.GridMap;
 using System;
 
-namespace DS.RVT.ModelSpaceFragmentation.Path
+namespace DS.RVT.ModelSpaceFragmentation
 {
     class PathRequiment : IPathRequiment
     {
