@@ -1,5 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using System.Collections.Generic;
+using DS.RevitUtils.MEP;
+using System.Linq;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -38,14 +40,16 @@ namespace DS.RVT.ModelSpaceFragmentation
             Outline myOutLn = new Outline(ElementInfo.MinBoundPoint, ElementInfo.MaxBoundPoint);
             BoundingBoxIntersectsFilter boundingBoxFilter = new BoundingBoxIntersectsFilter(myOutLn);
 
-
-            ICollection<ElementId> elementIds = new List<ElementId>
+            List<Element> connectedElements = new List<Element>()
             {
-                Main.CurrentElement.Id
-
+                Main.CurrentElement
             };
-            ExclusionFilter exclusionFilter = new ExclusionFilter(elementIds);
+            ConnectedElement connectedElement = new ConnectedElement();
+            connectedElements.AddRange(connectedElement.GetAllConnected(Main.CurrentElement, Doc));
 
+            ICollection<ElementId> elementIds = connectedElements.Select(el => el.Id).ToList();
+           
+            ExclusionFilter exclusionFilter = new ExclusionFilter(elementIds);
 
             collector.WhereElementIsNotElementType();
             collector.WherePasses(boundingBoxFilter);

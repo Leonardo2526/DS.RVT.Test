@@ -6,7 +6,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 {
     class PathRequiment : IPathRequiment
     {
-        static double ClearanceDistance = 100;
+        static double ClearanceDistance = 50;
 
         public byte Clearance
         { 
