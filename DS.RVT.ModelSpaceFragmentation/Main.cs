@@ -6,7 +6,7 @@ using DS.RVT.ModelSpaceFragmentation.Path;
 using FrancoGustavo;
 using System;
 using System.Collections.Generic;
-using DS.RevitUtils;
+using DS.RevitUtils; 
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -31,17 +31,17 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         public static double PointsStepF { get; set; }
 
-         
-        public void Implement()
+          
+        public void Implement() 
         {
             PointsStepF = UnitUtils.Convert(PointsStep,
                                 DisplayUnitType.DUT_MILLIMETERS,
                                 DisplayUnitType.DUT_DECIMAL_FEET);
 
-            ElementUtils elementUtils = new ElementUtils();
+            ElementUtils elementUtils = new ElementUtils(); 
             CurrentElement = elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
 
-            ElementSize elementSize = new ElementSize(); 
+            ElementSize elementSize = new ElementSize();  
             elementSize.GetElementSizes(CurrentElement as MEPCurve);
 
             SpaceFragmentator spaceFragmentator = new SpaceFragmentator(App, Uiapp, Uidoc, Doc);
@@ -84,10 +84,10 @@ namespace DS.RVT.ModelSpaceFragmentation
                 RevitUtils.MEP.PypeSystem pypeSystem = new RevitUtils.MEP.PypeSystem(Uiapp, Uidoc, Doc , CurrentElement);
 
                 //check min distance
-                double minDist = 1.5 * ElementSize.ElemDiameterF / 2;
-                if (Math.Abs(pathCoords[pathCoords.Count - 1].X - ElementInfo.EndElemPoint.X) <= minDist &&
-                    Math.Abs(pathCoords[pathCoords.Count - 1].Y - ElementInfo.EndElemPoint.Y) <= minDist &&
-                    Math.Abs(pathCoords[pathCoords.Count - 1].Z - ElementInfo.EndElemPoint.Z) <= minDist)
+                double minDist = 1.5 * ElementSize.ElemDiameterF;
+                if (Math.Abs(pathCoords[pathCoords.Count - 2].X - ElementInfo.EndElemPoint.X) <= minDist &&
+                    Math.Abs(pathCoords[pathCoords.Count - 2].Y - ElementInfo.EndElemPoint.Y) <= minDist &&
+                    Math.Abs(pathCoords[pathCoords.Count - 2].Z - ElementInfo.EndElemPoint.Z) <= minDist)
                     pathCoords.RemoveAt(pathCoords.Count -1);
 
                     pypeSystem.CreatePipeSystem(pathCoords);
@@ -97,7 +97,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
                 //CLZVisualizator.ShowCLZOfPoint(PointsInfo.StartElemPoint); 
             }
-        }
+        } 
 
         private XYZ ConvertToModel(XYZ point)
         {
