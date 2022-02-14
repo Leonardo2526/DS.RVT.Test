@@ -10,12 +10,12 @@ using DS.RevitUtils;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
-    class Main 
+    class Main  
     {
-        readonly Application App; 
+        readonly Application App;  
         readonly UIDocument Uidoc;
         public static Document Doc { get; set; }
-        readonly UIApplication Uiapp;
+        readonly UIApplication Uiapp; 
 
         public Main(Application app, UIApplication uiapp, UIDocument uidoc, Document doc)
         {
@@ -35,7 +35,7 @@ namespace DS.RVT.ModelSpaceFragmentation
         public void Implement() 
         {
             PointsStepF = UnitUtils.Convert(PointsStep,
-                                DisplayUnitType.DUT_MILLIMETERS,
+                                DisplayUnitType.DUT_MILLIMETERS, 
                                 DisplayUnitType.DUT_DECIMAL_FEET);
 
             ElementUtils elementUtils = new ElementUtils(); 
@@ -74,7 +74,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
                 }
               
-                pathCoords.Add(ElementInfo.EndElemPoint);
+                pathCoords.Add(ElementInfo.EndElemPoint); 
 
                 //Path visualization 
                 LineCreator lineCreator = new LineCreator();
@@ -85,12 +85,12 @@ namespace DS.RVT.ModelSpaceFragmentation
 
                 //check min distance
                 double minDist = 1.5 * ElementSize.ElemDiameterF;
-                if (Math.Abs(pathCoords[pathCoords.Count - 2].X - ElementInfo.EndElemPoint.X) <= minDist &&
-                    Math.Abs(pathCoords[pathCoords.Count - 2].Y - ElementInfo.EndElemPoint.Y) <= minDist &&
-                    Math.Abs(pathCoords[pathCoords.Count - 2].Z - ElementInfo.EndElemPoint.Z) <= minDist)
-                    pathCoords.RemoveAt(pathCoords.Count -1);
+                if (Math.Abs(pathCoords[pathCoords.Count - 2].X - pathCoords[pathCoords.Count - 1].X) <= minDist ||
+                    Math.Abs(pathCoords[pathCoords.Count - 2].Y - pathCoords[pathCoords.Count - 1].Y) <= minDist ||
+                    Math.Abs(pathCoords[pathCoords.Count - 2].Z - pathCoords[pathCoords.Count - 1].Z) <= minDist)
+                    pathCoords.RemoveAt(pathCoords.Count - 2);
 
-                    pypeSystem.CreatePipeSystem(pathCoords);
+                pypeSystem.CreatePipeSystem(pathCoords);
 
                 RevitUtils.MEP.ElementEraser elementEraser = new RevitUtils.MEP.ElementEraser(Doc);
                 elementEraser.DeleteElement(CurrentElement);

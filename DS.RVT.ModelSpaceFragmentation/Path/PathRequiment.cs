@@ -30,7 +30,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             //get { return 0; }
             get
             {
-                double Rad = 1.5 * ElementSize.ElemDiameterF;
+                double Rad = 1.5 * ElementSize.ElemDiameterF + 0.01;
                 return (byte)Math.Round(Rad / Main.PointsStepF);
             }
         }

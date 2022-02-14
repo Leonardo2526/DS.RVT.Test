@@ -40,15 +40,14 @@ namespace DS.RVT.ModelSpaceFragmentation
             Outline myOutLn = new Outline(ElementInfo.MinBoundPoint, ElementInfo.MaxBoundPoint);
             BoundingBoxIntersectsFilter boundingBoxFilter = new BoundingBoxIntersectsFilter(myOutLn);
 
+            //Exclusions
             List<Element> connectedElements = new List<Element>()
             {
                 Main.CurrentElement
             };
             ConnectedElement connectedElement = new ConnectedElement();
             connectedElements.AddRange(connectedElement.GetAllConnected(Main.CurrentElement, Doc));
-
-            ICollection<ElementId> elementIds = connectedElements.Select(el => el.Id).ToList();
-           
+            ICollection<ElementId> elementIds = connectedElements.Select(el => el.Id).ToList();           
             ExclusionFilter exclusionFilter = new ExclusionFilter(elementIds);
 
             collector.WhereElementIsNotElementType();
