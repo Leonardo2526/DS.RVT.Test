@@ -44,19 +44,45 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             List<BoundingBoxXYZ> boundingBoxes = BoundingBoxCreator.Create();
 
+            //Get list with BoundingBoxIntersectsFilters
+            List<BoundingBoxIntersectsFilter> bbFilters = new List<BoundingBoxIntersectsFilter>();
             foreach (BoundingBoxXYZ bb in boundingBoxes)
             {
-                BoundigBoxVizualizator.ShowBoudaries(bb);
+                Outline myOutLn = new Outline(bb.Min, bb.Max);
+
+                bbFilters.Add(new BoundingBoxIntersectsFilter(myOutLn));
+
+                //Show boundingBoxes
+                //BoundigBoxVizualizator.ShowBoudaries(bb);
             }
 
             ModelSolid modelSolid = new ModelSolid(Doc);
             Dictionary<Element, List<Solid>> solids = modelSolid.GetSolids();
 
-            PointsSeparator pointsSeparator = new PointsSeparator(spacePoints);
-            pointsSeparator.Separate();
+            //Get Outlines with solids
+            List<Outline> outlines  = new List<Outline>();
+            foreach (BoundingBoxIntersectsFilter bbf in bbFilters)
+            {
+                List<Solid> bbSolids = modelSolid.GetSolidsByBBF(bbf);
+                if (bbSolids.Count > 0)
+                    outlines.Add(bbf.GetBoundingBox());
 
-            UnpassablePoints = pointsSeparator.UnpassablePoints;
-            PassablePoints = pointsSeparator.PassablePoints;
+            }
+
+            foreach (Outline outline in outlines)
+            {
+                BoundingBoxXYZ boundingBoxXYZ = new BoundingBoxXYZ();
+                boundingBoxXYZ.Min = outline.MinimumPoint;
+                boundingBoxXYZ.Max = outline.MaximumPoint;
+               BoundigBoxVizualizator.ShowBoudaries(boundingBoxXYZ);
+            }
+
+
+            //PointsSeparator pointsSeparator = new PointsSeparator(spacePoints);
+            //pointsSeparator.Separate();
+
+            //UnpassablePoints = pointsSeparator.UnpassablePoints;
+            //PassablePoints = pointsSeparator.PassablePoints;
 
             //Visualize(pointsSeparator);
         }
