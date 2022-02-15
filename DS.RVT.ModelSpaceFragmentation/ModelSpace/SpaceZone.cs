@@ -6,6 +6,7 @@ namespace DS.RVT.ModelSpaceFragmentation
     class SpaceZone
     {
         private static int ZoneSize = 500;
+
         private static double ZoneSizeF
         {
             get
@@ -25,50 +26,46 @@ namespace DS.RVT.ModelSpaceFragmentation
             }
         }
 
-        public static int ZoneXCount
+        public static int ZoneCountX
         {
             get
             {
                 return (int)Math.Round(DeltaBounds.X / ZoneSizeF);
             }
         }
-
         public static double ZoneSizeX
         {
             get
             {
-                return DeltaBounds.X / ZoneXCount;
+                return DeltaBounds.X / ZoneCountX;
             }
         }
-
-        public static int ZoneYCount
+        public static int ZoneCountY
         {
             get
             {
                 return (int)Math.Round(DeltaBounds.Y / ZoneSizeF);
             }
         }
-
         public static double ZoneSizeY
         {
             get
             {
-                return DeltaBounds.Y / ZoneYCount;
+                return DeltaBounds.Y / ZoneCountY;
             }
         }
-        public static int ZoneZCount
+        public static int ZoneCountZ
         {
             get
             {
                 return (int)Math.Round(DeltaBounds.Z / ZoneSizeF);
             }
         }
-
         public static double ZoneSizeZ
         {
             get
             {
-                return DeltaBounds.Z / ZoneZCount;
+                return DeltaBounds.Z / ZoneCountZ;
             }
         }
     }

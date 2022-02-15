@@ -39,8 +39,10 @@ namespace DS.RVT.ModelSpaceFragmentation
             List<XYZ> spacePoints = modelSpacePointsGenerator.Generate();
 
 
-           int c1 =SpaceZone.ZoneXCount;
+           int c1 =SpaceZone.ZoneCountX;
            double s1 =SpaceZone.ZoneSizeX;
+
+            List<BoundingBoxXYZ> boundingBoxes = BoundingBoxCreator.Create();
 
             ModelSolid modelSolid = new ModelSolid(Doc);
             Dictionary<Element, List<Solid>> solids = modelSolid.GetSolids();

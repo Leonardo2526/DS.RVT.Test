@@ -75,8 +75,9 @@
     <Compile Include="MapCreator.cs" />
     <Compile Include="Path\PathRequiment.cs" />
     <Compile Include="Path\Priority.cs" />
+    <Compile Include="Points\BoundingBoxCreator.cs" />
     <Compile Include="Points\Convertor\PointsConvertor.cs" />
-    <Compile Include="Points\SpaceZone.cs" />
+    <Compile Include="ModelSpace\SpaceZone.cs" />
     <Compile Include="Points\StepPoint.cs" />
     <Compile Include="Path\PathFinder.cs" />
     <Compile Include="Path\StepPointsList.cs" />
@@ -95,8 +96,8 @@
     <Compile Include="Points\PointsSeparator.cs" />
     <Compile Include="Points\PointUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Solids\ModelSolid.cs" />
-    <Compile Include="SpaceFragmentator.cs" />
+    <Compile Include="ModelSpace\ModelSolid.cs" />
+    <Compile Include="ModelSpace\SpaceFragmentator.cs" />
     <Compile Include="Visualization\GraphicOverwriter.cs" />
     <Compile Include="Visualization\IPointsVisualization.cs" />
     <Compile Include="Visualization\PointsVisualizator.cs" />
