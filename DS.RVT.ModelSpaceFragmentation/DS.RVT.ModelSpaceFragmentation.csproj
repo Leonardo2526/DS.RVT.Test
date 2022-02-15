@@ -73,9 +73,10 @@
     <Compile Include="Lines\CurvesByPointsCreator.cs" />
     <Compile Include="Lines\RayCreator.cs" />
     <Compile Include="MapCreator.cs" />
+    <Compile Include="ModelSpace\BoundigBoxVizualizator.cs" />
     <Compile Include="Path\PathRequiment.cs" />
     <Compile Include="Path\Priority.cs" />
-    <Compile Include="Points\BoundingBoxCreator.cs" />
+    <Compile Include="ModelSpace\BoundingBoxCreator.cs" />
     <Compile Include="Points\Convertor\PointsConvertor.cs" />
     <Compile Include="ModelSpace\SpaceZone.cs" />
     <Compile Include="Points\StepPoint.cs" />

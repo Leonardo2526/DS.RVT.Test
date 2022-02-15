@@ -5,7 +5,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 {
     class SpaceZone
     {
-        private static int ZoneSize = 500;
+        private static int ZoneSize = 1000;
 
         private static double ZoneSizeF
         {

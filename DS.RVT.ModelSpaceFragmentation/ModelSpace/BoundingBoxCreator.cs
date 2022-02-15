@@ -28,8 +28,8 @@ namespace DS.RVT.ModelSpaceFragmentation
                         double xMax = (x + 1) * SpaceZone.ZoneSizeX;
 
                         BoundingBoxXYZ boundingBoxXYZ = new BoundingBoxXYZ();
-                        boundingBoxXYZ.Min = new XYZ(xMin, yMin, zMin);
-                        boundingBoxXYZ.Max = new XYZ(xMax, yMax, zMax);
+                        boundingBoxXYZ.Min = new XYZ(xMin, yMin, zMin) + ElementInfo.MinBoundPoint;
+                        boundingBoxXYZ.Max = new XYZ(xMax, yMax, zMax) + ElementInfo.MinBoundPoint;
 
                         boundingBoxes.Add(boundingBoxXYZ);
                     }

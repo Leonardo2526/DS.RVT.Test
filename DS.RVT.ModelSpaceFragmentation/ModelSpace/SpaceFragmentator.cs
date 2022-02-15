@@ -44,6 +44,11 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             List<BoundingBoxXYZ> boundingBoxes = BoundingBoxCreator.Create();
 
+            foreach (BoundingBoxXYZ bb in boundingBoxes)
+            {
+                BoundigBoxVizualizator.ShowBoudaries(bb);
+            }
+
             ModelSolid modelSolid = new ModelSolid(Doc);
             Dictionary<Element, List<Solid>> solids = modelSolid.GetSolids();
 

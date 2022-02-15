@@ -85,8 +85,8 @@ namespace DS.RVT.ModelSpaceFragmentation
 
                 //check min distance
                 double minDist = 1.5 * ElementSize.ElemDiameterF;
-                if (Math.Abs(pathCoords[pathCoords.Count - 2].X - pathCoords[pathCoords.Count - 1].X) <= minDist ||
-                    Math.Abs(pathCoords[pathCoords.Count - 2].Y - pathCoords[pathCoords.Count - 1].Y) <= minDist ||
+                if (Math.Abs(pathCoords[pathCoords.Count - 2].X - pathCoords[pathCoords.Count - 1].X) <= minDist &&
+                    Math.Abs(pathCoords[pathCoords.Count - 2].Y - pathCoords[pathCoords.Count - 1].Y) <= minDist &&
                     Math.Abs(pathCoords[pathCoords.Count - 2].Z - pathCoords[pathCoords.Count - 1].Z) <= minDist)
                     pathCoords.RemoveAt(pathCoords.Count - 2);
 
