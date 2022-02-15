@@ -76,6 +76,7 @@
     <Compile Include="Path\PathRequiment.cs" />
     <Compile Include="Path\Priority.cs" />
     <Compile Include="Points\Convertor\PointsConvertor.cs" />
+    <Compile Include="Points\SpaceZone.cs" />
     <Compile Include="Points\StepPoint.cs" />
     <Compile Include="Path\PathFinder.cs" />
     <Compile Include="Path\StepPointsList.cs" />
