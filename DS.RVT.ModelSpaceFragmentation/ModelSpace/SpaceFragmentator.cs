@@ -78,13 +78,13 @@ namespace DS.RVT.ModelSpaceFragmentation
             }
 
 
-            //PointsSeparator pointsSeparator = new PointsSeparator(spacePoints);
-            //pointsSeparator.Separate();
+            PointsSeparator pointsSeparator = new PointsSeparator(spacePoints, outlines);
+            pointsSeparator.Separate();
 
-            //UnpassablePoints = pointsSeparator.UnpassablePoints;
-            //PassablePoints = pointsSeparator.PassablePoints;
+            UnpassablePoints = pointsSeparator.UnpassablePoints;
+            PassablePoints = pointsSeparator.PassablePoints;
 
-            //Visualize(pointsSeparator);
+            Visualize(pointsSeparator);
         }
 
         private void Visualize(PointsSeparator pointsSeparator)

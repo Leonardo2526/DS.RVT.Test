@@ -8,10 +8,12 @@ namespace DS.RVT.ModelSpaceFragmentation
     class PointsSeparator
     {
         List<XYZ> SpacePoints;
+        List<Outline> Outlines;
 
-        public PointsSeparator(List<XYZ> spacePoints)
+        public PointsSeparator(List<XYZ> spacePoints, List<Outline> outlines)
         {
             SpacePoints = spacePoints;
+            Outlines = outlines;
         }
 
         public List<XYZ> PassablePoints { get; set; } = new List<XYZ>();
@@ -28,16 +30,39 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             foreach (XYZ point in SpacePoints)
             {
-                if (pointInSolidChecker.IsPointInSolid(point))
+                if (!IsPointInOutline(point))
                 {
-                    UnpassablePoints.Add(point);
+                    PassablePoints.Add(point);
+                    continue;
                 }
                 else
                 {
-                    PassablePoints.Add(point);
+                    UnpassablePoints.Add(point);
 
                 }
+
+                //if (pointInSolidChecker.IsPointInSolid(point))
+                //{
+                //    UnpassablePoints.Add(point);
+                //}
+                //else
+                //{
+                //    PassablePoints.Add(point);
+
+                //}
             }
+        }
+
+        private bool IsPointInOutline(XYZ point)
+        {
+            foreach (Outline outline in Outlines)
+            {
+                if (outline.MinimumPoint.X <= point.X && point.X <= outline.MaximumPoint.X &&
+                    outline.MinimumPoint.Y <= point.Y && point.Y <= outline.MaximumPoint.Y &&
+                    outline.MinimumPoint.Z <= point.Z && point.Z <= outline.MaximumPoint.Z)
+                    return true;
+            }
+            return false;
         }
     }
 }
