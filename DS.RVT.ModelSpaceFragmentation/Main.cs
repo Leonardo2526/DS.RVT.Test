@@ -27,7 +27,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         public static Element CurrentElement { get; set; }
 
-        public static int PointsStep { get; } = 200;
+        public static int PointsStep { get; } = 50;
 
         public static double PointsStepF { get; set; }
 
@@ -49,54 +49,54 @@ namespace DS.RVT.ModelSpaceFragmentation
              
             ////Path finding initiation
             PathFinder pathFinder = new PathFinder();
-            //List<PathFinderNode> path = pathFinder.AStarPath(ElementInfo.StartElemPoint,
-            //    ElementInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);
+            List<PathFinderNode> path = pathFinder.AStarPath(ElementInfo.StartElemPoint,
+                ElementInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);
 
-            //if (path == null)
-            //    TaskDialog.Show("Error", "No available path exist!"); 
-            //else
-            //{
-            //    //Convert path to revit coordinates                
-            //    List<XYZ> pathCoords = new List<XYZ>();
-            //    pathCoords.Add(ElementInfo.StartElemPoint);
+            if (path == null)
+                TaskDialog.Show("Error", "No available path exist!");
+            else
+            {
+                //Convert path to revit coordinates                
+                List<XYZ> pathCoords = new List<XYZ>();
+                pathCoords.Add(ElementInfo.StartElemPoint);
 
-            //    foreach (PathFinderNode item in path) 
-            //    {
-            //        XYZ point = new XYZ(item.ANX, item.ANY, item.ANZ); 
-            //        XYZ pathpoint = ConvertToModel(point);
+                foreach (PathFinderNode item in path)
+                {
+                    XYZ point = new XYZ(item.ANX, item.ANY, item.ANZ);
+                    XYZ pathpoint = ConvertToModel(point);
 
-            //        double xx = Math.Abs(pathCoords[pathCoords.Count - 1].X - pathpoint.X);
-            //        double xy = Math.Abs(pathCoords[pathCoords.Count - 1].Y - pathpoint.Y);
-            //        double xz = Math.Abs(pathCoords[pathCoords.Count - 1].Z - pathpoint.Z);
+                    double xx = Math.Abs(pathCoords[pathCoords.Count - 1].X - pathpoint.X);
+                    double xy = Math.Abs(pathCoords[pathCoords.Count - 1].Y - pathpoint.Y);
+                    double xz = Math.Abs(pathCoords[pathCoords.Count - 1].Z - pathpoint.Z);
 
-            //        if (xx > 0.01 || xy > 0.01 || xz > 0.01)
-            //            pathCoords.Add(pathpoint);  
+                    if (xx > 0.01 || xy > 0.01 || xz > 0.01)
+                        pathCoords.Add(pathpoint);
 
-            //    }
-              
-            //    pathCoords.Add(ElementInfo.EndElemPoint); 
+                }
 
-            //    //Path visualization 
-            //    LineCreator lineCreator = new LineCreator();
-            //    lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
-                
-            //    //MEP system changing
-            //    RevitUtils.MEP.PypeSystem pypeSystem = new RevitUtils.MEP.PypeSystem(Uiapp, Uidoc, Doc , CurrentElement);
+                pathCoords.Add(ElementInfo.EndElemPoint);
 
-            //    //check min distance
-            //    double minDist = 1.5 * ElementSize.ElemDiameterF;
-            //    if (Math.Abs(pathCoords[pathCoords.Count - 2].X - pathCoords[pathCoords.Count - 1].X) <= minDist &&
-            //        Math.Abs(pathCoords[pathCoords.Count - 2].Y - pathCoords[pathCoords.Count - 1].Y) <= minDist &&
-            //        Math.Abs(pathCoords[pathCoords.Count - 2].Z - pathCoords[pathCoords.Count - 1].Z) <= minDist)
-            //        pathCoords.RemoveAt(pathCoords.Count - 2);
+                //Path visualization 
+                LineCreator lineCreator = new LineCreator();
+                lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
 
-            //    pypeSystem.CreatePipeSystem(pathCoords);
+                //MEP system changing
+                RevitUtils.MEP.PypeSystem pypeSystem = new RevitUtils.MEP.PypeSystem(Uiapp, Uidoc, Doc, CurrentElement);
 
-            //    RevitUtils.MEP.ElementEraser elementEraser = new RevitUtils.MEP.ElementEraser(Doc);
-            //    elementEraser.DeleteElement(CurrentElement);
+                //check min distance
+                double minDist = 1.5 * ElementSize.ElemDiameterF;
+                if (Math.Abs(pathCoords[pathCoords.Count - 2].X - pathCoords[pathCoords.Count - 1].X) <= minDist &&
+                    Math.Abs(pathCoords[pathCoords.Count - 2].Y - pathCoords[pathCoords.Count - 1].Y) <= minDist &&
+                    Math.Abs(pathCoords[pathCoords.Count - 2].Z - pathCoords[pathCoords.Count - 1].Z) <= minDist)
+                    pathCoords.RemoveAt(pathCoords.Count - 2);
 
-            //    //CLZVisualizator.ShowCLZOfPoint(PointsInfo.StartElemPoint); 
-            //}
+                pypeSystem.CreatePipeSystem(pathCoords);
+
+                RevitUtils.MEP.ElementEraser elementEraser = new RevitUtils.MEP.ElementEraser(Doc);
+                elementEraser.DeleteElement(CurrentElement);
+
+                //CLZVisualizator.ShowCLZOfPoint(PointsInfo.StartElemPoint); 
+            }
         } 
 
         private XYZ ConvertToModel(XYZ point)
