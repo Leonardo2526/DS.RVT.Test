@@ -1,7 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using DS.RVT.ModelSpaceFragmentation.Lines;
 using System.Collections.Generic;
-
+using System.Linq;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -22,7 +22,7 @@ namespace DS.RVT.ModelSpaceFragmentation
         public void Separate()
         {
 
-            Dictionary<Outline, List<XYZ>> pointsInOutlines = GetPointsInOutlines();
+            Dictionary<Outline, List<XYZ>> pointsInOutlines = SortPointsByOutlines();
 
 
             //Separate points inside each outline
@@ -51,27 +51,27 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         }
 
-        private Dictionary<Outline, List<XYZ>> GetPointsInOutlines()
+        private Dictionary<Outline, List<XYZ>> SortPointsByOutlines()
         {
-            Dictionary<Outline, List<XYZ>> pointsInOutlines = new Dictionary<Outline, List<XYZ>>();
+            Dictionary<Outline, List<XYZ>> sortedPoints = new Dictionary<Outline, List<XYZ>>();
 
-            foreach (XYZ point in SpacePoints)
+            List<XYZ> pointsInOutlines = GetPointsInOutlines();
+
+            foreach (XYZ point in pointsInOutlines)
             {
                 foreach (KeyValuePair<Outline, List<Solid>> keyValue in OutlinesWithSolids)
                 {
 
                     //Is point inside outline
-                    if (keyValue.Key.MinimumPoint.X <= point.X && point.X < keyValue.Key.MaximumPoint.X &&
-                                     keyValue.Key.MinimumPoint.Y <= point.Y && point.Y < keyValue.Key.MaximumPoint.Y &&
-                                     keyValue.Key.MinimumPoint.Z <= point.Z && point.Z < keyValue.Key.MaximumPoint.Z)
+                    if (keyValue.Key.Contains(point, 0))
                     {
-                        if (!pointsInOutlines.ContainsKey(keyValue.Key))
-                            pointsInOutlines.Add(keyValue.Key, new List<XYZ>());
+                        if (!sortedPoints.ContainsKey(keyValue.Key))
+                            sortedPoints.Add(keyValue.Key, new List<XYZ>());
 
-                        pointsInOutlines.TryGetValue(keyValue.Key, out List<XYZ> points);
+                        sortedPoints.TryGetValue(keyValue.Key, out List<XYZ> points);
 
                         points.Add(point);
-                        pointsInOutlines[keyValue.Key] = points;
+                        sortedPoints[keyValue.Key] = points;
                         break;
                     }
                    
@@ -79,8 +79,27 @@ namespace DS.RVT.ModelSpaceFragmentation
             }
              
             
-            return pointsInOutlines;
+            return sortedPoints;
 
+        }
+
+
+        private List<XYZ> GetPointsInOutlines()
+        {
+            List<XYZ> xYZs = new List<XYZ>();
+
+            XYZ minPoint = OutlinesWithSolids.First().Key.MinimumPoint;
+            XYZ maxPoint = OutlinesWithSolids.Last().Key.MaximumPoint;
+
+            Outline outline = new Outline(minPoint, maxPoint);
+
+            for (int i = 0; i < SpacePoints.Count; i++)
+            {
+                if (outline.Contains(SpacePoints[i],0))
+                    xYZs.Add(SpacePoints[i]);
+            }
+
+            return xYZs;
         }
     }
 }
