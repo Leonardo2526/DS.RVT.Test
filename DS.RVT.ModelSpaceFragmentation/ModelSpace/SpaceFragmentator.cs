@@ -1,12 +1,8 @@
 ﻿using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
-using System.Collections.Generic;
-using System.Linq;
-using DS.RVT.ModelSpaceFragmentation.Path;
 using DS.RVT.ModelSpaceFragmentation.Visualization;
-using System;
+using System.Collections.Generic;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -30,7 +26,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         public void FragmentSpace(Element element)
         {
-            
+
             ElementInfo pointsInfo = new ElementInfo();
             pointsInfo.GetPoints(element);
 
@@ -39,8 +35,8 @@ namespace DS.RVT.ModelSpaceFragmentation
             List<XYZ> spacePoints = modelSpacePointsGenerator.Generate();
 
 
-           int c1 =SpaceZone.ZoneCountX;
-           double s1 =SpaceZone.ZoneSizeX;
+            int c1 = SpaceZone.ZoneCountX;
+            double s1 = SpaceZone.ZoneSizeX;
 
             List<BoundingBoxXYZ> boundingBoxes = BoundingBoxCreator.Create();
 
@@ -60,7 +56,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             Dictionary<Element, List<Solid>> solids = modelSolid.GetSolids();
 
             //Get Outlines with solids
-            Dictionary<Outline,  List <Solid>>  outlinesSolids  = new Dictionary<Outline, List <Solid>>();
+            Dictionary<Outline, List<Solid>> outlinesSolids = new Dictionary<Outline, List<Solid>>();
             foreach (BoundingBoxIntersectsFilter bbf in bbFilters)
             {
                 List<Solid> bbSolids = modelSolid.GetSolidsByBBF(bbf);
@@ -88,7 +84,7 @@ namespace DS.RVT.ModelSpaceFragmentation
         }
 
         private void Visualize(PointsSeparator pointsSeparator)
-        {           
+        {
             Visualizator.ShowPoints(new PointsVisualizator(pointsSeparator.PassablePoints));
 
             IPointsVisualization unpassablePointsVisualization = new PointsVisualizator(pointsSeparator.UnpassablePoints)

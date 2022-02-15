@@ -42,6 +42,7 @@ namespace DS.RVT.ModelSpaceFragmentation
                 }
             }
 
+            //For visualization only
             //foreach (XYZ point in SpacePoints)
             //{
             //    if (!UnpassablePoints.Contains(point))
@@ -68,10 +69,6 @@ namespace DS.RVT.ModelSpaceFragmentation
                             pointsInOutlines.Add(keyValue.Key, new List<XYZ>());
 
                         pointsInOutlines.TryGetValue(keyValue.Key, out List<XYZ> points);
-                   
-                        if (points == null)
-                            points = new List<XYZ>();
-                       
 
                         points.Add(point);
                         pointsInOutlines[keyValue.Key] = points;

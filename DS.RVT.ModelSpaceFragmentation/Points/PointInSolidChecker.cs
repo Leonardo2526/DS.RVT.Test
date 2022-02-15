@@ -27,18 +27,5 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             return false;
         }
-
-        public bool IsPointInSolidOld(XYZ point)
-        {
-            RayCreator ray = new RayCreator(point);
-            Line rayLine = lineCreator.Create(ray);
-
-            bool IfOneLineIntersections = lineCollision.GetElementsCurveCollisionsOld(rayLine, ModelSolid.SolidsInModel);
-            if (IfOneLineIntersections)
-                return true;
-
-            return false;
-        }
-
     }
 }
