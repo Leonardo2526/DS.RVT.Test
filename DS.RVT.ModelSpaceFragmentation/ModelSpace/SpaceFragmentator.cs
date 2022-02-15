@@ -60,25 +60,25 @@ namespace DS.RVT.ModelSpaceFragmentation
             Dictionary<Element, List<Solid>> solids = modelSolid.GetSolids();
 
             //Get Outlines with solids
-            List<Outline> outlines  = new List<Outline>();
+            Dictionary<Outline,  List <Solid>>  outlinesSolids  = new Dictionary<Outline, List <Solid>>();
             foreach (BoundingBoxIntersectsFilter bbf in bbFilters)
             {
                 List<Solid> bbSolids = modelSolid.GetSolidsByBBF(bbf);
                 if (bbSolids.Count > 0)
-                    outlines.Add(bbf.GetBoundingBox());
+                    outlinesSolids.Add(bbf.GetBoundingBox(), bbSolids);
 
             }
 
-            foreach (Outline outline in outlines)
-            {
-                BoundingBoxXYZ boundingBoxXYZ = new BoundingBoxXYZ();
-                boundingBoxXYZ.Min = outline.MinimumPoint;
-                boundingBoxXYZ.Max = outline.MaximumPoint;
-               BoundigBoxVizualizator.ShowBoudaries(boundingBoxXYZ);
-            }
+            //foreach (Outline outline in outlines)
+            //{
+            //    BoundingBoxXYZ boundingBoxXYZ = new BoundingBoxXYZ();
+            //    boundingBoxXYZ.Min = outline.MinimumPoint;
+            //    boundingBoxXYZ.Max = outline.MaximumPoint;
+            //   BoundigBoxVizualizator.ShowBoudaries(boundingBoxXYZ);
+            //}
 
 
-            PointsSeparator pointsSeparator = new PointsSeparator(spacePoints, outlines);
+            PointsSeparator pointsSeparator = new PointsSeparator(spacePoints, outlinesSolids);
             pointsSeparator.Separate();
 
             UnpassablePoints = pointsSeparator.UnpassablePoints;

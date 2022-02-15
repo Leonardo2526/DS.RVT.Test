@@ -8,12 +8,12 @@ namespace DS.RVT.ModelSpaceFragmentation
     class PointsSeparator
     {
         List<XYZ> SpacePoints;
-        List<Outline> Outlines;
+        Dictionary<Outline, List<Solid>> OutlinesWithSolids;
 
-        public PointsSeparator(List<XYZ> spacePoints, List<Outline> outlines)
+        public PointsSeparator(List<XYZ> spacePoints, Dictionary<Outline, List<Solid>> outlinesSolids)
         {
             SpacePoints = spacePoints;
-            Outlines = outlines;
+            OutlinesWithSolids = outlinesSolids;
         }
 
         public List<XYZ> PassablePoints { get; set; } = new List<XYZ>();
@@ -21,48 +21,59 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         public void Separate()
         {
+
+            Dictionary<Outline, List<XYZ>> pointsInOutlines = GetPointsInOutlines();
+
+
+            //Separate points inside each outline
             LineCreator lineCreator = new LineCreator();
             SolidCurveIntersectionOptions intersectOptions = new SolidCurveIntersectionOptions();
             LineCollision lineCollision = new LineCollision(intersectOptions);
-
             PointInSolidChecker pointInSolidChecker = new PointInSolidChecker(lineCreator, lineCollision);
 
+            foreach (KeyValuePair<Outline, List<XYZ>> keyValue in pointsInOutlines)
+            {
+                OutlinesWithSolids.TryGetValue(keyValue.Key, out List<Solid> solids);
+
+                foreach (XYZ point in keyValue.Value)
+                {
+                    if (pointInSolidChecker.IsPointInSolid(point, solids))
+                        UnpassablePoints.Add(point);
+                    else
+                    {
+                        //PassablePoints.Add(point);
+
+                    }
+                }
+            }
 
             foreach (XYZ point in SpacePoints)
             {
-                if (!IsPointInOutline(point))
-                {
-                    PassablePoints.Add(point);
-                    continue;
-                }
-                else
-                {
-                    UnpassablePoints.Add(point);
-
-                }
-
-                //if (pointInSolidChecker.IsPointInSolid(point))
-                //{
-                //    UnpassablePoints.Add(point);
-                //}
-                //else
-                //{
-                //    PassablePoints.Add(point);
-
-                //}
+                if (!UnpassablePoints.Contains(point))
+                    PassablePoints.Add(point);  
             }
+
         }
 
-        private bool IsPointInOutline(XYZ point)
+        private Dictionary<Outline, List<XYZ>> GetPointsInOutlines()
         {
-            foreach (Outline outline in Outlines)
+            Dictionary<Outline, List<XYZ>> pointsInOutlines = new Dictionary<Outline, List<XYZ>>();
+
+            foreach (KeyValuePair<Outline, List<Solid>> keyValue in OutlinesWithSolids)
             {
-                if (outline.MinimumPoint.X <= point.X && point.X <= outline.MaximumPoint.X &&
-                    outline.MinimumPoint.Y <= point.Y && point.Y <= outline.MaximumPoint.Y &&
-                    outline.MinimumPoint.Z <= point.Z && point.Z <= outline.MaximumPoint.Z)
-                    return true;
+                List<XYZ> points = new List<XYZ>();
+                foreach (XYZ point in SpacePoints)
+                {
+                    //Is point inside outline
+                    if (keyValue.Key.MinimumPoint.X <= point.X && point.X < keyValue.Key.MaximumPoint.X &&
+                                     keyValue.Key.MinimumPoint.Y <= point.Y && point.Y < keyValue.Key.MaximumPoint.Y &&
+                                     keyValue.Key.MinimumPoint.Z <= point.Z && point.Z < keyValue.Key.MaximumPoint.Z)
+                        points.Add(point);
+                }
+                pointsInOutlines.Add(keyValue.Key, points);
             }
-            return false;
+            return pointsInOutlines;
+
         }
     }
 }
