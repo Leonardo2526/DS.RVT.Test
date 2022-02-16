@@ -35,7 +35,9 @@ namespace DS.RVT.ModelSpaceFragmentation
             {
                 OutlinesWithSolids.TryGetValue(keyValue.Key, out List<Solid> solids);
 
-                foreach (XYZ point in keyValue.Value)
+                List<XYZ> pointsForSearch = GetPointsInSolids(keyValue.Value, solids);
+
+                foreach (XYZ point in pointsForSearch)
                 {
                     if (pointInSolidChecker.IsPointInSolid(point, solids))
                         UnpassablePoints.Add(point);
@@ -48,6 +50,68 @@ namespace DS.RVT.ModelSpaceFragmentation
             //    if (!UnpassablePoints.Contains(point))
             //        PassablePoints.Add(point);
             //}
+
+        }
+
+        private Dictionary<Outline, List<XYZ>> SortPointsByOutlines2()
+        {
+            Dictionary<Outline, List<XYZ>> sortedPoints = new Dictionary<Outline, List<XYZ>>();
+
+            List<XYZ> pointsInAllOutlines = GetPointsInOutlines();
+
+            foreach (KeyValuePair<Outline, List<Solid>> keyValue in OutlinesWithSolids)
+            {
+                List<XYZ> pointsInOutline = new List<XYZ>();
+
+                List<int> indexes = new List<int>();
+                for (int i = 0; i < pointsInAllOutlines.Count; i++)
+                {
+                    if (keyValue.Key.Contains(pointsInAllOutlines[i], 0))
+                    {
+                        indexes.Add(i);
+                        pointsInOutline.Add(pointsInAllOutlines[i]);
+                    }
+                }
+
+                for (int i = indexes.Count - 1; i-- > 0;)
+                    pointsInAllOutlines.RemoveAt(i);
+
+                sortedPoints.Add(keyValue.Key, pointsInOutline);
+            }
+            return sortedPoints;
+        }
+
+        private Dictionary<Outline, List<XYZ>> SortPointsByOutlines1()
+        {
+            Dictionary<Outline, List<XYZ>> sortedPoints = new Dictionary<Outline, List<XYZ>>();
+
+            List<XYZ> pointsInOutlines = GetPointsInOutlines();
+
+            foreach (XYZ point in pointsInOutlines)
+            {
+                foreach (KeyValuePair<Outline, List<Solid>> keyValue in OutlinesWithSolids)
+                {
+                    if (sortedPoints.Values.Count >= SpaceZone.ZonePointsCount)
+                        continue;
+
+                    //Is point inside outline
+                    if (keyValue.Key.Contains(point, 0))
+                    {
+                        if (!sortedPoints.ContainsKey(keyValue.Key))
+                            sortedPoints.Add(keyValue.Key, new List<XYZ>());
+
+                        sortedPoints.TryGetValue(keyValue.Key, out List<XYZ> points);
+
+                        points.Add(point);
+                        sortedPoints[keyValue.Key] = points;
+                        break;
+                    }
+
+                }
+            }
+
+
+            return sortedPoints;
 
         }
 
@@ -74,11 +138,12 @@ namespace DS.RVT.ModelSpaceFragmentation
                         sortedPoints[keyValue.Key] = points;
                         break;
                     }
-                   
+
+
                 }
             }
-             
-            
+
+
             return sortedPoints;
 
         }
@@ -95,11 +160,39 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             for (int i = 0; i < SpacePoints.Count; i++)
             {
-                if (outline.Contains(SpacePoints[i],0))
+                if (outline.Contains(SpacePoints[i], 0))
                     xYZs.Add(SpacePoints[i]);
             }
 
             return xYZs;
         }
+
+        private List<XYZ> GetPointsInSolids(List<XYZ> points , List<Solid> solids)
+        {
+            List<XYZ> pointsForSearch = new List<XYZ>();
+
+            foreach (Solid solid in solids)
+            {
+                Transform transform = solid.GetBoundingBox().Transform;
+                Solid solidTransformed = SolidUtils.CreateTransformed(solid, transform);
+
+                XYZ minPoint = solidTransformed.GetBoundingBox().Min;
+                XYZ maxPoint = solidTransformed.GetBoundingBox().Max;
+
+                XYZ minTrPoint = transform.OfPoint(minPoint);
+                XYZ maxTrPoint = transform.OfPoint(maxPoint);
+
+                Outline outline = new Outline(minTrPoint, maxTrPoint);
+
+                foreach (XYZ point in points)
+                {
+                    if (outline.Contains(point, 0))
+                        pointsForSearch.Add(point);
+                }
+            }
+
+            return pointsForSearch;
+        }
+
     }
 }

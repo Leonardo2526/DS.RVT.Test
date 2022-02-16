@@ -68,5 +68,13 @@ namespace DS.RVT.ModelSpaceFragmentation
                 return DeltaBounds.Z / ZoneCountZ;
             }
         }
+
+        public static int ZonePointsCount
+        {
+            get
+            {
+                return ZoneCountX * ZoneCountY * ZoneCountZ;
+            }
+        }
     }
 }

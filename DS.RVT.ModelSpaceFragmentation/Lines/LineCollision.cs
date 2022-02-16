@@ -19,6 +19,7 @@ namespace DS.RVT.ModelSpaceFragmentation
                 {
                     //Get intersections with curve
                     SolidCurveIntersection intersection = solid.IntersectWithCurve(curve, intersectOptions);
+               
                     if (intersection.SegmentCount != 0)
                     {
                         CurveExtents curveExt = intersection.GetCurveSegmentExtents(0);

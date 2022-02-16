@@ -27,7 +27,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         public static Element CurrentElement { get; set; }
 
-        public static int PointsStep { get; } = 50;
+        public static int PointsStep { get; } = 20;
 
         public static double PointsStepF { get; set; }
 
@@ -46,8 +46,8 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             SpaceFragmentator spaceFragmentator = new SpaceFragmentator(App, Uiapp, Uidoc, Doc);
             spaceFragmentator.FragmentSpace(CurrentElement);
-             
-            ////Path finding initiation
+
+            //Path finding initiation
             PathFinder pathFinder = new PathFinder();
             List<PathFinderNode> path = pathFinder.AStarPath(ElementInfo.StartElemPoint,
                 ElementInfo.EndElemPoint, SpaceFragmentator.UnpassablePoints);

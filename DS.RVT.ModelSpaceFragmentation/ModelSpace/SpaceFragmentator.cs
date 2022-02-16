@@ -53,7 +53,6 @@ namespace DS.RVT.ModelSpaceFragmentation
             }
 
             ModelSolid modelSolid = new ModelSolid(Doc);
-            Dictionary<Element, List<Solid>> solids = modelSolid.GetSolids();
 
             //Get Outlines with solids
             Dictionary<Outline, List<Solid>> outlinesSolids = new Dictionary<Outline, List<Solid>>();
