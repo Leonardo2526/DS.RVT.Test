@@ -1,7 +1,10 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using DS.RVT.ModelSpaceFragmentation.Lines;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -22,16 +25,16 @@ namespace DS.RVT.ModelSpaceFragmentation
         public void Separate()
         {
 
-            Dictionary<Outline, List<XYZ>> pointsInOutlines = SortPointsByOutlines();
+            Dictionary<Outline, List<XYZ>> sortedPoints = SortPointsByOutlinesTPL();
 
 
-            //Separate points inside each outline
+            //Separate points inside each outline 
             LineCreator lineCreator = new LineCreator();
             SolidCurveIntersectionOptions intersectOptions = new SolidCurveIntersectionOptions();
             LineCollision lineCollision = new LineCollision(intersectOptions);
             PointInSolidChecker pointInSolidChecker = new PointInSolidChecker(lineCreator, lineCollision);
 
-            foreach (KeyValuePair<Outline, List<XYZ>> keyValue in pointsInOutlines)
+            foreach (KeyValuePair<Outline, List<XYZ>> keyValue in sortedPoints)
             {
                 OutlinesWithSolids.TryGetValue(keyValue.Key, out List<Solid> solids);
 
@@ -73,8 +76,8 @@ namespace DS.RVT.ModelSpaceFragmentation
                     }
                 }
 
-                for (int i = indexes.Count - 1; i-- > 0;)
-                    pointsInAllOutlines.RemoveAt(i);
+                //for (int i = indexes.Count - 1; i-- > 0;)
+                //    pointsInAllOutlines.RemoveAt(i);
 
                 sortedPoints.Add(keyValue.Key, pointsInOutline);
             }
@@ -121,6 +124,11 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             List<XYZ> pointsInOutlines = GetPointsInOutlines();
 
+            foreach (KeyValuePair<Outline, List<Solid>> keyValue in OutlinesWithSolids)
+            {
+                sortedPoints.Add(keyValue.Key, new List<XYZ>());
+            }
+
             foreach (XYZ point in pointsInOutlines)
             {
                 foreach (KeyValuePair<Outline, List<Solid>> keyValue in OutlinesWithSolids)
@@ -129,9 +137,6 @@ namespace DS.RVT.ModelSpaceFragmentation
                     //Is point inside outline
                     if (keyValue.Key.Contains(point, 0))
                     {
-                        if (!sortedPoints.ContainsKey(keyValue.Key))
-                            sortedPoints.Add(keyValue.Key, new List<XYZ>());
-
                         sortedPoints.TryGetValue(keyValue.Key, out List<XYZ> points);
 
                         points.Add(point);
@@ -148,6 +153,26 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         }
 
+        private Dictionary<Outline, List<XYZ>> SortPointsByOutlinesTPL()
+        {
+
+            List<XYZ> pointsInOutlines = GetPointsInOutlines();
+
+            ParallelSort2 parallelSort = new ParallelSort2(OutlinesWithSolids, pointsInOutlines);
+            parallelSort.RunSort();
+            Dictionary<Outline, List<XYZ>> sortedPoints = parallelSort.SortedPoints;
+
+            //ParallelSort parallelSort = new ParallelSort(OutlinesWithSolids, pointsInOutlines);
+            //parallelSort.RunSort();
+            //Dictionary<Outline, List<XYZ>> sortedPoints = parallelSort.SortedPoints;
+
+            //Multithreadsort multithreadsort = new Multithreadsort(OutlinesWithSolids, pointsInOutlines);
+            //multithreadsort.RunSort();
+            //Dictionary<Outline, List<XYZ>> sortedPoints = multithreadsort.SortedPoints;
+
+            return sortedPoints;
+
+        }
 
         private List<XYZ> GetPointsInOutlines()
         {
@@ -186,7 +211,11 @@ namespace DS.RVT.ModelSpaceFragmentation
 
                 foreach (XYZ point in points)
                 {
-                    if (outline.Contains(point, 0))
+                    //if (point == null)
+                    //{
+                    //    TaskDialog.Show("Revit", "null Point");
+                    //}
+                    if (point != null && outline.Contains(point, 0))
                         pointsForSearch.Add(point);
                 }
             }
