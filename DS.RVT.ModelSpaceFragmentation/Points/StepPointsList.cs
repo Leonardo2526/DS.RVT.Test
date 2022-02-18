@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DS.RVT.ModelSpaceFragmentation.Path
+namespace DS.RVT.ModelSpaceFragmentation
 {
     class StepPointsList
     {

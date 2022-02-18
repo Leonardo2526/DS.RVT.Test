@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using DS.RVT.ModelSpaceFragmentation.Lines;
+using System.Collections.Generic;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -15,17 +16,16 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         }
 
-        public bool IsPointInSolid(XYZ point)
+        public bool IsPointInSolid(XYZ point, List<Solid> solids)
         {
             RayCreator ray = new RayCreator(point);
             Line rayLine = lineCreator.Create(ray);
 
-            bool IfOneLineIntersections = lineCollision.GetElementsCurveCollisions(rayLine, ModelSolid.SolidsInModel);
+            bool IfOneLineIntersections = lineCollision.GetElementsCurveCollisions(rayLine, solids);
             if (IfOneLineIntersections)
                 return true;
 
             return false;
         }
-
     }
 }

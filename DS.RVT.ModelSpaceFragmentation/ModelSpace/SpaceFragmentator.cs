@@ -1,12 +1,8 @@
 ﻿using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
-using System.Collections.Generic;
-using System.Linq;
-using DS.RVT.ModelSpaceFragmentation.Path;
 using DS.RVT.ModelSpaceFragmentation.Visualization;
-using System;
+using System.Collections.Generic;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -30,7 +26,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         public void FragmentSpace(Element element)
         {
-            
+
             ElementInfo pointsInfo = new ElementInfo();
             pointsInfo.GetPoints(element);
 
@@ -38,10 +34,46 @@ namespace DS.RVT.ModelSpaceFragmentation
             new ModelSpacePointsGenerator(ElementInfo.MinBoundPoint, ElementInfo.MaxBoundPoint);
             List<XYZ> spacePoints = modelSpacePointsGenerator.Generate();
 
-            ModelSolid modelSolid = new ModelSolid(Doc);
-            Dictionary<Element, List<Solid>> solids = modelSolid.GetSolids();
 
-            PointsSeparator pointsSeparator = new PointsSeparator(spacePoints);
+            int c1 = SpaceZone.ZoneCountX;
+            double s1 = SpaceZone.ZoneSizeX;
+
+            List<BoundingBoxXYZ> boundingBoxes = BoundingBoxCreator.Create();
+
+            //Get list with BoundingBoxIntersectsFilters
+            List<BoundingBoxIntersectsFilter> bbFilters = new List<BoundingBoxIntersectsFilter>();
+            foreach (BoundingBoxXYZ bb in boundingBoxes)
+            {
+                Outline myOutLn = new Outline(bb.Min, bb.Max);
+
+                bbFilters.Add(new BoundingBoxIntersectsFilter(myOutLn));
+
+                //Show boundingBoxes
+                //BoundigBoxVizualizator.ShowBoudaries(bb);
+            }
+
+            ModelSolid modelSolid = new ModelSolid(Doc);
+
+            //Get Outlines with solids
+            Dictionary<Outline, List<Solid>> outlinesSolids = new Dictionary<Outline, List<Solid>>();
+            foreach (BoundingBoxIntersectsFilter bbf in bbFilters)
+            {
+                List<Solid> bbSolids = modelSolid.GetSolidsByBBF(bbf);
+                if (bbSolids.Count > 0)
+                    outlinesSolids.Add(bbf.GetBoundingBox(), bbSolids);
+
+            }
+
+            //foreach (Outline outline in outlines)
+            //{
+            //    BoundingBoxXYZ boundingBoxXYZ = new BoundingBoxXYZ();
+            //    boundingBoxXYZ.Min = outline.MinimumPoint;
+            //    boundingBoxXYZ.Max = outline.MaximumPoint;
+            //   BoundigBoxVizualizator.ShowBoudaries(boundingBoxXYZ);
+            //}
+
+
+            PointsSeparator pointsSeparator = new PointsSeparator(spacePoints, outlinesSolids);
             pointsSeparator.Separate();
 
             UnpassablePoints = pointsSeparator.UnpassablePoints;
@@ -51,7 +83,7 @@ namespace DS.RVT.ModelSpaceFragmentation
         }
 
         private void Visualize(PointsSeparator pointsSeparator)
-        {           
+        {
             Visualizator.ShowPoints(new PointsVisualizator(pointsSeparator.PassablePoints));
 
             IPointsVisualization unpassablePointsVisualization = new PointsVisualizator(pointsSeparator.UnpassablePoints)

@@ -1,5 +1,5 @@
 ﻿using Autodesk.Revit.DB;
-using DS.RVT.ModelSpaceFragmentation.Path;
+using DS.RVT.ModelSpaceFragmentation;
 using DSUtils.GridMap;
 using FrancoGustavo;
 using System.Collections.Generic;

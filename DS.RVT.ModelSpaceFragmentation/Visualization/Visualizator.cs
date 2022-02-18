@@ -4,7 +4,7 @@ using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using System.Collections.Generic;
 using System.Linq;
-using DS.RVT.ModelSpaceFragmentation.Path;
+using DS.RVT.ModelSpaceFragmentation;
 
 namespace DS.RVT.ModelSpaceFragmentation.Visualization
 {
