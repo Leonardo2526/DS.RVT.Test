@@ -22,37 +22,31 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         private void CheckPoints(int n)
         {
-            foreach (KeyValuePair<Outline, List<Solid>> keyValue in OutlinesWithSolids)
-            {
+            
+                List<XYZ> pointsInOutline = new List<XYZ>();
 
-                //Is point inside outline
-                if (keyValue.Key.Contains(PointsInOutlines[n], 0))
+                List<int> indexes = new List<int>();
+                for (int i = 0; i < PointsInOutlines.Count; i++)
                 {
-                    SortedPoints.TryGetValue(keyValue.Key, out List<XYZ> points);
-
-                    points.Add(PointsInOutlines[n]);
-                    SortedPoints[keyValue.Key] = points;
-                    break;
+                    if (OutlinesWithSolids.ElementAt(n).Key.Contains(PointsInOutlines[i], 0))
+                    {
+                        indexes.Add(i);
+                        pointsInOutline.Add(PointsInOutlines[i]);
+                    }
                 }
 
+                //for (int i = indexes.Count - 1; i-- > 0;)
+                //    pointsInAllOutlines.RemoveAt(i);
 
-            }
+                SortedPoints.Add(OutlinesWithSolids.ElementAt(n).Key, pointsInOutline);
+           
         }
 
 
         public void RunSort()
         {
-            Fill();
-
-            Parallel.For(1, PointsInOutlines.Count, CheckPoints);
+            Parallel.For(0, OutlinesWithSolids.Count, CheckPoints);
         }
 
-        private void Fill()
-        {
-            foreach (KeyValuePair<Outline, List<Solid>> keyValue in OutlinesWithSolids)
-            {
-                SortedPoints.Add(keyValue.Key, new List<XYZ>());
-            }
-        }
     }
 }

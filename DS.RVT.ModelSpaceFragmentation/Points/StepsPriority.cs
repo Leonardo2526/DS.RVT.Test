@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DS.RVT.ModelSpaceFragmentation.Path
+namespace DS.RVT.ModelSpaceFragmentation
 {
     class StepsPriority
     {

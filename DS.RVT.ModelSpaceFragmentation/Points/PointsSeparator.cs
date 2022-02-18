@@ -56,119 +56,14 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         }
 
-        private Dictionary<Outline, List<XYZ>> SortPointsByOutlines2()
-        {
-            Dictionary<Outline, List<XYZ>> sortedPoints = new Dictionary<Outline, List<XYZ>>();
-
-            List<XYZ> pointsInAllOutlines = GetPointsInOutlines();
-
-            foreach (KeyValuePair<Outline, List<Solid>> keyValue in OutlinesWithSolids)
-            {
-                List<XYZ> pointsInOutline = new List<XYZ>();
-
-                List<int> indexes = new List<int>();
-                for (int i = 0; i < pointsInAllOutlines.Count; i++)
-                {
-                    if (keyValue.Key.Contains(pointsInAllOutlines[i], 0))
-                    {
-                        indexes.Add(i);
-                        pointsInOutline.Add(pointsInAllOutlines[i]);
-                    }
-                }
-
-                //for (int i = indexes.Count - 1; i-- > 0;)
-                //    pointsInAllOutlines.RemoveAt(i);
-
-                sortedPoints.Add(keyValue.Key, pointsInOutline);
-            }
-            return sortedPoints;
-        }
-
-        private Dictionary<Outline, List<XYZ>> SortPointsByOutlines1()
-        {
-            Dictionary<Outline, List<XYZ>> sortedPoints = new Dictionary<Outline, List<XYZ>>();
-
-            List<XYZ> pointsInOutlines = GetPointsInOutlines();
-
-            foreach (XYZ point in pointsInOutlines)
-            {
-                foreach (KeyValuePair<Outline, List<Solid>> keyValue in OutlinesWithSolids)
-                {
-                    if (sortedPoints.Values.Count >= SpaceZone.ZonePointsCount)
-                        continue;
-
-                    //Is point inside outline
-                    if (keyValue.Key.Contains(point, 0))
-                    {
-                        if (!sortedPoints.ContainsKey(keyValue.Key))
-                            sortedPoints.Add(keyValue.Key, new List<XYZ>());
-
-                        sortedPoints.TryGetValue(keyValue.Key, out List<XYZ> points);
-
-                        points.Add(point);
-                        sortedPoints[keyValue.Key] = points;
-                        break;
-                    }
-
-                }
-            }
-
-
-            return sortedPoints;
-
-        }
-
-        private Dictionary<Outline, List<XYZ>> SortPointsByOutlines()
-        {
-            Dictionary<Outline, List<XYZ>> sortedPoints = new Dictionary<Outline, List<XYZ>>();
-
-            List<XYZ> pointsInOutlines = GetPointsInOutlines();
-
-            foreach (KeyValuePair<Outline, List<Solid>> keyValue in OutlinesWithSolids)
-            {
-                sortedPoints.Add(keyValue.Key, new List<XYZ>());
-            }
-
-            foreach (XYZ point in pointsInOutlines)
-            {
-                foreach (KeyValuePair<Outline, List<Solid>> keyValue in OutlinesWithSolids)
-                {
-
-                    //Is point inside outline
-                    if (keyValue.Key.Contains(point, 0))
-                    {
-                        sortedPoints.TryGetValue(keyValue.Key, out List<XYZ> points);
-
-                        points.Add(point);
-                        sortedPoints[keyValue.Key] = points;
-                        break;
-                    }
-
-
-                }
-            }
-
-
-            return sortedPoints;
-
-        }
-
         private Dictionary<Outline, List<XYZ>> SortPointsByOutlinesTPL()
         {
 
             List<XYZ> pointsInOutlines = GetPointsInOutlines();
 
-            ParallelSort2 parallelSort = new ParallelSort2(OutlinesWithSolids, pointsInOutlines);
+            ParallelSort parallelSort = new ParallelSort(OutlinesWithSolids, pointsInOutlines);
             parallelSort.RunSort();
             Dictionary<Outline, List<XYZ>> sortedPoints = parallelSort.SortedPoints;
-
-            //ParallelSort parallelSort = new ParallelSort(OutlinesWithSolids, pointsInOutlines);
-            //parallelSort.RunSort();
-            //Dictionary<Outline, List<XYZ>> sortedPoints = parallelSort.SortedPoints;
-
-            //Multithreadsort multithreadsort = new Multithreadsort(OutlinesWithSolids, pointsInOutlines);
-            //multithreadsort.RunSort();
-            //Dictionary<Outline, List<XYZ>> sortedPoints = multithreadsort.SortedPoints;
 
             return sortedPoints;
 

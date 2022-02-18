@@ -1,10 +1,5 @@
 ﻿using Autodesk.Revit.DB;
-using DS.RVT.ModelSpaceFragmentation.Path;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DS.RVT.ModelSpaceFragmentation.Points
 {
@@ -19,7 +14,7 @@ namespace DS.RVT.ModelSpaceFragmentation.Points
             stepPoint.Y * PointsStepF,
             stepPoint.Z * PointsStepF);
 
-            return new XYZ(ElementInfo.MinBoundPoint.X + refPoint.X, 
+            return new XYZ(ElementInfo.MinBoundPoint.X + refPoint.X,
                 ElementInfo.MinBoundPoint.Y + refPoint.Y,
                 ElementInfo.MinBoundPoint.Z + refPoint.Z);
 
@@ -39,9 +34,9 @@ namespace DS.RVT.ModelSpaceFragmentation.Points
 
         public static XYZ StepPointToXYZByPoint(XYZ basePoint, StepPoint stepPoint)
         {
-             XYZ point = new XYZ(basePoint.X + stepPoint.X * PointsStepF,
-                    basePoint.Y + stepPoint.Y * PointsStepF,
-                    basePoint.Z + stepPoint.Z * PointsStepF);
+            XYZ point = new XYZ(basePoint.X + stepPoint.X * PointsStepF,
+                   basePoint.Y + stepPoint.Y * PointsStepF,
+                   basePoint.Z + stepPoint.Z * PointsStepF);
 
             return point;
         }
