@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+	<AddIn Type="Command">
+		<Name>ExternalEvents</Name>
+		<FullClassName>DS.RevitLib.ExternalEvents.ExternalCommand</FullClassName>
+		<Text>ExternalEvents</Text>
+		<Description>ExternalEvents test</Description>
+		<VisibilityMode>AlwaysVisible</VisibilityMode>
+		<Assembly>.\DS.RevitLib.ExternalEvents\DS.RevitLib.ExternalEvents.dll</Assembly>
+		<AddInId>149af317-eae9-48f5-9d3e-2b71b9867a77</AddInId>
+		<VendorId>DS</VendorId>
+	</AddIn> 
+</RevitAddIns>
