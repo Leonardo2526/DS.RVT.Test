@@ -77,6 +77,7 @@
     <PostBuildEvent>xcopy /Y  "$(TargetDir)*.*" "C:\ProgramData\Autodesk\Revit\Addins\2020\$(TargetName)\" 
 Copy "$(ProjectDir)$(TargetName).addin" "C:\ProgramData\Autodesk\Revit\Addins\2020"
 xcopy /Y  "$(TargetDir)*.*" "$(AppData)\Autodesk\Revit\Addins\2020\$(TargetName)\" 
+Copy "$(ProjectDir)/DS.RevitLib.ExternalEventsApp.addin" "$(AppData)\Autodesk\Revit\Addins\2020"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
