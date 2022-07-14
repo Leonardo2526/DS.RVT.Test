@@ -36,10 +36,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ClassLibrary1">
-      <HintPath>..\ClassLibrary1\bin\Debug\ClassLibrary1.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="DS.System">
       <HintPath>..\..\DS.System\DS.System\bin\Release\DS.System.dll</HintPath>
     </Reference>
@@ -63,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Class1.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
