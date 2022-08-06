@@ -1,9 +1,9 @@
 ﻿using Autodesk.Revit.DB;
 using DS.RVT.ModelSpaceFragmentation;
-using DSUtils.GridMap;
+using DS.PathSearch.GridMap;
 using FrancoGustavo;
 using System.Collections.Generic;
-using Location = DSUtils.Location;
+using Location = DS.PathSearch.Location;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -16,7 +16,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             InputData data = new InputData(startPoint, endPoint, unpassablePoints);
             data.ConvertToPlane();
 
-            MapCreator map = new MapCreator();
+            IMap map = new MapCreator();
             map.Start = new Location(InputData.Ax, InputData.Ay, InputData.Az);
             map.Goal = new Location(InputData.Bx, InputData.By, InputData.Bz);
 
@@ -25,7 +25,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             foreach (StepPoint unpass in InputData.UnpassStepPoints)
                 map.Matrix[unpass.X, unpass.Y, unpass.Z] = 1;
 
-            List<PathFinderNode> pathNodes = FGAlgorythm.GetPathByMap(map, new PathRequiment());
+            List<PathFinderNode> pathNodes = FGAlgorythm.GetPathByMap(map, new PathRequiment0());
 
             return pathNodes;
         }

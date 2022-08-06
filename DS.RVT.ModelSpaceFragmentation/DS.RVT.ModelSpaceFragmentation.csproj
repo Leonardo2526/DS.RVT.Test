@@ -36,15 +36,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DS.PathSearch, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="DS.RevitUtils.MEP">
       <HintPath>..\..\DS.RevitUtils\DS.RevitUtilsTools\DS.RevitUtils.MEP\bin\Release\DS.RevitUtils.MEP.dll</HintPath>
     </Reference>
-    <Reference Include="DSUtils">
-      <HintPath>..\..\DSUtils\DSUtils\bin\Release\DSUtils.dll</HintPath>
-    </Reference>
     <Reference Include="FrancoGustavo, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\DS.PathSearchAlgorythms\FrancoGustavo\bin\Release\FrancoGustavo.dll</HintPath>
+      <HintPath>..\..\DS.WindowsApp.Programs\PathSearchAlgorythms\FrancoGustavo\bin\Release\FrancoGustavo.dll</HintPath>
     </Reference>
     <Reference Include="RevitAPI">
       <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>

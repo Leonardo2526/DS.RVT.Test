@@ -52,8 +52,8 @@ namespace DS.RVT.ModelSpaceFragmentation
             lineCreator.CreateCurves(new CurvesByPointsCreator(pathCoords));
 
             //MEP system changing
-            RevitUtils.MEP.PypeSystem pypeSystem = new RevitUtils.MEP.PypeSystem(Main.Uiapp, Main.Uidoc, Main.Doc, Main.CurrentElement);
-            pypeSystem.CreatePipeSystem(pathCoords);
+            //RevitUtils.MEP.PypeSystem pypeSystem = new RevitUtils.MEP.PypeSystem(Main.Uiapp, Main.Uidoc, Main.Doc, Main.CurrentElement);
+            //pypeSystem.CreatePipeSystem(pathCoords);
 
             RevitUtils.MEP.ElementEraser elementEraser = new RevitUtils.MEP.ElementEraser(Main.Doc);
             elementEraser.DeleteElement(Main.CurrentElement);
