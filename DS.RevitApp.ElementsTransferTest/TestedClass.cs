@@ -2,6 +2,8 @@
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using DS.RevitLib.Utils;
+using DS.RevitLib.Utils.Extensions;
+using DS.RevitLib.Utils.MEP.Creator;
 using DS.RevitLib.Utils.MEP.SystemTree;
 using System;
 using System.Collections.Generic;
@@ -40,12 +42,35 @@ namespace DS.RevitApp.ElementsTransferTest
             var rootElements = system.GetRootElements(system.Composite);
             var rootFamilies = rootElements.OfType<FamilyInstance>();
 
-            var families = rootElements.Where(x => x.Category.Name.Contains("Accessories") || x.Category.Name.Contains("Арматура")).ToList();
+            var elemFamilies = rootElements.Where(x => x.Category.Name.Contains("Accessories") || x.Category.Name.Contains("Арматура")).ToList();
 
-            var selectedFamilies = SelectFilter(rootElements);
 
-             ElementUtils.Highlight(selectedFamilies);
+            //selection
+            var selectedElemFamilies = SelectFilter(rootElements);
+            var families = selectedElemFamilies.Cast<FamilyInstance>().ToList();
 
+             ElementUtils.Highlight(elemFamilies);
+
+            //trasfer
+            List<XYZ> points = new List<XYZ>()
+            {
+                new XYZ(0,0,0),
+                new XYZ(0,20,0),
+            };
+
+            var comp = system.Composite.Root as MEPSystemComponent;
+            MEPCurve baseMEPCurve = comp.BaseElement as MEPCurve;
+            var builder = new BuilderByPoints(baseMEPCurve, points);
+            var model = builder.BuildMEPCurves();
+            MEPCurve mEPCurve = model.MEPCurves.First() as MEPCurve;
+
+            //Reference reference3 = Uidoc.Selection.PickObject(ObjectType.Element, "Select targer MEPCurve");
+            //MEPCurve baseElement = Doc.GetElement(reference3) as MEPCurve;
+
+            //Uidoc.PromptForFamilyInstancePlacement(families.First().GetFamilySymbol());
+
+            var elementsTransfer = new ElementsTransfer(families, mEPCurve);
+            elementsTransfer.Transfer();
         }
 
         private List<Element> SelectFilter(List<Element> elements)
@@ -68,6 +93,7 @@ namespace DS.RevitApp.ElementsTransferTest
             var range = elements.FindAll(x => elements.IndexOf(x) > minInd && elements.IndexOf(x) < maxInd);
 
             return range.Where(x => x.Category.Name.Contains("Accessories") || x.Category.Name.Contains("Арматура")).ToList();
+               
         }
 
 
