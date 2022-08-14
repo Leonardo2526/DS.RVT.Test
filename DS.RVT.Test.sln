@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewTool1", "DS.RVT.ExtCmd.F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitLib.ExternalEvents", "DS.RevitLib.ExternalEvents\DS.RevitLib.ExternalEvents.csproj", "{BCF72AE9-2C4E-4DC9-A6A9-DAD6A63D4B4E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitApp.ElementsTransferTest", "DS.RevitApp.ElementsTransferTest\DS.RevitApp.ElementsTransferTest.csproj", "{5E7D867B-3629-46ED-A7D8-61EDDE093260}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,10 @@ Global
 		{BCF72AE9-2C4E-4DC9-A6A9-DAD6A63D4B4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BCF72AE9-2C4E-4DC9-A6A9-DAD6A63D4B4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCF72AE9-2C4E-4DC9-A6A9-DAD6A63D4B4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E7D867B-3629-46ED-A7D8-61EDDE093260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E7D867B-3629-46ED-A7D8-61EDDE093260}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E7D867B-3629-46ED-A7D8-61EDDE093260}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E7D867B-3629-46ED-A7D8-61EDDE093260}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
