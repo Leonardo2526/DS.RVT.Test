@@ -21,7 +21,9 @@ namespace DS.RevitApp.SymbolPlacerTest
         private readonly List<MEPCurve> _targerMEPCurves;
         private readonly Document _doc;
         private readonly Connector _baseConnector;
-        private readonly double _minElemDist = 50.mmToFyt2();
+        private readonly double _minFamInstLength = 50.mmToFyt2();
+        private readonly double _minMEPCurveLength = 50.mmToFyt2();
+        private double _minPlacementLength;
 
 
         public SymbolPlacerClient(List<FamilyInstance> familyInstances, List<MEPCurve> targerMEPCurves, Connector baseConnector = null)
@@ -30,82 +32,59 @@ namespace DS.RevitApp.SymbolPlacerTest
             _targerMEPCurves = targerMEPCurves;
             _doc = targerMEPCurves.First().Document;
             _baseConnector = baseConnector;
+            _minPlacementLength = _minFamInstLength + 2*_minMEPCurveLength;
         }
 
         public void Run()
         {
-            int i = 0;
-            XYZ point = null;
-            MEPCurve mEPCurve = null;
+            var availableMEPCurves = new AvailableMEPCurves(_targerMEPCurves, _minMEPCurveLength, _minPlacementLength);
+            if (availableMEPCurves.CurrentStack is null)
+            {
+                MessageBox.Show($"No available MEPCurves exist for family insatances placement.");
+                return;
+            }
 
             foreach (var family in _familyInstances)
             {
-                if (i > _targerMEPCurves.Count)
-                {
-                    MessageBox.Show("No available MEPCurves exist for family insatance placement.");
-                    break;
-                }
-
                 FamilySymbol familySymbol = family.GetFamilySymbol();
                 double familyLength = new FamilySymbolUtils().GetLength(familySymbol, _doc, family);
+                double placementLength = familyLength + 2 * _minMEPCurveLength;
 
-                mEPCurve ??= GetAvailableMEPCurve(familyLength);
+                MEPCurve mEPCurve = availableMEPCurves.Get(placementLength);
                 if (mEPCurve is null)
                 {
-                    MessageBox.Show("No available MEPCurves exist for family insatance placement.");
+                    MessageBox.Show($"No available MEPCurves exist for family insatance id ({family.Id}) placement.");
                     break;
                 }
 
-                point ??= new PlacementPoint(mEPCurve, familyLength, _minElemDist).GetPoint(PlacementOption.Edge);
-
-                //if (point is null)
-                //{
-                //    return null;
-                //}
-
+                XYZ point = _baseConnector is null
+                    ? new PlacementPoint(mEPCurve, placementLength).GetPoint(PlacementOption.Edge)
+                    : new PlacementPoint(mEPCurve, placementLength).GetPoint(_baseConnector);
 
                 var symbolPlacer = new SymbolPlacer(familySymbol, mEPCurve, point, familyLength, family,
                     new RollBackCommitter(), "autoMEP");
                 symbolPlacer.Place();
 
-
-                mEPCurve = symbolPlacer.SplittedMEPCurve;
-                Connector baseConnector = symbolPlacer.BaseConnector;
-
-                point = new PlacementPoint(mEPCurve, familyLength, _minElemDist).GetPoint(baseConnector);
-
-                if (point is null)
+                //add splitted mEPCurve to stack
+                if (availableMEPCurves.CheckMinLength(symbolPlacer.SplittedMEPCurve))
                 {
-                    i++;
-                    mEPCurve = _targerMEPCurves[i];
+                    availableMEPCurves.CurrentStack.Push(symbolPlacer.SplittedMEPCurve);
                 }
+
+
+                //mEPCurve = symbolPlacer.SplittedMEPCurve;
+                //Connector baseConnector = symbolPlacer.BaseConnector;
+
+                //point = new PlacementPoint(mEPCurve, familyLength, _minElemDist).GetPoint(baseConnector);
+
+                //if (point is null)
+                //{
+                //    i++;
+                //    mEPCurve = _targerMEPCurves[i];
+                //}
             }
         }
 
 
-        private MEPCurve GetAvailableMEPCurve(double familyLength)
-        {
-            foreach (var targerMEPCurve in _targerMEPCurves)
-            {
-                if (IsPlacementAvailable(targerMEPCurve, familyLength))
-                {
-                    return targerMEPCurve;
-                }
-            }
-
-            return null;
-        }
-
-        private bool IsPlacementAvailable(MEPCurve mEPCurve, double familyLength)
-        {
-            double targetLength = mEPCurve.GetCenterLine().ApproximateLength;
-
-            if (targetLength < familyLength + 2 * _minElemDist)
-            {
-                return false;
-            }
-
-            return true;
-        }
     }
 }

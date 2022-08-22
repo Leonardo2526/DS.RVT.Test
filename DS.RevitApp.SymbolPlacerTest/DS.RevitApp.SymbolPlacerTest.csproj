@@ -59,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AvailableMEPCurves.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="FamiliesSelectorTest.cs" />
     <Compile Include="PlacementOption.cs" />
