@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+	<AddIn Type="Command">
+		<Name>SymbolPlacerTest</Name>
+		<FullClassName>DS.RevitApp.SymbolPlacerTest.ExternalCommand</FullClassName>
+		<Text>SymbolPlacerTest</Text>
+		<Description>SymbolPlacerTest</Description>
+		<VisibilityMode>AlwaysVisible</VisibilityMode>
+		<Assembly>.\DS.RevitApp.SymbolPlacerTest\DS.RevitApp.SymbolPlacerTest.dll</Assembly>
+		<AddInId>a4b2c3d5-20cc-408f-bd8f-72b43e11b52f</AddInId>
+		<VendorId>DS</VendorId>
+	</AddIn> 
+</RevitAddIns>

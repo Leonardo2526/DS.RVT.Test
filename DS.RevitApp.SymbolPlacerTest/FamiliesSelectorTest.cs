@@ -1,30 +1,32 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
-using DS.RevitLib.Utils;
-using DS.RevitLib.Utils.Extensions;
+using Autodesk.Revit.UI;
 using DS.RevitLib.Utils.MEP.Creator;
 using DS.RevitLib.Utils.MEP.SystemTree;
+using DS.RevitLib.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DS.RevitApp.ElementsTransferTest
+namespace DS.RevitApp.SymbolPlacerTest
 {
-    internal class TestedClass
+    internal class FamiliesSelectorTest
     {
         readonly UIDocument Uidoc;
         readonly Document Doc;
         readonly UIApplication Uiapp;
 
-        public TestedClass(UIDocument uidoc, Document doc, UIApplication uiapp)
+        public FamiliesSelectorTest(UIDocument uidoc, Document doc, UIApplication uiapp)
         {
             Uidoc = uidoc;
             Doc = doc;
             Uiapp = uiapp;
         }
+
+        public List<FamilyInstance> Families { get; private set; }
+        public MEPCurve MEPCurve { get; private set; }
 
         public void RunTest()
         {
@@ -47,30 +49,42 @@ namespace DS.RevitApp.ElementsTransferTest
 
             //selection
             var selectedElemFamilies = SelectFilter(rootElements);
-            var families = selectedElemFamilies.Cast<FamilyInstance>().ToList();
+            Families = selectedElemFamilies.Cast<FamilyInstance>().ToList();
 
-             ElementUtils.Highlight(elemFamilies);
+            //ElementUtils.Highlight(elemFamilies);
 
             //trasfer
+            //List<XYZ> points = new List<XYZ>()
+            //{
+            //    new XYZ(0,0,0),
+            //    new XYZ(10, 0, 0),
+            //    new XYZ(10, 10, 0),
+            //    new XYZ(20, 10, 0),
+            //    new XYZ(20, 0, 0),
+            //    new XYZ(30, 0, 0),
+            //    //new XYZ(20, 20, -10)
+            //};
+
             List<XYZ> points = new List<XYZ>()
             {
                 new XYZ(0,0,0),
-                new XYZ(0,20,0),
+                new XYZ(1, 0, 0),
+                new XYZ(1, 10, 0),
+                new XYZ(20, 10, 0),
+                new XYZ(20, 0, 0),
+                new XYZ(30, 0, 0),
+                //new XYZ(20, 20, -10)
             };
 
             var comp = system.Composite.Root as MEPSystemComponent;
             MEPCurve baseMEPCurve = comp.BaseElement as MEPCurve;
             var builder = new BuilderByPoints(baseMEPCurve, points);
-            var model = builder.BuildMEPCurves();
-            MEPCurve mEPCurve = model.MEPCurves.First() as MEPCurve;
+            var model = builder.BuildMEPCurves().WithFittings();
+            MEPCurve = model.MEPCurves.First() as MEPCurve;
 
-            //Reference reference3 = Uidoc.Selection.PickObject(ObjectType.Element, "Select targer MEPCurve");
-            //MEPCurve baseElement = Doc.GetElement(reference3) as MEPCurve;
+            //var mEPCurveCreator = new MEPCurveCreator(MEPCurve);
+            //mEPCurveCreator.SwapSize(MEPCurve);
 
-            //Uidoc.PromptForFamilyInstancePlacement(families.First().GetFamilySymbol());
-
-            var elementsTransfer = new ElementsTransfer(families, mEPCurve);
-            elementsTransfer.Transfer();
         }
 
         private List<Element> SelectFilter(List<Element> elements)
@@ -93,9 +107,7 @@ namespace DS.RevitApp.ElementsTransferTest
             var range = elements.FindAll(x => elements.IndexOf(x) > minInd && elements.IndexOf(x) < maxInd);
 
             return range.Where(x => x.Category.Name.Contains("Accessories") || x.Category.Name.Contains("Арматура")).ToList();
-               
+
         }
-
-
     }
 }
