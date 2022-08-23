@@ -1,18 +1,19 @@
 ﻿using Autodesk.Revit.DB;
 using DS.RevitLib.Utils.Extensions;
+using Nito.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace DS.RevitApp.SymbolPlacerTest
 {
-    internal class AvailableMEPCurves
+    internal class AvailableMEPCurvesService
     {
         private readonly double _minMEPCurveLength;
         private readonly bool _orederedFamInstSequence;
         private readonly double _minPlacementLength;
         private double _placementLength;
 
-        public AvailableMEPCurves(List<MEPCurve> targetMEPCurves, double minMEPCurveLength, double minPlacementLength,
+        public AvailableMEPCurvesService(List<MEPCurve> targetMEPCurves, double minMEPCurveLength, double minPlacementLength,
             bool orederedFamInstSequence = true)
         {
             _minMEPCurveLength = minMEPCurveLength;
@@ -20,22 +21,22 @@ namespace DS.RevitApp.SymbolPlacerTest
             _orederedFamInstSequence = orederedFamInstSequence;
 
             List<MEPCurve> validMEPCurves = targetMEPCurves.Where(obj => CheckMinLength(obj)).ToList();
-            validMEPCurves.ForEach(CurrentStack.Push);
-        }
+            validMEPCurves.ForEach(obj => AvailableMEPCurves.AddToBack(obj));
 
-        public Stack<MEPCurve> ReserveStack { get; private set; }
-        public Stack<MEPCurve> CurrentStack { get; private set; }
+        }
+        //public Stack<MEPCurve> ReserveStack { get; private set; }
+        public Deque<MEPCurve> AvailableMEPCurves { get; private set; } = new Deque<MEPCurve>();
 
         public MEPCurve Get(double placementLength)
         {
             _placementLength = placementLength;
-            MEPCurve mEPCurve = CurrentStack.Where(obj => AvailableForPlacement(obj)).FirstOrDefault();
-            if (mEPCurve is null && !_orederedFamInstSequence)
-            {
-                mEPCurve = ReserveStack.Where(obj => AvailableForPlacement(obj)).FirstOrDefault();
-            }
 
-            return mEPCurve;
+            while(!AvailableForPlacement(AvailableMEPCurves.First()))
+                {
+
+            }           
+            //var mEPCurves = AvailableMEPCurves.Where(obj => AvailableForPlacement(obj));
+            return AvailableMEPCurves.RemoveFromFront();
         }
 
         public bool CheckMinLength(MEPCurve mEPCurve)
@@ -62,12 +63,15 @@ namespace DS.RevitApp.SymbolPlacerTest
         private bool CheckLength(MEPCurve mEPCurve)
         {
             double targetLength = mEPCurve.GetCenterLine().ApproximateLength;
-
             if (targetLength < _placementLength)
             {
-                if (targetLength > _minPlacementLength)
+                if (_orederedFamInstSequence)
                 {
-                    ReserveStack.Push(mEPCurve);
+                    AvailableMEPCurves.RemoveFromFront();
+                }
+                else
+                {
+                    AvailableMEPCurves.AddToBack(AvailableMEPCurves.RemoveFromFront());
                 }
                 return false;
             }

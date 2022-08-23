@@ -42,6 +42,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\VAR.RevitLib.Utils\iUtils\bin\Debug\iUtils.dll</HintPath>
     </Reference>
+    <Reference Include="Nito.Collections.Deque, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nito.Collections.Deque.1.1.1\lib\net461\Nito.Collections.Deque.dll</HintPath>
+    </Reference>
     <Reference Include="RevitAPI">
       <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
     </Reference>
@@ -69,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="DS.RevitApp.SymbolPlacerTest.addin" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

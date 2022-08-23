@@ -26,7 +26,8 @@ namespace DS.RevitApp.SymbolPlacerTest
         }
 
         public List<FamilyInstance> Families { get; private set; }
-        public MEPCurve MEPCurve { get; private set; }
+        public List<MEPCurve> MEPCurves { get; private set; }
+        public List<XYZ> Points { get; private set; }
 
         public void RunTest()
         {
@@ -53,8 +54,13 @@ namespace DS.RevitApp.SymbolPlacerTest
 
             //ElementUtils.Highlight(elemFamilies);
 
-            //trasfer
-            //List<XYZ> points = new List<XYZ>()
+            //Points = new List<XYZ>()
+            //{
+            //    new XYZ(0,0,0),
+            //    new XYZ(10, 10,  -10),
+            //};
+
+            //Points = new List<XYZ>()
             //{
             //    new XYZ(0,0,0),
             //    new XYZ(10, 0, 0),
@@ -62,25 +68,35 @@ namespace DS.RevitApp.SymbolPlacerTest
             //    new XYZ(20, 10, 0),
             //    new XYZ(20, 0, 0),
             //    new XYZ(30, 0, 0),
-            //    //new XYZ(20, 20, -10)
             //};
 
-            List<XYZ> points = new List<XYZ>()
+            //Points = new List<XYZ>()
+            //{
+            //    new XYZ(0,0,0),
+            //    new XYZ(1, 0, 0),
+            //    new XYZ(1, 3, 0),
+            //    new XYZ(3, 3, 0),
+            //    new XYZ(3, 0, 0),
+            //    new XYZ(5, 0, 0),
+            //};
+
+
+            //points for ducts
+            Points = new List<XYZ>()
             {
                 new XYZ(0,0,0),
-                new XYZ(1, 0, 0),
-                new XYZ(1, 10, 0),
-                new XYZ(20, 10, 0),
-                new XYZ(20, 0, 0),
-                new XYZ(30, 0, 0),
-                //new XYZ(20, 20, -10)
+                new XYZ(2, 0, 0),
+                new XYZ(2, 5, 0),
+                new XYZ(7, 5, 0),
+                new XYZ(7, 0, 0),
+                new XYZ(10, 0, 0),
             };
 
             var comp = system.Composite.Root as MEPSystemComponent;
             MEPCurve baseMEPCurve = comp.BaseElement as MEPCurve;
-            var builder = new BuilderByPoints(baseMEPCurve, points);
+            var builder = new BuilderByPoints(baseMEPCurve, Points);
             var model = builder.BuildMEPCurves().WithFittings();
-            MEPCurve = model.MEPCurves.First() as MEPCurve;
+            MEPCurves = model.MEPCurves.Cast<MEPCurve>().ToList();
 
             //var mEPCurveCreator = new MEPCurveCreator(MEPCurve);
             //mEPCurveCreator.SwapSize(MEPCurve);
