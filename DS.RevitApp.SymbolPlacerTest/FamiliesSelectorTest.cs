@@ -37,19 +37,10 @@ namespace DS.RevitApp.SymbolPlacerTest
 
             var mEPSystemBuilder = new SimpleMEPSystemBuilder(element);
             //var mEPSystemBuilder = new MEPSystemBuilder(element);
-            var system = mEPSystemBuilder.Build();
-
-            //var elemsCount = system.Composite.Children.Count;
-
-            var elements = system.GetElements(system.Composite);
-            var rootElements = system.GetRootElements(system.Composite);
-            var rootFamilies = rootElements.OfType<FamilyInstance>();
-
-            var elemFamilies = rootElements.Where(x => x.Category.Name.Contains("Accessories") || x.Category.Name.Contains("Арматура")).ToList();
-
+            var system = mEPSystemBuilder.Build();          
 
             //selection
-            var selectedElemFamilies = SelectFilter(rootElements);
+            var selectedElemFamilies = SelectFilter(system.Root.Accessories.Cast<Element>().ToList());
             Families = selectedElemFamilies.Cast<FamilyInstance>().ToList();
 
             //ElementUtils.Highlight(elemFamilies);
