@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewTool1", "DS.RVT.ExtCmd.F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitLib.ExternalEvents", "DS.RevitLib.ExternalEvents\DS.RevitLib.ExternalEvents.csproj", "{BCF72AE9-2C4E-4DC9-A6A9-DAD6A63D4B4E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitApp.SymbolPlacerTest", "DS.RevitApp.SymbolPlacerTest\DS.RevitApp.SymbolPlacerTest.csproj", "{5E7D867B-3629-46ED-A7D8-61EDDE093260}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitApp.Test", "DS.RevitApp.SymbolPlacerTest\DS.RevitApp.Test.csproj", "{5E7D867B-3629-46ED-A7D8-61EDDE093260}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
