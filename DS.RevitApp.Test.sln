@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewTool1", "DS.RVT.ExtCmd.F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitLib.ExternalEvents", "DS.RevitLib.ExternalEvents\DS.RevitLib.ExternalEvents.csproj", "{BCF72AE9-2C4E-4DC9-A6A9-DAD6A63D4B4E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitApp.ElementsTransferTest", "DS.RevitApp.ElementsTransferTest\DS.RevitApp.ElementsTransferTest.csproj", "{5E7D867B-3629-46ED-A7D8-61EDDE093260}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitApp.SymbolPlacerTest", "DS.RevitApp.SymbolPlacerTest\DS.RevitApp.SymbolPlacerTest.csproj", "{5E7D867B-3629-46ED-A7D8-61EDDE093260}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,7 +43,6 @@ Global
 		{3423357B-A177-4697-B2BF-A720176B6135}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3423357B-A177-4697-B2BF-A720176B6135}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9208DCBD-3F74-477C-87E3-9598C551E538}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9208DCBD-3F74-477C-87E3-9598C551E538}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9208DCBD-3F74-477C-87E3-9598C551E538}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9208DCBD-3F74-477C-87E3-9598C551E538}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1477EE57-AE6D-436D-8446-274814E3F268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

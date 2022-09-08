@@ -9,8 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 using DS.RevitLib.Utils.MEP.SystemTree;
 using System.Xml.Linq;
+using DS.RevitLib.Utils.MEP;
 
-namespace DS.RevitApp.ElementsTransferTest
+namespace DS.RevitApp.SymbolPlacerTest
 {
     [Transaction(TransactionMode.Manual)]
     public class ExternalCommand : IExternalCommand
@@ -24,8 +25,13 @@ namespace DS.RevitApp.ElementsTransferTest
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            TestedClass testedClass = new TestedClass(uidoc, doc, uiapp);
-            testedClass.RunTest();           
+            var selector = new FamiliesSelectorTest(uidoc, doc, uiapp);
+            selector.RunTest();
+            List<MEPCurve> _targerMEPCurves = new List<MEPCurve>();
+            _targerMEPCurves.AddRange(selector.MEPCurves);
+
+            SymbolPlacerClient symbolPlacer = new SymbolPlacerClient(selector.Families, _targerMEPCurves, selector.Points);
+            symbolPlacer.Run();
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }
