@@ -12,6 +12,7 @@ using DS.RevitLib.Utils.TransactionCommitter;
 using System.Security.Cryptography;
 using System.Windows.Forms;
 using DS.RevitLib.SymbolPlacerTest;
+using DS.RevitLib.Utils.Solids.Models;
 
 namespace DS.RevitApp.SymbolPlacerTest
 {
@@ -46,9 +47,8 @@ namespace DS.RevitApp.SymbolPlacerTest
 
             foreach (var family in _familyInstances)
             {
-                FamilySymbol familySymbol = family.GetFamilySymbol();
-                double familyLength = new FamilySymbolUtils().GetLength(familySymbol, _doc, family);
-                double placementLength = familyLength + 2 * _minMEPCurveLength;
+                var solidModelExt = new SolidModelExt(family);
+                double placementLength = solidModelExt.Length + 2 * _minMEPCurveLength;
 
                 MEPCurve mEPCurve = availableMEPCurves.Get(placementLength);
                 if (mEPCurve is null)
@@ -61,17 +61,47 @@ namespace DS.RevitApp.SymbolPlacerTest
                     ? new PlacementPoint(mEPCurve, placementLength).GetPoint(PlacementOption.Edge)
                     : new PlacementPoint(mEPCurve, placementLength).GetPoint(baseConnector);
 
-                var symbolPlacer = new SymbolPlacer(familySymbol, mEPCurve, point, familyLength, family,
-                    new RollBackCommitter(), "autoMEP");
-                symbolPlacer.Place();
 
-                //add splitted mEPCurve to stack
-                if (availableMEPCurves.CheckMinLength(symbolPlacer.SplittedMEPCurve))
-                {
-                    availableMEPCurves.AvailableMEPCurves.AddToFront(symbolPlacer.SplittedMEPCurve);
-                }
             }
         }
+
+        //public void Run()
+        //{
+        //    var availableMEPCurves = new AvailableMEPCurvesService(_targerMEPCurves, _minMEPCurveLength, _minPlacementLength);
+        //    if (availableMEPCurves.AvailableMEPCurves is null)
+        //    {
+        //        MessageBox.Show($"No available MEPCurves exist for family insatances placement.");
+        //        return;
+        //    }
+
+        //    foreach (var family in _familyInstances)
+        //    {
+        //        FamilySymbol familySymbol = family.GetFamilySymbol();
+        //        double familyLength = new FamilySymbolUtils().GetLength(familySymbol, _doc, family);
+        //        double placementLength = familyLength + 2 * _minMEPCurveLength;
+
+        //        MEPCurve mEPCurve = availableMEPCurves.Get(placementLength);
+        //        if (mEPCurve is null)
+        //        {
+        //            MessageBox.Show($"No available MEPCurves exist for family insatance id ({family.Id}) placement.");
+        //            break;
+        //        }
+        //        Connector baseConnector = GetBaseConnector(_points, mEPCurve);
+        //        XYZ point = baseConnector is null
+        //            ? new PlacementPoint(mEPCurve, placementLength).GetPoint(PlacementOption.Edge)
+        //            : new PlacementPoint(mEPCurve, placementLength).GetPoint(baseConnector);
+
+        //        var symbolPlacer = new SymbolPlacer(familySymbol, mEPCurve, point, familyLength, family,
+        //            new RollBackCommitter(), "autoMEP");
+        //        symbolPlacer.Place();
+
+        //        //add splitted mEPCurve to stack
+        //        if (availableMEPCurves.CheckMinLength(symbolPlacer.SplittedMEPCurve))
+        //        {
+        //            availableMEPCurves.AvailableMEPCurves.AddToFront(symbolPlacer.SplittedMEPCurve);
+        //        }
+        //    }
+        //}
 
         private Connector GetBaseConnector(List<XYZ> points, MEPCurve mEPCurve)
         {
