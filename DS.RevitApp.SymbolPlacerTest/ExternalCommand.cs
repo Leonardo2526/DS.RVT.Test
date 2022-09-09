@@ -11,6 +11,9 @@ using DS.RevitLib.Utils.MEP.SystemTree;
 using System.Xml.Linq;
 using DS.RevitLib.Utils.MEP;
 using DS.RevitApp.Test.TransactionTests;
+using Autodesk.Revit.UI.Selection;
+using DS.RevitLib.Utils;
+using DS.RevitLib.Utils.MEP.Creator;
 
 namespace DS.RevitApp.Test
 {
@@ -26,25 +29,31 @@ namespace DS.RevitApp.Test
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            application.FailuresProcessing += Application_FailuresProcessing;
+            //application.FailuresProcessing += Application_FailuresProcessing;
 
-            var tr = new TransactionTest(doc);
-            tr.Test1();
+            //Reference reference = uidoc.Selection.PickObject(ObjectType.Element, "Select element");
+            //MEPCurve element = doc.GetElement(reference) as MEPCurve;
+            //(Connector con1, Connector con2) = ConnectorUtils.GetMainConnectors(element);
 
+            //var failTr = new FailedTransaction(doc);
+            //failTr.CreateFittingByConnectors(con1, con2);
+            //failTr.CreateFittingByConnectors();
 
-            //var selector = new FamiliesSelectorTest(uidoc, doc, uiapp);
-            //selector.RunTest();
-            //List<MEPCurve> _targerMEPCurves = new List<MEPCurve>();
-            //_targerMEPCurves.AddRange(selector.MEPCurves);
+            //failTr.CreateTwoWalls();
 
-            //SymbolPlacerClient symbolPlacer = new SymbolPlacerClient(selector.Families, _targerMEPCurves, selector.Points);
-            //symbolPlacer.Run();
-             
+            FamInstCreator famInstCreator = new FamInstCreator(doc);
+            famInstCreator.CreateFittingByConnectors(null, null);
+
             return Autodesk.Revit.UI.Result.Succeeded;
         }
 
+
         private void Application_FailuresProcessing(object sender, Autodesk.Revit.DB.Events.FailuresProcessingEventArgs e)
         {
+            FailuresAccessor fa = e.GetFailuresAccessor();
+            var failList = fa.GetFailureMessages();
+            TaskDialog.Show("Fails: ", failList.Count.ToString());
+
             var messagesHandler = new MessagesHandler(e);
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
+using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,12 +34,14 @@ namespace DS.RevitApp.Test
             HandleWarnings(warningMessages);
         }
 
-        public bool ShowFails { get; private set; }
+        public bool ShowFails { get; private set; } = true;
 
         public void HandleErrors(List<FailureMessageAccessor> errorMessages)
         {
             if (errorMessages != null && errorMessages.Any())
             {
+                TaskDialog.Show("errorMessages: ", errorMessages.Count.ToString());
+
                 foreach (var m in errorMessages)
                 {
                     var type = m.GetCurrentResolutionType();
@@ -57,8 +60,8 @@ namespace DS.RevitApp.Test
                         {
                             _eventArgs.SetProcessingResult(FailureProcessingResult.ProceedWithRollBack);
                         }
-                        _failuresAccessor.SetTransactionName(_transactionName + "-RolledBack");
-                        _failuresAccessor.DeleteWarning(m);                    
+                    _failuresAccessor.SetTransactionName(_transactionName + "-RolledBack");
+                    _failuresAccessor.DeleteWarning(m);
                 }
             }
         }
@@ -67,6 +70,7 @@ namespace DS.RevitApp.Test
         {
             if (warningMessages != null && warningMessages.Any())
             {
+                TaskDialog.Show("warningMessages: ", warningMessages.Count.ToString());
                 foreach (var m in warningMessages)
                 {
                         _failuresAccessor.SetTransactionName(_transactionName + "-Warning");
