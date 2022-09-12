@@ -14,6 +14,7 @@ using DS.RevitApp.Test.TransactionTests;
 using Autodesk.Revit.UI.Selection;
 using DS.RevitLib.Utils;
 using DS.RevitLib.Utils.MEP.Creator;
+using DS.RevitLib.Utils.ModelCurveUtils;
 
 namespace DS.RevitApp.Test
 {
@@ -29,20 +30,17 @@ namespace DS.RevitApp.Test
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            //application.FailuresProcessing += Application_FailuresProcessing;
-
             //Reference reference = uidoc.Selection.PickObject(ObjectType.Element, "Select element");
             //MEPCurve element = doc.GetElement(reference) as MEPCurve;
-            //(Connector con1, Connector con2) = ConnectorUtils.GetMainConnectors(element);
 
-            //var failTr = new FailedTransaction(doc);
-            //failTr.CreateFittingByConnectors(con1, con2);
-            //failTr.CreateFittingByConnectors();
 
-            //failTr.CreateTwoWalls();
+            var selector = new ElementSelector(uidoc);
+            var element1 = selector.Select("Element1");
+            var element2 = selector.Select("Element2");
 
-            FamInstCreator famInstCreator = new FamInstCreator(doc);
-            famInstCreator.CreateFittingByConnectors(null, null);
+            var creator = new ModelCurveCreator(doc);
+            creator.Create(element1.Value, element2.Value);
+
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }
