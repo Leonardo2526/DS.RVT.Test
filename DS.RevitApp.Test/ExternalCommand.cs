@@ -15,6 +15,7 @@ using Autodesk.Revit.UI.Selection;
 using DS.RevitLib.Utils;
 using DS.RevitLib.Utils.MEP.Creator;
 using DS.RevitLib.Utils.ModelCurveUtils;
+using DS.RevitLib.Utils.Collisions.Models;
 
 namespace DS.RevitApp.Test
 {
@@ -30,25 +31,8 @@ namespace DS.RevitApp.Test
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            //Reference reference = uidoc.Selection.PickObject(ObjectType.Element, "Select element");
-            //MEPCurve element = doc.GetElement(reference) as MEPCurve;
-
-
-            var selector = new ElementSelector(uidoc);
-            var element1 = selector.Select("Element1");
-            var element2 = selector.Select("Element2");
-
-
-            PathGenerator pathGenerator = new PathGenerator(element1.Value, element2.Value, 1, 1);
-            List<XYZ> points = pathGenerator.Generate();
-
-            var creator = new ModelCurveCreator(doc);
-
-            for (int i = 0; i < points.Count -1; i++)
-            {
-                creator.Create(points[i], points[i+1]);
-            }
-
+            var test = new EdgePointsSearch(uidoc);
+            test.Run();
 
 
             return Autodesk.Revit.UI.Result.Succeeded;

@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="CmdFailureGatherer.cs" />
     <Compile Include="EdgeElementSelector.cs" />
+    <Compile Include="EdgePointsSearch.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="MessagesHandler.cs" />
     <Compile Include="PathGenerator.cs" />
