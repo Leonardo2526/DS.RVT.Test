@@ -38,8 +38,17 @@ namespace DS.RevitApp.Test
             var element1 = selector.Select("Element1");
             var element2 = selector.Select("Element2");
 
+
+            PathGenerator pathGenerator = new PathGenerator(element1.Value, element2.Value, 1, 1);
+            List<XYZ> points = pathGenerator.Generate();
+
             var creator = new ModelCurveCreator(doc);
-            creator.Create(element1.Value, element2.Value);
+
+            for (int i = 0; i < points.Count -1; i++)
+            {
+                creator.Create(points[i], points[i+1]);
+            }
+
 
 
             return Autodesk.Revit.UI.Result.Succeeded;

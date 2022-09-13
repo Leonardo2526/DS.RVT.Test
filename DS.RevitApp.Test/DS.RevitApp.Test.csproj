@@ -65,10 +65,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CmdFailureGatherer.cs" />
-    <Compile Include="EdgeElement.cs" />
     <Compile Include="EdgeElementSelector.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="MessagesHandler.cs" />
+    <Compile Include="PathGenerator.cs" />
     <Compile Include="SymbolPlacer\AvailableMEPCurves.cs" />
     <Compile Include="SymbolPlacer\FamiliesSelectorTest.cs" />
     <Compile Include="SymbolPlacer\PlacementOption.cs" />
