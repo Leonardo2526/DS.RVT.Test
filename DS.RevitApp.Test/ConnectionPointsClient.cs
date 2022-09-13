@@ -11,17 +11,18 @@ using System.Threading.Tasks;
 
 namespace DS.RevitApp.Test
 {
-    internal class EdgePointsSearch
+    internal class ConnectionPointsClient
     {
 
         private readonly UIDocument _uidoc;
         private readonly Document _doc;
 
-        public EdgePointsSearch(UIDocument uidoc)
+        public ConnectionPointsClient(UIDocument uidoc)
         {
             _uidoc = uidoc;
             _doc = _uidoc.Document;
         }
+        
 
         public void Run()
         {
@@ -32,7 +33,7 @@ namespace DS.RevitApp.Test
             MEPSystemModel resolvingSystemModel = mEPSystemBuilder.Build();
 
 
-            var (point1, point2) = GetEdgePointsManually();
+            var (point1, point2) = GetPointsManually();
 
             PathGenerator pathGenerator = new PathGenerator(point1.Value, point2.Value, 1, 1);
             List<XYZ> points = pathGenerator.Generate();
@@ -45,9 +46,18 @@ namespace DS.RevitApp.Test
             }
         }
 
-        private (KeyValuePair<Element, XYZ> point1, KeyValuePair<Element, XYZ> point2) GetEdgePointsManually()
+        private (KeyValuePair<Element, XYZ> point1, KeyValuePair<Element, XYZ> point2) GetPointsManually()
         {
-            var selector = new ElementSelector(_uidoc);
+            var selector = new ConnectionElementSelector(_uidoc);
+            var element1 = selector.Select("Element1");
+            var element2 = selector.Select("Element2");
+
+            return (element1, element2);
+        }
+
+        private (KeyValuePair<Element, XYZ> point1, KeyValuePair<Element, XYZ> point2) GetPoints()
+        {
+            var selector = new ConnectionElementSelector(_uidoc);
             var element1 = selector.Select("Element1");
             var element2 = selector.Select("Element2");
 

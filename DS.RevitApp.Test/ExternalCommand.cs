@@ -31,7 +31,7 @@ namespace DS.RevitApp.Test
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            var test = new EdgePointsSearch(uidoc);
+            var test = new ConnectionPointsClient(uidoc);
             test.Run();
 
 

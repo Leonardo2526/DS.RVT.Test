@@ -65,8 +65,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CmdFailureGatherer.cs" />
-    <Compile Include="EdgeElementSelector.cs" />
-    <Compile Include="EdgePointsSearch.cs" />
+    <Compile Include="ConnectionElementSelector.cs" />
+    <Compile Include="ConnectionPointsClient.cs" />
+    <Compile Include="ConnectionPointService\IPathFinder.cs" />
+    <Compile Include="ConnectionPointService\ITransfromBuilder.cs" />
+    <Compile Include="ConnectionPointService\PointModel\ConnectionPoint.cs" />
+    <Compile Include="ConnectionPointService\PointModel\IConnectionPoint.cs" />
+    <Compile Include="ConnectionPointService\SearchersModel\AbstractConnectionSearcher.cs" />
+    <Compile Include="ConnectionPointService\SearchersModel\ConnectionSearchClient.cs" />
+    <Compile Include="ConnectionPointService\SearchersModel\SearcherAlgorithm.cs" />
+    <Compile Include="ConnectionPointService\SearchersModel\SearcherByNodes.cs" />
+    <Compile Include="ConnectionPointService\SearchersModel\SeracherByMEPCurves.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="MessagesHandler.cs" />
     <Compile Include="PathGenerator.cs" />

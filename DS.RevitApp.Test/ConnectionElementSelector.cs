@@ -8,12 +8,12 @@ using System.Collections.Generic;
 
 namespace DS.RevitApp.Test
 {
-    public class ElementSelector
+    public class ConnectionElementSelector
     {
         private readonly UIDocument _uidoc;
         private readonly Document _doc;
 
-        public ElementSelector(UIDocument uidoc)
+        public ConnectionElementSelector(UIDocument uidoc)
         {
             _uidoc = uidoc;
             _doc = _uidoc.Document;
