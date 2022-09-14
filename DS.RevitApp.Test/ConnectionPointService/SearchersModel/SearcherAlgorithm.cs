@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using DS.RevitApp.Test.PathFinders;
 using DS.RevitLib.Utils.MEP.SystemTree;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace DS.RevitApp.Test.ConnectionPointService.SearchersModel
 
         protected List<XYZ> GetPath(XYZ point1, XYZ point2)
         {
-            return _pathFinder.FindPath();
+            return _pathFinder.FindPath(point1, point2);
         }
         protected Dictionary<FamilyInstance, Transform> GetFamInstTransform(List<FamilyInstance> familyInstances, List<XYZ> path)
         {

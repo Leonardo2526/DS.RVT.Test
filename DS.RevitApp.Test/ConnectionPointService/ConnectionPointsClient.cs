@@ -1,11 +1,14 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
+using DS.RevitApp.Test.ConnectionPointService.SearchersModel;
+using DS.RevitApp.Test.PathFinders;
 using DS.RevitLib.Utils.MEP.SystemTree;
 using DS.RevitLib.Utils.ModelCurveUtils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,11 +19,14 @@ namespace DS.RevitApp.Test
 
         private readonly UIDocument _uidoc;
         private readonly Document _doc;
+        private readonly IPathFinder _pathFinder;
+        private MEPSystemModel _mEPSystemModel;
 
         public ConnectionPointsClient(UIDocument uidoc)
         {
             _uidoc = uidoc;
             _doc = _uidoc.Document;
+            _pathFinder = new SimplePathFinder(1, 1);
         }
         
 
@@ -29,20 +35,19 @@ namespace DS.RevitApp.Test
             //Get MEPSystemModel
             Reference reference = _uidoc.Selection.PickObject(ObjectType.Element, "Select element");
             MEPCurve element = _doc.GetElement(reference) as MEPCurve;
+
             var mEPSystemBuilder = new SimpleMEPSystemBuilder(element);
-            MEPSystemModel resolvingSystemModel = mEPSystemBuilder.Build();
+            _mEPSystemModel = mEPSystemBuilder.Build();
 
-
-            var (point1, point2) = GetPointsManually();
-
-            PathGenerator pathGenerator = new PathGenerator(point1.Value, point2.Value, 1, 1);
-            List<XYZ> points = pathGenerator.Generate();
+            //var (point1, point2) = GetPointsManually();
+            //List<XYZ> points = pathGenerator.FindPath(point1.Value, point2.Value);
+            List<XYZ>  path = GetPath();
 
             //Show path
             var creator = new ModelCurveCreator(_doc);
-            for (int i = 0; i < points.Count - 1; i++)
+            for (int i = 0; i < path.Count - 1; i++)
             {
-                creator.Create(points[i], points[i + 1]);
+                creator.Create(path[i], path[i + 1]);
             }
         }
 
@@ -55,13 +60,12 @@ namespace DS.RevitApp.Test
             return (element1, element2);
         }
 
-        private (KeyValuePair<Element, XYZ> point1, KeyValuePair<Element, XYZ> point2) GetPoints()
+        private List<XYZ> GetPath()
         {
-            var selector = new ConnectionElementSelector(_uidoc);
-            var element1 = selector.Select("Element1");
-            var element2 = selector.Select("Element2");
+            var client = new ConnectionSearchClient(_pathFinder, null, _mEPSystemModel);
+            var (Point1, Point2) = client.GetConnectionPoints();
 
-            return (element1, element2);
+            return client.Path;
         }
     }
 }

@@ -65,9 +65,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CmdFailureGatherer.cs" />
-    <Compile Include="ConnectionElementSelector.cs" />
-    <Compile Include="ConnectionPointsClient.cs" />
-    <Compile Include="ConnectionPointService\IPathFinder.cs" />
+    <Compile Include="ConnectionPointService\CheckPointsBuilder.cs" />
+    <Compile Include="ConnectionPointService\ChildPointBuilder.cs" />
+    <Compile Include="ConnectionPointService\ConnectionElementSelector.cs" />
+    <Compile Include="ConnectionPointService\ConnectionPointsClient.cs" />
+    <Compile Include="PathFinders\IPathFinder.cs" />
     <Compile Include="ConnectionPointService\ITransfromBuilder.cs" />
     <Compile Include="ConnectionPointService\PointModel\ConnectionPoint.cs" />
     <Compile Include="ConnectionPointService\PointModel\IConnectionPoint.cs" />
@@ -78,7 +80,7 @@
     <Compile Include="ConnectionPointService\SearchersModel\SeracherByMEPCurves.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="MessagesHandler.cs" />
-    <Compile Include="PathGenerator.cs" />
+    <Compile Include="PathFinders\SimplePathFinder.cs" />
     <Compile Include="SymbolPlacer\AvailableMEPCurves.cs" />
     <Compile Include="SymbolPlacer\FamiliesSelectorTest.cs" />
     <Compile Include="SymbolPlacer\PlacementOption.cs" />
