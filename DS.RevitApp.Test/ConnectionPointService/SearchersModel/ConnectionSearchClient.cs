@@ -30,10 +30,30 @@ namespace DS.RevitApp.Test.ConnectionPointService.SearchersModel
 
         public override (IConnectionPoint Point1, IConnectionPoint Point2) GetConnectionPoints()
         {
+
             var (con1, con2) = ConnectorUtils.GetMainConnectors(_baseElement);
+            var cons = ConnectorUtils.GetConnectors(_baseElement);
+
+            //return (null, null);
+
             var builer = new CheckPointsBuilder(_mEPSystemModel, _baseElement);
             _points1 = builer.Build(con1);
             _points2 = builer.Build(con2);
+
+            if (!_points1.Any())
+            {
+                Element elem = _mEPSystemModel.Root.Elements.First();
+                var c = ConnectorUtils.GetFreeConnector(elem).First();
+                _points1 = new List<IConnectionPoint>()
+                { new ConnectionPoint(c.Origin, elem) };
+            }
+            if (!_points2.Any())
+            {
+                Element elem = _mEPSystemModel.Root.Elements.Last();
+                var c = ConnectorUtils.GetFreeConnector(elem).First();
+                _points2 = new List<IConnectionPoint>()
+                { new ConnectionPoint(c.Origin, elem) };
+            }
 
 
             var searcher1 = new SearcherByNodes(_pathFinder, _transfromBuilder, _mEPSystemModel, _points1, _points2);
