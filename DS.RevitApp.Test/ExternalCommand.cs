@@ -16,6 +16,7 @@ using DS.RevitLib.Utils;
 using DS.RevitLib.Utils.MEP.Creator;
 using DS.RevitLib.Utils.ModelCurveUtils;
 using DS.RevitLib.Utils.Collisions.Models;
+using DS.RevitApp.Test.PathFindTest.ConnectionPointService;
 
 namespace DS.RevitApp.Test
 {

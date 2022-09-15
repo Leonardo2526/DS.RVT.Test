@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DS.RevitApp.Test.PathFinders
+namespace DS.RevitApp.Test.PathFindTest.PathFinders
 {
     public interface IPathFinder
     {

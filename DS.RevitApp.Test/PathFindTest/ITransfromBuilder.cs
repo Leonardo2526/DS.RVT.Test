@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DS.RevitApp.Test.ConnectionPointService.PointModel
+namespace DS.RevitApp.Test.PathFindTest
 {
-    public interface IConnectionPoint
+    public interface ITransfromBuilder
     {
-        public XYZ Point { get; }
+        public Dictionary<FamilyInstance, Transform> Build();
     }
 }

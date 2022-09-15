@@ -1,5 +1,5 @@
 ﻿using Autodesk.Revit.DB;
-using DS.RevitApp.Test.ConnectionPointService.PointModel;
+using DS.RevitApp.Test.PathFindTest.ConnectionPointService.PointModel;
 using DS.RevitLib.Utils.Extensions;
 using DS.RevitLib.Utils.MEP;
 using DS.RevitLib.Utils.MEP.SystemTree;
@@ -10,57 +10,65 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DS.RevitApp.Test.ConnectionPointService
+namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService.PointsToCheckStrategies
 {
-    internal class CheckPointsBuilder
+    internal class FittingPointStrategy : AbstractPointsToCheckStategy
     {
-        private readonly MEPSystemModel _mEPSystemModel;
-        private readonly Element _baseElement;
+        private List<Element> _spanElements = new List<Element>();
         private readonly int _baseIndex;
-        private List<Element> _spanElements;
 
-        public CheckPointsBuilder(MEPSystemModel mEPSystemModel, Element baseElement)
+        public FittingPointStrategy(MEPSystemModel mEPSystemModel, Element baseElement, XYZ collisionCenter) : 
+            base(mEPSystemModel, baseElement, collisionCenter)
         {
-            _mEPSystemModel = mEPSystemModel;
-            _baseElement = baseElement;
             _baseIndex = _mEPSystemModel.Root.Elements.FindIndex(obj => obj.Id == _baseElement.Id);
         }
 
-        public List<IConnectionPoint> Build(Connector baseConnector)
+        public override List<IConnectionPoint> GetPointsToCheck(Connector baseConnector)
         {
-            List<IConnectionPoint> points = new List<IConnectionPoint>();
+            PointsToCheck = new List<IConnectionPoint>();
+            _spanElements = new List<Element>();
 
+            //Check all fittings by this direction          
             List<FamilyInstance> fittings = GetFittings(baseConnector);
-
-            var childIds = _mEPSystemModel.Root.ChildrenNodes.Select(obj => obj.Element.Id);
-
+            var childIds = _mEPSystemModel.Root.ChildrenNodes?.Select(obj => obj.Element.Id);
             if (fittings is not null && fittings.Any())
             {
                 //Exclude childs
                 var fittingIds = fittings.Select(obj => obj.Id);
-                var childElemsIds = fittingIds.Intersect(childIds);
-                if (childElemsIds.Any())
+                var childElemsIds = childIds is not null ? fittingIds.Intersect(childIds) : null;
+                if (childElemsIds is not null && childElemsIds.Any())
                 {
                     var childElem = fittings.Where(obj => obj.Id == childElemsIds.First()).First();
-                    XYZ lp = GetChildNodePoint(childElem);
-                    points.Add(new ConnectionPoint(lp, childElem));
-                    return points;
+                    XYZ lp = GetChildNodePoint(childElem, _spanElements);
+                    PointsToCheck.Add(new ConnectionPoint(lp, childElem));
+                    return PointsToCheck;
                 }
 
                 //add all fitting points
                 foreach (var fam in fittings)
                 {
                     XYZ lp = fam.GetLocationPoint();
-                    points.Add(new ConnectionPoint(lp, fam));
+                    var parentIds = _mEPSystemModel.Root.ParentNodes?.Select(obj => obj.Element.Id).ToList();
+                    if (parentIds is not null && parentIds.Contains(fam.Id) && fam.IsSpud())
+                    {
+                        var node = _mEPSystemModel.Root.ParentNodes?.Where(obj => obj.Element.Id == fam.Id).First();
+                        MEPCurve mEPCurve = node.RelationElement as MEPCurve;
+                        Line line = mEPCurve.GetCenterLine();
+                        lp = line.Project(lp).XYZPoint;
+                    }
+                    PointsToCheck.Add(new ConnectionPoint(lp, fam));
                 }
             }
 
-            points.Reverse();
+            if (!PointsToCheck.Any())
+            {
+                PointsToCheck = Successor.GetPointsToCheck(baseConnector);
+            }
 
-            return points;
+            return PointsToCheck;
         }
 
-        public List<FamilyInstance> GetFittings(Connector baseConnector)
+        public List<FamilyInstance> GetFittingsOld(Connector baseConnector)
         {
             var points = new List<IConnectionPoint>();
             _spanElements = new List<Element>();
@@ -91,11 +99,16 @@ namespace DS.RevitApp.Test.ConnectionPointService
             return fittings;
         }
 
-        private XYZ GetChildNodePoint(FamilyInstance fitting)
+        public List<FamilyInstance> GetFittings(Connector baseConnector)
         {
-            var node = _mEPSystemModel.Root.ChildrenNodes.Where(obj => obj.Element.Id == fitting.Id).First();
-            var builder = new ChildPointBuilder(_spanElements, node, _baseElement, _baseElement.GetLocationPoint()); 
-            return builder.Build(); 
+            _spanElements.Add(_baseElement);
+            var elemSpan = _mEPSystemModel.Root.GetElementsSpan(baseConnector) ?? new List<Element>();
+            _spanElements.AddRange(elemSpan);
+
+            var fIds = _mEPSystemModel.Root.Fittings.Select(obj => obj.Id)?.ToList();
+            var fittings = _spanElements.Where(obj => fIds.Contains(obj.Id)).Cast<FamilyInstance>().ToList();
+
+            return fittings;
         }
     }
 }
