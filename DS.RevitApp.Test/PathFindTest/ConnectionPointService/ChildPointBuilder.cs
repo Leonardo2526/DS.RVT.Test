@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DS.RevitApp.Test.ConnectionPointService
+namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
 {
     internal class ChildPointBuilder
     {

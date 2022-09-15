@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.DB;
-using DS.ClassLib.VarUtils;
-using DS.RevitApp.Test.ConnectionPointService.PointModel;
+using DS.RevitApp.Test.PathFindTest.ConnectionPointService.PointModel;
 using DS.RevitLib.Utils.Extensions;
 using DS.RevitLib.Utils.MEP;
 using DS.RevitLib.Utils.MEP.SystemTree;
@@ -8,46 +7,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DS.RevitApp.Test.ConnectionPointService
+namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService.PointsToCheckStrategies
 {
-    internal class CheckPointsBuilder
+    internal class FittingPointStrategy : AbstractPointsToCheckStategy
     {
-        private readonly MEPSystemModel _mEPSystemModel;
-        private readonly Element _baseElement;
-        private readonly int _baseIndex;
         private List<Element> _spanElements;
-        private XYZ _collisionCenter;
+        private readonly int _baseIndex;
 
-        public CheckPointsBuilder(MEPSystemModel mEPSystemModel, Element baseElement)
+        public FittingPointStrategy(MEPSystemModel mEPSystemModel, Element baseElement, XYZ collisionCenter) : 
+            base(mEPSystemModel, baseElement, collisionCenter)
         {
-            _mEPSystemModel = mEPSystemModel;
-            _baseElement = baseElement;
             _baseIndex = _mEPSystemModel.Root.Elements.FindIndex(obj => obj.Id == _baseElement.Id);
-            _collisionCenter = _baseElement.GetLocationPoint();
         }
 
-        public List<IConnectionPoint> Build(Connector baseConnector)
+        public override List<IConnectionPoint> GetPointsToCheck(Connector baseConnector)
         {
-            var points = new List<IConnectionPoint>();
-
-            //Check spuds connected to baseMEPCurve
-            List<FamilyInstance> spudsToBase = _mEPSystemModel.Root.GetConnectedSpuds(_baseElement as MEPCurve);
-            if (spudsToBase is not null && spudsToBase.Any())
-            {
-                var closestSpud = GetClosest(spudsToBase, baseConnector);
-                if (closestSpud is not null)
-                {
-                    List<Element> spanElements = new List<Element>() { _baseElement, closestSpud }; 
-                    XYZ lp = GetChildNodePoint(closestSpud, spanElements);
-                    points.Add(new ConnectionPoint(lp, closestSpud));
-                    return points;
-                }
-            }
-
             //Check all fittings by this direction
             List<FamilyInstance> fittings = GetFittings(baseConnector);
             var childIds = _mEPSystemModel.Root.ChildrenNodes?.Select(obj => obj.Element.Id);
@@ -60,8 +37,8 @@ namespace DS.RevitApp.Test.ConnectionPointService
                 {
                     var childElem = fittings.Where(obj => obj.Id == childElemsIds.First()).First();
                     XYZ lp = GetChildNodePoint(childElem, _spanElements);
-                    points.Add(new ConnectionPoint(lp, childElem));
-                    return points;
+                    PointsToCheck.Add(new ConnectionPoint(lp, childElem));
+                    return PointsToCheck;
                 }
 
                 //add all fitting points
@@ -76,13 +53,16 @@ namespace DS.RevitApp.Test.ConnectionPointService
                         Line line = mEPCurve.GetCenterLine();
                         lp = line.Project(lp).XYZPoint;
                     }
-                    points.Add(new ConnectionPoint(lp, fam));
+                    PointsToCheck.Add(new ConnectionPoint(lp, fam));
                 }
             }
 
-            points.Reverse();
+            if (!PointsToCheck.Any())
+            {
+                PointsToCheck = Successor.GetPointsToCheck(baseConnector);
+            }
 
-            return points;
+            return PointsToCheck;
         }
 
         public List<FamilyInstance> GetFittings(Connector baseConnector)
@@ -115,42 +95,5 @@ namespace DS.RevitApp.Test.ConnectionPointService
 
             return fittings;
         }
-
-        private XYZ GetChildNodePoint(FamilyInstance fitting, List<Element> spanElements)
-        {
-            var node = _mEPSystemModel.Root.ChildrenNodes.Where(obj => obj.Element.Id == fitting.Id).First();
-            var builder = new ChildPointBuilder(spanElements, node, _baseElement, _collisionCenter); 
-            return builder.Build(); 
-        }
-
-        private FamilyInstance GetClosest(List<FamilyInstance> spuds, Connector baseConnector)
-        {
-            XYZ dir = (baseConnector.Origin - _collisionCenter).Normalize();
-            Line line = _baseElement.GetCenterLine();
-
-            double dist = 1000;
-            FamilyInstance familyInstance = null;
-
-            foreach (var fam in spuds)
-            {
-                XYZ lp = fam.GetLocationPoint();
-                XYZ projectLp = line.Project(lp).XYZPoint;
-                XYZ curDir = (projectLp - _collisionCenter).Normalize();
-
-                if (curDir.IsAlmostEqualTo(dir, 3.DegToRad()))
-                {
-                    double currentDist = _collisionCenter.DistanceTo(projectLp);
-                    if (currentDist < dist)
-                    {
-                        dist = currentDist;
-                        familyInstance = fam;
-                    }
-                }
-
-            }
-
-            return familyInstance;
-        }
-
     }
 }

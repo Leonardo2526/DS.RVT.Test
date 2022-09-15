@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DS.RevitApp.Test.ConnectionPointService.PointModel
+namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService.PointModel
 {
     internal class ConnectionPoint : IConnectionPoint
     {

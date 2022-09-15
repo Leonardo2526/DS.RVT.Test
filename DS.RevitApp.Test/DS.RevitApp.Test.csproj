@@ -69,22 +69,29 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CmdFailureGatherer.cs" />
-    <Compile Include="ConnectionPointService\CheckPointsBuilder.cs" />
-    <Compile Include="ConnectionPointService\ChildPointBuilder.cs" />
-    <Compile Include="ConnectionPointService\ConnectionElementSelector.cs" />
-    <Compile Include="ConnectionPointService\ConnectionPointsClient.cs" />
-    <Compile Include="PathFinders\IPathFinder.cs" />
-    <Compile Include="ConnectionPointService\ITransfromBuilder.cs" />
-    <Compile Include="ConnectionPointService\PointModel\ConnectionPoint.cs" />
-    <Compile Include="ConnectionPointService\PointModel\IConnectionPoint.cs" />
-    <Compile Include="ConnectionPointService\SearchersModel\AbstractConnectionSearcher.cs" />
-    <Compile Include="ConnectionPointService\SearchersModel\ConnectionSearchClient.cs" />
-    <Compile Include="ConnectionPointService\SearchersModel\SearcherAlgorithm.cs" />
-    <Compile Include="ConnectionPointService\SearchersModel\SearcherByNodes.cs" />
-    <Compile Include="ConnectionPointService\SearchersModel\SeracherByMEPCurves.cs" />
+    <Compile Include="PathFindTest\ConnectionPointService\PointsToCheckStrategies\AbstractPointsToCheckStategy.cs" />
+    <Compile Include="PathFindTest\ConnectionPointService\PointsToCheckBuilder.cs" />
+    <Compile Include="PathFindTest\ConnectionPointService\ChildPointBuilder.cs" />
+    <Compile Include="PathFindTest\ConnectionPointService\ConnectionElementSelector.cs" />
+    <Compile Include="PathFindTest\ConnectionPointService\ConnectionPointsClient.cs" />
+    <Compile Include="PathFindTest\ConnectionPointService\PointsToCheckStrategies\FittingPointStrategy.cs" />
+    <Compile Include="PathFindTest\ConnectionPointService\PointsToCheckStrategies\FreeConnectorsStrategy.cs" />
+    <Compile Include="PathFindTest\ConnectionPointService\PointsToCheckStrategies\IPointsToCheckStrategy.cs" />
+    <Compile Include="PathFindTest\ConnectionPointService\PointsToCheckStrategies\SpudPointsStrategy.cs" />
+    <Compile Include="PathFindTest\Solution\Creators\ISolutionCreator.cs" />
+    <Compile Include="PathFindTest\Solution\Creators\ISolutionCreatorStrategy.cs" />
+    <Compile Include="PathFindTest\Solution\Creators\SketchSolutionCreator.cs" />
+    <Compile Include="PathFindTest\Solution\MEPSolutionModel.cs" />
+    <Compile Include="PathFindTest\Solution\SketchSolutionModel.cs" />
+    <Compile Include="PathFindTest\Solution\ICollisionSolutionModel.cs" />
+    <Compile Include="PathFindTest\PathFinders\IPathFinder.cs" />
+    <Compile Include="PathFindTest\ITransfromBuilder.cs" />
+    <Compile Include="PathFindTest\ConnectionPointService\PointModel\ConnectionPoint.cs" />
+    <Compile Include="PathFindTest\ConnectionPointService\PointModel\IConnectionPoint.cs" />
+    <Compile Include="PathFindTest\Solution\LoopCheckPointsStrategy.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="MessagesHandler.cs" />
-    <Compile Include="PathFinders\SimplePathFinder.cs" />
+    <Compile Include="PathFindTest\PathFinders\SimplePathFinder.cs" />
     <Compile Include="SymbolPlacer\AvailableMEPCurves.cs" />
     <Compile Include="SymbolPlacer\FamiliesSelectorTest.cs" />
     <Compile Include="SymbolPlacer\PlacementOption.cs" />
@@ -97,6 +104,7 @@
     <None Include="DS.RevitApp.Test.addin" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y  "$(TargetDir)*.*" "C:\ProgramData\Autodesk\Revit\Addins\2020\$(TargetName)\" 

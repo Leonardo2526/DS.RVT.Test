@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using DS.RevitApp.Test.ConnectionPointService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DS.RevitApp.Test.PathFinders
+namespace DS.RevitApp.Test.PathFindTest.PathFinders
 {
     internal class SimplePathFinder : IPathFinder
     {

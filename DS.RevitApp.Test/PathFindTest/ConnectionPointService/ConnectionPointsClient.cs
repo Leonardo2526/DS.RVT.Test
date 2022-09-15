@@ -1,8 +1,9 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
-using DS.RevitApp.Test.ConnectionPointService.SearchersModel;
-using DS.RevitApp.Test.PathFinders;
+using DS.RevitApp.Test.PathFindTest.PathFinders;
+using DS.RevitApp.Test.PathFindTest.Solution;
+using DS.RevitApp.Test.PathFindTest.Solution.Creators;
 using DS.RevitLib.Utils.MEP.SystemTree;
 using DS.RevitLib.Utils.ModelCurveUtils;
 using System;
@@ -12,7 +13,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DS.RevitApp.Test
+namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
 {
     internal class ConnectionPointsClient
     {
@@ -62,10 +63,11 @@ namespace DS.RevitApp.Test
 
         private List<XYZ> GetPath()
         {
-            var client = new ConnectionSearchClient(_pathFinder, null, _mEPSystemModel);
-            var (Point1, Point2) = client.GetConnectionPoints();
+            var strategy = new LoopCheckPointsStrategy(_pathFinder, null, _mEPSystemModel);
+            var solutionCreator = new SketchSolutionCreator(strategy, _mEPSystemModel);
+            var solution = solutionCreator.Create() as SketchSolutionModel;
 
-            return client.Path;
+            return solution.Path;
         }
     }
 }

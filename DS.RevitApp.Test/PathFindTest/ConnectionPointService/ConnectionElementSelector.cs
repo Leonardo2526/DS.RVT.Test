@@ -6,7 +6,7 @@ using DS.RevitLib.Utils.Extensions;
 using DS.RevitLib.Utils.MEP;
 using System.Collections.Generic;
 
-namespace DS.RevitApp.Test
+namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
 {
     public class ConnectionElementSelector
     {
