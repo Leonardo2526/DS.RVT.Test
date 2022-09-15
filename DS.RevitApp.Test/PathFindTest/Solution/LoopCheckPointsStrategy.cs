@@ -19,7 +19,7 @@ namespace DS.RevitApp.Test.PathFindTest.Solution
         private readonly IPathFinder _pathFinder;
         private readonly ITransfromBuilder _transfromBuilder;
         private readonly MEPSystemModel _mEPSystemModel;
-        private bool FamInstTransformAvailable;
+        private bool FamInstTransformAvailable = true;
 
         public LoopCheckPointsStrategy(IPathFinder pathFinder, ITransfromBuilder transfromBuilder, MEPSystemModel mEPSystemModel)
         {

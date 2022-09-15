@@ -20,6 +20,8 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService.PointsToCheckStra
 
         public override List<IConnectionPoint> GetPointsToCheck(Connector baseConnector)
         {
+            PointsToCheck = new List<IConnectionPoint>();
+
             //Check spuds connected to baseMEPCurve
             List<FamilyInstance> spudsToBase = _mEPSystemModel.Root.GetConnectedSpuds(_baseElement as MEPCurve);
             if (spudsToBase is not null && spudsToBase.Any())

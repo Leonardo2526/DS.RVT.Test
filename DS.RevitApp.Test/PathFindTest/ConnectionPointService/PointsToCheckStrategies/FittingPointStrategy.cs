@@ -14,7 +14,7 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService.PointsToCheckStra
 {
     internal class FittingPointStrategy : AbstractPointsToCheckStategy
     {
-        private List<Element> _spanElements;
+        private List<Element> _spanElements = new List<Element>();
         private readonly int _baseIndex;
 
         public FittingPointStrategy(MEPSystemModel mEPSystemModel, Element baseElement, XYZ collisionCenter) : 
@@ -25,15 +25,18 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService.PointsToCheckStra
 
         public override List<IConnectionPoint> GetPointsToCheck(Connector baseConnector)
         {
-            //Check all fittings by this direction
+            PointsToCheck = new List<IConnectionPoint>();
+            _spanElements = new List<Element>();
+
+            //Check all fittings by this direction          
             List<FamilyInstance> fittings = GetFittings(baseConnector);
             var childIds = _mEPSystemModel.Root.ChildrenNodes?.Select(obj => obj.Element.Id);
             if (fittings is not null && fittings.Any())
             {
                 //Exclude childs
                 var fittingIds = fittings.Select(obj => obj.Id);
-                var childElemsIds = fittingIds.Intersect(childIds);
-                if (childElemsIds.Any())
+                var childElemsIds = childIds is not null ? fittingIds.Intersect(childIds) : null;
+                if (childElemsIds is not null && childElemsIds.Any())
                 {
                     var childElem = fittings.Where(obj => obj.Id == childElemsIds.First()).First();
                     XYZ lp = GetChildNodePoint(childElem, _spanElements);
@@ -45,10 +48,10 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService.PointsToCheckStra
                 foreach (var fam in fittings)
                 {
                     XYZ lp = fam.GetLocationPoint();
-                    var parentIds = _mEPSystemModel.Root.ParentNodes.Select(obj => obj.Element.Id).ToList();
-                    if (parentIds.Contains(fam.Id) && fam.IsSpud())
+                    var parentIds = _mEPSystemModel.Root.ParentNodes?.Select(obj => obj.Element.Id).ToList();
+                    if (parentIds is not null && parentIds.Contains(fam.Id) && fam.IsSpud())
                     {
-                        var node = _mEPSystemModel.Root.ParentNodes.Where(obj => obj.Element.Id == fam.Id).First();
+                        var node = _mEPSystemModel.Root.ParentNodes?.Where(obj => obj.Element.Id == fam.Id).First();
                         MEPCurve mEPCurve = node.RelationElement as MEPCurve;
                         Line line = mEPCurve.GetCenterLine();
                         lp = line.Project(lp).XYZPoint;
@@ -65,7 +68,7 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService.PointsToCheckStra
             return PointsToCheck;
         }
 
-        public List<FamilyInstance> GetFittings(Connector baseConnector)
+        public List<FamilyInstance> GetFittingsOld(Connector baseConnector)
         {
             var points = new List<IConnectionPoint>();
             _spanElements = new List<Element>();
@@ -92,6 +95,18 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService.PointsToCheckStra
                 var fIds = _spanElements.Select(obj => obj.Id).Intersect(_mEPSystemModel.Root.Fittings.Select(obj => obj.Id))?.ToList();
                 fittings = _mEPSystemModel.Root.Fittings.Where(obj => fIds.Contains(obj.Id))?.ToList();
             }
+
+            return fittings;
+        }
+
+        public List<FamilyInstance> GetFittings(Connector baseConnector)
+        {
+            _spanElements.Add(_baseElement);
+            var elemSpan = _mEPSystemModel.Root.GetElementsSpan(baseConnector) ?? new List<Element>();
+            _spanElements.AddRange(elemSpan);
+
+            var fIds = _mEPSystemModel.Root.Fittings.Select(obj => obj.Id)?.ToList();
+            var fittings = _spanElements.Where(obj => fIds.Contains(obj.Id)).Cast<FamilyInstance>().ToList();
 
             return fittings;
         }

@@ -24,7 +24,11 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService.PointsToCheckStra
 
         public List<IConnectionPoint> GetPointsToCheck(Connector baseConnector)
         {
-            var elems = _mEPSystemModel.Root.GetElementsSpan(baseConnector);
+            PointsToCheck = new List<IConnectionPoint>();
+            var elems = new List<Element>();
+            elems.Add(_mEPSystemModel.Root.BaseElement);
+            var span = _mEPSystemModel.Root.GetElementsSpan(baseConnector) ?? new List<Element>();           
+            elems.AddRange(span);
             var elem = elems.Last();
             var c = ConnectorUtils.GetFreeConnector(elem).First();
             PointsToCheck.Add(new ConnectionPoint(c.Origin, elem));
