@@ -1,18 +1,19 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
+using DS.RevitLib.Utils;
 using DS.RevitLib.Utils.Extensions;
 using DS.RevitLib.Utils.MEP;
 using System.Collections.Generic;
 
-namespace DS.RevitApp.Test
+namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
 {
-    public class ElementSelector
+    public class ConnectionElementSelector
     {
         private readonly UIDocument _uidoc;
         private readonly Document _doc;
 
-        public ElementSelector(UIDocument uidoc)
+        public ConnectionElementSelector(UIDocument uidoc)
         {
             _uidoc = uidoc;
             _doc = _uidoc.Document;
@@ -28,7 +29,7 @@ namespace DS.RevitApp.Test
             XYZ point = null;
             if (element is FamilyInstance)
             {
-                point = element.GetCenterPoint();
+                point = ElementUtils.GetLocationPoint(element);
             }
             else if (element is MEPCurve)
             {

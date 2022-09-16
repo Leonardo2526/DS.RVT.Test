@@ -15,6 +15,8 @@ using Autodesk.Revit.UI.Selection;
 using DS.RevitLib.Utils;
 using DS.RevitLib.Utils.MEP.Creator;
 using DS.RevitLib.Utils.ModelCurveUtils;
+using DS.RevitLib.Utils.Collisions.Models;
+using DS.RevitApp.Test.PathFindTest.ConnectionPointService;
 
 namespace DS.RevitApp.Test
 {
@@ -30,16 +32,8 @@ namespace DS.RevitApp.Test
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            //Reference reference = uidoc.Selection.PickObject(ObjectType.Element, "Select element");
-            //MEPCurve element = doc.GetElement(reference) as MEPCurve;
-
-
-            var selector = new ElementSelector(uidoc);
-            var element1 = selector.Select("Element1");
-            var element2 = selector.Select("Element2");
-
-            var creator = new ModelCurveCreator(doc);
-            creator.Create(element1.Value, element2.Value);
+            var test = new ConnectionPointsClient(uidoc);
+            test.Run();
 
 
             return Autodesk.Revit.UI.Result.Succeeded;
