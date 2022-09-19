@@ -10,14 +10,14 @@ using System.Threading.Tasks;
 
 namespace DS.RevitApp.Test.TransformTest
 {
-    public abstract class AbstractAvailableCurveModel<T>
+    public abstract class AbstractAvailableCurveService<T>
     {
         protected readonly List<T> _targetCurves;
         protected readonly double _minCurveLength;
         protected readonly double _minPlacementLength;
         private readonly bool _saveElementsOrder;
 
-        protected AbstractAvailableCurveModel(List<T> targetCurves, double minCurveLength, double minPlacementLength, bool saveElementsOrder = false)
+        protected AbstractAvailableCurveService(List<T> targetCurves, double minCurveLength, double minPlacementLength, bool saveElementsOrder = false)
         {
             _targetCurves = targetCurves;
             _minCurveLength = minCurveLength;
@@ -55,7 +55,7 @@ namespace DS.RevitApp.Test.TransformTest
             return true;
         }
 
-        protected bool CheckMinPlacementLength(T curve)
+        public bool CheckMinPlacementLength(T curve)
         {
             double curveLength = GetLength(curve);
             if (curveLength > _minPlacementLength)

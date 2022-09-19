@@ -7,9 +7,9 @@ using System.Security.Cryptography;
 
 namespace DS.RevitApp.Test.TransformTest
 {
-    internal class AvailableMEPCurveModel : AbstractAvailableCurveModel<MEPCurve>
+    internal class AvailableMEPCurveService : AbstractAvailableCurveService<MEPCurve>
     {
-        public AvailableMEPCurveModel(List<MEPCurve> targetCurves, double minCurveLength, double minPlacementLength, bool saveElementsOrder = false) : 
+        public AvailableMEPCurveService(List<MEPCurve> targetCurves, double minCurveLength, double minPlacementLength, bool saveElementsOrder = false) : 
             base(targetCurves, minCurveLength, minPlacementLength, saveElementsOrder)
         {
         }

@@ -99,12 +99,26 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SymbolPlacer\SymbolPlacerClient.cs" />
     <Compile Include="TransactionTests\MEPCurveTransaction.cs" />
-    <Compile Include="TransformTest\AvailableModels\AbstractAvailableCurveModel.cs" />
-    <Compile Include="TransformTest\AvailableModels\AvailableLineModel.cs" />
-    <Compile Include="TransformTest\AvailableModels\AvailableMEPCurveModel.cs" />
-    <Compile Include="TransformTest\FamToLineBuilder.cs" />
-    <Compile Include="TransformTest\FamToLineModel.cs" />
-    <Compile Include="TransformTest\FamToLineMultipleBuilder.cs" />
+    <Compile Include="TransformTest\AvailableModels\AbstractAvailableCurveService.cs" />
+    <Compile Include="TransformTest\AvailableModels\AvailableLineService.cs" />
+    <Compile Include="TransformTest\AvailableModels\AvailableMEPCurveService.cs" />
+    <Compile Include="TransformTest\LineModel.cs" />
+    <Compile Include="TransformTest\PlacementOption.cs" />
+    <Compile Include="TransformTest\PlacementPoint.cs" />
+    <Compile Include="TransformTest\TargetLineBuilder.cs" />
+    <Compile Include="TransformTest\TargetLineModel.cs" />
+    <Compile Include="TransformTest\TransformBuilders\BasisLineTransformBuilder.cs" />
+    <Compile Include="TransformTest\TransformBuilders\FamToLineTransformBuilder.cs" />
+    <Compile Include="TransformTest\TransformModels\BasisLineTransformModel.cs" />
+    <Compile Include="TransformTest\TransformModels\FamToLineTransformModel.cs" />
+    <Compile Include="TransformTest\TransformBuilders\FamToLineMultipleBuilder.cs" />
+    <Compile Include="TransformTest\PositionFinder.cs" />
+    <Compile Include="TransformTest\Resolvers\AroundCenterLineRotateResolver.cs" />
+    <Compile Include="TransformTest\Resolvers\MoveResolver.cs" />
+    <Compile Include="TransformTest\Resolvers\RotateCenterLineResolver.cs" />
+    <Compile Include="TransformTest\SolidCollisionClient.cs" />
+    <Compile Include="TransformTest\TransformBuilders\BasisTransformBuilder.cs" />
+    <Compile Include="TransformTest\TransformModels\BasisTransformModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="DS.RevitApp.Test.addin" />

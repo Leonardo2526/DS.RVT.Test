@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace DS.RevitApp.Test.TransformTest
 {
-    internal class FamToLineModel : AbstractTransformModel<FamilyInstance, Line>
+    internal class FamToLineTransformModel : AbstractTransformModel<FamilyInstance, LineModel>
     {
-        public FamToLineModel(FamilyInstance sourceObject, Line targetObject) : 
+        public FamToLineTransformModel(FamilyInstance sourceObject, LineModel targetObject) : 
             base(sourceObject, targetObject)
         {
         }
