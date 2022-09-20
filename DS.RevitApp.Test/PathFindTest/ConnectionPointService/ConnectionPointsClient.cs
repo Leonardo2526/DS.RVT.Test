@@ -25,6 +25,8 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Windows.Forms.LinkLabel;
 using DS.RevitLib.Utils.FamilyInstances;
+using DS.RevitLib.Utils.Collisions.Checkers;
+using DS.RevitLib.Utils.Extensions;
 
 namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
 {
@@ -41,6 +43,7 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
         private string _transactionPrefix;
         private List<Element> _elementsToDelete;
         private readonly Committer _committer;
+        private MEPCurve _baseMEPCurve;
 
 
         public ConnectionPointsClient(UIDocument uidoc)
@@ -55,9 +58,9 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
         {
             //Get MEPSystemModel
             Reference reference = _uidoc.Selection.PickObject(ObjectType.Element, "Select element");
-            MEPCurve baseMEPCurve = _doc.GetElement(reference) as MEPCurve;
+            _baseMEPCurve = _doc.GetElement(reference) as MEPCurve;
 
-            var mEPSystemBuilder = new SimpleMEPSystemBuilder(baseMEPCurve);
+            var mEPSystemBuilder = new SimpleMEPSystemBuilder(_baseMEPCurve);
             _mEPSystemModel = mEPSystemBuilder.Build();
 
             //var (point1, point2) = GetPointsManually();
@@ -84,11 +87,12 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
 
             var accecoriesExt = accecoriesSpan.Select(obj => new SolidModelExt(obj)).ToList();
 
-            var builder = new FamToLineMultipleBuilder(accecoriesExt, lineModels, path, 50.mmToFyt2(), null, lineBuilder.StartMEPCurveModel);
+            var collisionCheckers = GetCheckers();
+            var builder = new FamToLineMultipleBuilder(accecoriesExt, lineModels, path, 50.mmToFyt2(), collisionCheckers, lineBuilder.StartMEPCurveModel);
             var transformModels = builder.Build().Cast<FamToLineTransformModel>().ToList();
 
             //create MEPSystem
-            var builderByPoints = new BuilderByPoints(baseMEPCurve, path, new RollBackCommitter(), _transactionPrefix);
+            var builderByPoints = new BuilderByPoints(_baseMEPCurve, path, new RollBackCommitter(), _transactionPrefix);
             var MEPSystemModel = builderByPoints.BuildMEPCurves().WithFittings();
             List<MEPCurve> mEPCurves = MEPSystemModel.MEPCurves.Cast<MEPCurve>().ToList();
 
@@ -156,6 +160,69 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
             }
 
             return element;
+        }
+
+        private List<ICollisionChecker> GetCheckers()
+        {
+            //Create collisions checker
+            var modelElements = GetGeometryElements(_doc);
+            var excludedObjects = new List<Element> { _baseMEPCurve };
+
+            var collisionCheckers = new List<ICollisionChecker>();
+
+            //Get model checker
+            var sm = new SolidCollisionChecker(modelElements, excludedObjects);
+            collisionCheckers.Add(sm);
+
+            //get link checkers
+            //foreach (var link in DocModel.GetInstance().Links)
+            //{
+            //    List<Element> linkElements = link.ElementSolids.Keys.ToList();
+            //    collisionCheckers.Add(new LinkCollisionChecker(linkElements, link.LinkInsatance, null));
+            //}
+
+            return collisionCheckers;
+        }
+
+        private List<Element> GetGeometryElements(Document doc, Transform tr = null)
+        {
+            if (doc == null || !doc.IsValidObject)
+                return null;
+
+            var categories = doc.Settings.Categories.Cast<Category>().Where(x => x.CategoryType == CategoryType.Model).Select(x => x.Id)
+                .Where(x => !x.IntegerValue.Equals((int)BuiltInCategory.OST_Materials)).ToList();
+            var filter = new ElementMulticategoryFilter(categories);
+            var elems = new FilteredElementCollector(doc).WhereElementIsNotElementType()
+                    .WherePasses(filter).Where(x => ContainsSolidChecker(x)).ToList();
+
+            elems = elems.Where(x => x.Category.GetBuiltInCategory().ToString() !=
+            BuiltInCategory.OST_TelephoneDevices.ToString()).ToList();
+
+            return elems;
+        }
+        private bool ContainsSolidChecker(Element x)
+        {
+            var g = x.get_Geometry(new Options() { ComputeReferences = false, DetailLevel = ViewDetailLevel.Fine, IncludeNonVisibleObjects = false })
+                ?.Cast<GeometryObject>().ToList();
+
+            return CheckGeometry(g);
+        }
+
+        private bool CheckGeometry(List<GeometryObject> g)
+        {
+            if (g is null) return false;
+
+            foreach (var elem in g)
+            {
+                if (elem is Solid s && s.Volume > 1e-6)
+                    return true;
+                else if (elem is GeometryInstance gi)
+                {
+                    var go = gi.GetInstanceGeometry();
+                    return CheckGeometry(go?.Cast<GeometryObject>().ToList());
+                }
+            }
+            return false;
         }
 
     }
