@@ -14,14 +14,17 @@ using DS.RevitLib.Utils.MEP.SystemTree;
 using DS.RevitLib.Utils.ModelCurveUtils;
 using DS.RevitLib.Utils.Models;
 using DS.RevitLib.Utils.Solids.Models;
+using DS.RevitLib.Utils.TransactionCommitter;
 using OLMP.RevitLib.MEPAC.Collisons.Resolvers.MEPBypass.ElementsTransfer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Windows.Forms.LinkLabel;
+using DS.RevitLib.Utils.FamilyInstances;
 
 namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
 {
@@ -33,17 +36,18 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
         private readonly IPathFinder _pathFinder;
         private MEPSystemModel _mEPSystemModel;
         private SketchSolutionModel _sketchSolutionModel;
-        private MEPCurveModel _mEPCurveModel;
         private ConnectionPoint _point1;
         private ConnectionPoint _point2;
         private string _transactionPrefix;
         private List<Element> _elementsToDelete;
+        private readonly Committer _committer;
+
 
         public ConnectionPointsClient(UIDocument uidoc)
         {
             _uidoc = uidoc;
             _doc = _uidoc.Document;
-            _pathFinder = new SimplePathFinder(1, 1);
+            _pathFinder = new SimplePathFinder(2, 2);
         }
         
 
@@ -51,9 +55,9 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
         {
             //Get MEPSystemModel
             Reference reference = _uidoc.Selection.PickObject(ObjectType.Element, "Select element");
-            MEPCurve element = _doc.GetElement(reference) as MEPCurve;
+            MEPCurve baseMEPCurve = _doc.GetElement(reference) as MEPCurve;
 
-            var mEPSystemBuilder = new SimpleMEPSystemBuilder(element);
+            var mEPSystemBuilder = new SimpleMEPSystemBuilder(baseMEPCurve);
             _mEPSystemModel = mEPSystemBuilder.Build();
 
             //var (point1, point2) = GetPointsManually();
@@ -72,23 +76,38 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
             //_uidoc.RefreshActiveView();
 
 
-            var lineModels = new LineModelBuilder(path, _sketchSolutionModel, 100.mmToFyt2(), _elementsToDelete).Build();
+            var lineBuilder = new LineModelBuilder(path, _sketchSolutionModel, 225.mmToFyt2(), _elementsToDelete);
+            var lineModels = lineBuilder.Build();
 
             var allAccIds = _mEPSystemModel.Root.Accessories.Select(a => a.Id);
             var accecoriesSpan = _elementsToDelete.Where(obj => allAccIds.Contains(obj.Id)).OfType<FamilyInstance>().ToList();
 
             var accecoriesExt = accecoriesSpan.Select(obj => new SolidModelExt(obj)).ToList();
 
-            var builder = new FamToLineMultipleBuilder(accecoriesExt, lineModels, path, 50.mmToFyt2(), null, _mEPCurveModel);
+            var builder = new FamToLineMultipleBuilder(accecoriesExt, lineModels, path, 50.mmToFyt2(), null, lineBuilder.StartMEPCurveModel);
             var transformModels = builder.Build().Cast<FamToLineTransformModel>().ToList();
 
+            //create MEPSystem
+            var builderByPoints = new BuilderByPoints(baseMEPCurve, path, new RollBackCommitter(), _transactionPrefix);
+            var MEPSystemModel = builderByPoints.BuildMEPCurves().WithFittings();
+            List<MEPCurve> mEPCurves = MEPSystemModel.MEPCurves.Cast<MEPCurve>().ToList();
 
+            List<MEPCurve> currentMEPCurves = new List<MEPCurve>();
+            currentMEPCurves.AddRange(mEPCurves);
+
+            //place families
+            var creator = new FamInstCreator(_doc, _committer, _transactionPrefix);
             foreach (var model in transformModels)
             {
                 MEPElementUtils.Disconnect(model.SourceObject.Element);
                 TransformElement(model.SourceObject.Element, model.MoveVector, model.Rotations);
-            }
 
+                //Connect families
+                var fam = model.SourceObject.Element as FamilyInstance;
+                MEPCurve mc = fam.GetMEPCuveToInsert(mEPCurves);
+                creator.Insert(fam, mc, out List<MEPCurve> splittedMEPCurves);
+                currentMEPCurves.AddRange(splittedMEPCurves);
+            }
         }
 
         private (KeyValuePair<Element, XYZ> point1, KeyValuePair<Element, XYZ> point2) GetPointsManually()
@@ -138,5 +157,6 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
 
             return element;
         }
+
     }
 }

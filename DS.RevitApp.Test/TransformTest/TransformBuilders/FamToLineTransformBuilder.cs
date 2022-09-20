@@ -44,10 +44,10 @@ namespace DS.RevitApp.Test.TransformTest
 
             var finder = new PositionFinder(targetModel, _sourceObject, _collisionCheckers, _mEPCurveModel, _minCurveLength);
             finder.Find();
-            _sourceObject.Basis.Show(_operationObject.Element.Document);
-            _operationObject.Basis.Show(_operationObject.Element.Document);
-            UIDocument uIDocument = new UIDocument(_operationObject.Element.Document);
-            uIDocument.RefreshActiveView();
+            //_sourceObject.Basis.Show(_operationObject.Element.Document);
+            //_operationObject.Basis.Show(_operationObject.Element.Document);
+            //UIDocument uIDocument = new UIDocument(_operationObject.Element.Document);
+            //uIDocument.RefreshActiveView();
 
             var transformModel = new BasisTransformBuilder(_operationObject.Basis, _sourceObject.Basis).Build() as BasisTransformModel;
             var model = new FamToLineTransformModel(_sourceObject, _targetObject);
