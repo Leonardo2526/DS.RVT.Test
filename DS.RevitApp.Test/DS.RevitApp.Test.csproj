@@ -103,6 +103,7 @@
     <Compile Include="TransformTest\AvailableModels\AvailableLineService.cs" />
     <Compile Include="TransformTest\AvailableModels\AvailableMEPCurveService.cs" />
     <Compile Include="TransformTest\LineModel.cs" />
+    <Compile Include="TransformTest\LineModelBuilder.cs" />
     <Compile Include="TransformTest\PlacementOption.cs" />
     <Compile Include="TransformTest\PlacementPoint.cs" />
     <Compile Include="TransformTest\TargetModelBuilder.cs" />
