@@ -56,9 +56,13 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
         public void Run()
         {
             //Get MEPSystemModel
-            Reference reference = _uidoc.Selection.PickObject(ObjectType.Element, "Select element");
+            Reference reference = _uidoc.Selection.PickObject(ObjectType.Element, "Select element1");
             _baseMEPCurve = _doc.GetElement(reference) as MEPCurve;
-            _pathFinder = new BestSimplePathFinder(_baseMEPCurve.GetCenterLine(), 2, 2);
+
+            reference = _uidoc.Selection.PickObject(ObjectType.Element, "Select element2");
+            var mEPCurve2 = _doc.GetElement(reference) as MEPCurve;
+
+            _pathFinder = new BestSimplePathFinder(_baseMEPCurve.GetCenterLine(), mEPCurve2.GetCenterLine(), 2, 2);
 
             var mEPSystemBuilder = new SimpleMEPSystemBuilder(_baseMEPCurve);
             _mEPSystemModel = mEPSystemBuilder.Build();
