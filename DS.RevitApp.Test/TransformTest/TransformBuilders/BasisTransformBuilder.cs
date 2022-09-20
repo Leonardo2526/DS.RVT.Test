@@ -21,6 +21,7 @@ namespace OLMP.RevitLib.MEPAC.Collisons.Resolvers.MEPBypass.ElementsTransfer
     {
         public BasisTransformBuilder(Basis sourceObject, Basis targetObject) : base(sourceObject, targetObject)
         {
+            _operationObject = sourceObject.Clone();
         }
 
         /// <summary>
@@ -29,29 +30,31 @@ namespace OLMP.RevitLib.MEPAC.Collisons.Resolvers.MEPBypass.ElementsTransfer
         /// <returns></returns>
         public override AbstractTransformModel<Basis, Basis> Build()
         {
-            var transformModel = new BasisTransformModel(_sourceObject, _targetObject);
+            var transformModel = new BasisTransformModel(_operationObject, _targetObject);
 
-            transformModel.MoveVector = _targetObject.Point - _sourceObject.Point;
+            transformModel.MoveVector = _targetObject.Point - _operationObject.Point;
             Transform transform = Transform.CreateTranslation(transformModel.MoveVector);
-            _sourceObject.Transform(transform);
+            _operationObject.Transform(transform);
             transformModel.Transforms.Add(transform);
 
-            if (!_sourceObject.IsOrthogonal() | !_targetObject.IsOrthogonal())
+            if (!_operationObject.IsOrthogonal() | !_targetObject.IsOrthogonal())
             {
                 string errors = "Basisis are not orthogonal.";
                 //LogMessageCreator.CreateMessage(errors, TraceEventType.Error, SubType.General, _collision);
+                throw new InvalidOperationException(errors);
                 return null;
             }
             bool targetOrthogonality = _targetObject.IsOrthogonal();
-            if (_sourceObject.GetOrientaion() != _sourceObject.GetOrientaion())
+            if (_operationObject.GetOrientaion() != _sourceObject.GetOrientaion())
             {
                 string errors = "Orientaions are not equal.";
                 //LogMessageCreator.CreateMessage(errors, TraceEventType.Error, SubType.General, _collision);
+                throw new InvalidOperationException(errors);
                 return null;
             }
 
             int i = 0;
-            (XYZ basis1, XYZ basis2) = GetNotEqualBasises(_sourceObject, _targetObject);
+            (XYZ basis1, XYZ basis2) = GetNotEqualBasises(_operationObject, _targetObject);
             while (basis1 is not null && i < 3)
             {
                 double angle;
@@ -60,25 +63,26 @@ namespace OLMP.RevitLib.MEPAC.Collisons.Resolvers.MEPBypass.ElementsTransfer
                 {
                     angle = 180.DegToRad();
                     axis = XYZUtils.GetPerpendicular(basis1,
-                        new List<XYZ>() { _sourceObject.X, _sourceObject.Y, _sourceObject.Z }).First();
+                        new List<XYZ>() { _operationObject.X, _operationObject.Y, _operationObject.Z }).First();
                 }
                 else
                 {
                     angle = basis1.AngleTo(basis2);
                 }
-                transform = Transform.CreateRotationAtPoint(axis, angle, _sourceObject.Point);
-                _sourceObject.Transform(transform);
+                transform = Transform.CreateRotationAtPoint(axis, angle, _operationObject.Point);
+                _operationObject.Transform(transform);
                 transformModel.Transforms.Add(transform);
 
-                Line axisLine = Line.CreateBound(_sourceObject.Point, _sourceObject.Point + axis);
+                Line axisLine = Line.CreateBound(_operationObject.Point, _operationObject.Point + axis);
                 transformModel.Rotations.Add(new RotationModel(axisLine, angle));
-                (basis1, basis2) = GetNotEqualBasises(_sourceObject, _targetObject);
+                (basis1, basis2) = GetNotEqualBasises(_operationObject, _targetObject);
                 i++;
             }
             if (i > 2)
             {
                 string errors = "Failed to get transform model: number of rotation steps > 2";
                 //LogMessageCreator.CreateMessage(errors, TraceEventType.Error, SubType.General, _collision);
+                throw new InvalidOperationException(errors);
                 return null;
             }
 

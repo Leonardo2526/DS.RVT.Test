@@ -36,7 +36,6 @@ namespace OLMP.RevitLib.MEPAC.Collisons.Resolvers.MEPBypass.ElementsTransfer
             //add move transform
             var moveVector = _targetObject.GetCenter() - _sourceObject.Point;
             Transform transform = Transform.CreateTranslation(moveVector);
-            _sourceObject.Transform(transform);
             transformModel.Transforms.Add(transform);
           
             //add rotate transform
@@ -51,7 +50,6 @@ namespace OLMP.RevitLib.MEPAC.Collisons.Resolvers.MEPBypass.ElementsTransfer
                     angle = _sourceObject.X.AngleTo(_targetObject.Direction);
                 }
                 transform = Transform.CreateRotationAtPoint(axis, angle, _sourceObject.Point);
-                _sourceObject.Transform(transform);
                 transformModel.Transforms.Add(transform);
 
             return transformModel;

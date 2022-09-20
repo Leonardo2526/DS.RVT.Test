@@ -25,7 +25,7 @@ namespace OLMP.RevitLib.MEPAC.Collisons.Resolvers.MEPBypass.ElementsTransfer
    
     internal class PositionFinder
     {
-        private readonly TargetLineModel _targetModel;
+        private readonly TargetPlacementModel _targetModel;
         private SolidModelExt _operationModel;
         private readonly List<ICollisionChecker> _collisionCheckers;
         private readonly MEPCurveModel _mEPCurveModel;
@@ -34,7 +34,7 @@ namespace OLMP.RevitLib.MEPAC.Collisons.Resolvers.MEPBypass.ElementsTransfer
 
         //private readonly MEPCollision _collision;
 
-        public PositionFinder(TargetLineModel targetLine, SolidModelExt opertationModel,
+        public PositionFinder(TargetPlacementModel targetLine, SolidModelExt opertationModel,
             List<ICollisionChecker> collisionCheckers, MEPCurveModel _mEPCurveModel, double minCurveLength)
         {
             _targetModel = targetLine;
@@ -56,8 +56,12 @@ namespace OLMP.RevitLib.MEPAC.Collisons.Resolvers.MEPBypass.ElementsTransfer
             var transformModel = new BasisTransformBuilder(_operationModel.Basis, targetBasis).Build();
             _operationModel.Transform(transformModel.Transforms);
             //_operationModel.ShowBoundingBox();
-
             //DocModel.UiDoc.RefreshActiveView();
+
+            if (_collisionCheckers is null)
+            {
+                return;
+            }
 
             var checkedObjects1 = new List<SolidModelExt>() { _operationModel };
             var collisions = new List<ICollision>();
@@ -88,8 +92,12 @@ namespace OLMP.RevitLib.MEPAC.Collisons.Resolvers.MEPBypass.ElementsTransfer
             solidCollisionClient.Resolve();
         }
 
-        private Basis GetTargetBasis(TargetLineModel targetModel)
+        private Basis GetTargetBasis(TargetPlacementModel targetModel)
         {
+            return
+                  new Basis(targetModel.LineModel.Basis.X, targetModel.LineModel.Basis.Y, targetModel.LineModel.Basis.Z,
+                  _targetModel.StartPlacementPoint);
+
             Basis basis = _operationModel.Basis.Clone();
            
             if (_mEPCurveModel.Width == _mEPCurveModel.Height)
@@ -110,7 +118,7 @@ namespace OLMP.RevitLib.MEPAC.Collisons.Resolvers.MEPBypass.ElementsTransfer
 
         }
 
-        private List<Transform> GetTransforms(SolidModelExt operationModel, TargetLineModel targetModel)
+        private List<Transform> GetTransforms(SolidModelExt operationModel, TargetPlacementModel targetModel)
         {
             var transforms = new List<Transform>();
 

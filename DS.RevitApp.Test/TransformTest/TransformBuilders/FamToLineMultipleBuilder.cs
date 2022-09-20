@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace DS.RevitApp.Test.TransformTest
 {
-    internal class FamToLineMultipleBuilder : AbstractMultipleTransformBuilder<FamilyInstance, LineModel>
+    internal class FamToLineMultipleBuilder : AbstractMultipleTransformBuilder<SolidModelExt, LineModel>
     {
         private readonly double _minFamInstLength = 50.mmToFyt2();
         private readonly double _minCurveLength;
@@ -28,11 +28,10 @@ namespace DS.RevitApp.Test.TransformTest
         private readonly double _minPlacementLength;
         private AvailableLineService _lineService;
         private double _currentPlacementLength;
-        private SolidModelExt _sourceSolidModel;
         private readonly List<XYZ> _points;
         private readonly MEPCurveModel _mEPCurveModel;
 
-        public FamToLineMultipleBuilder(List<FamilyInstance> sourceObjects, List<LineModel> targetObjects, List<XYZ> points, double minCurveLength,
+        public FamToLineMultipleBuilder(List<SolidModelExt> sourceObjects, List<LineModel> targetObjects, List<XYZ> points, double minCurveLength,
             List<ICollisionChecker> collisionCheckers, MEPCurveModel mEPCurveModel) :
             base(sourceObjects, targetObjects)
         {
@@ -43,14 +42,14 @@ namespace DS.RevitApp.Test.TransformTest
             _mEPCurveModel = mEPCurveModel;
         }
 
-        public override AbstractTransformModel<FamilyInstance, LineModel> Build(FamilyInstance sourceObject, LineModel targetObject)
+        public override AbstractTransformModel<SolidModelExt, LineModel> Build(SolidModelExt operationObject, LineModel targetObject)
         { 
-            var builder = new FamToLineTransformBuilder(sourceObject, targetObject, 
-                _collisionCheckers, _currentPlacementLength, _sourceSolidModel, _points, _mEPCurveModel, _minCurveLength);
+            var builder = new FamToLineTransformBuilder(operationObject, targetObject, 
+                _collisionCheckers, _currentPlacementLength, _points, _mEPCurveModel, _minCurveLength);
             var model = builder.Build();
-
+         
             var (line1, line2) = 
-                targetObject.Line.Cut(_sourceSolidModel.ConnectorsPoints.First(), _sourceSolidModel.ConnectorsPoints.Last(), out Line cuttedLine);
+                targetObject.Line.Cut(operationObject.ConnectorsPoints.First(), operationObject.ConnectorsPoints.Last(), out Line cuttedLine);
 
 
             Line maxLine = line1.ApproximateLength > line2.ApproximateLength ? line1 : line2;
@@ -66,7 +65,7 @@ namespace DS.RevitApp.Test.TransformTest
             return model;
         }
 
-        public override List<AbstractTransformModel<FamilyInstance, LineModel>> Build()
+        public override List<AbstractTransformModel<SolidModelExt, LineModel>> Build()
         {
             _lineService = new AvailableLineService(_targetObjects, _minCurveLength, _minPlacementLength);
             if (_lineService.AvailableCurves is null)
@@ -76,20 +75,20 @@ namespace DS.RevitApp.Test.TransformTest
                 return null;
             }
 
-            var transforms = new List<AbstractTransformModel<FamilyInstance, LineModel>>();   
-            foreach (var fam in _sourceObjects)
+            var transforms = new List<AbstractTransformModel<SolidModelExt, LineModel>>();   
+            foreach (var sObj in _sourceObjects)
             {
-                _sourceSolidModel = new SolidModelExt(fam);
-                _currentPlacementLength = GetFamInsLength(fam) + 2 * _minCurveLength;
+                var operationObj = sObj.Clone();
+                _currentPlacementLength = GetFamInsLength(sObj.Element) + 2 * _minCurveLength;
                 LineModel lineModel = _lineService.Get(_currentPlacementLength);
                 if (lineModel is null)
                 {
-                    string errors = $"No available MEPCurves exist for family insatance id ({fam.Id}) placement.";
+                    string errors = $"No available MEPCurves exist for family insatance id ({sObj.Element.Id}) placement.";
                     //LogMessageCreator.CreateMessage(errors, TraceEventType.Error, SubType.General, _collision);
                     return null;
                 }
 
-                var model = Build(fam, lineModel);
+                var model = Build(operationObj, lineModel);
                 transforms.Add(model);
             }
 
@@ -97,7 +96,7 @@ namespace DS.RevitApp.Test.TransformTest
         }
 
 
-        private double GetFamInsLength(FamilyInstance fam)
+        private double GetFamInsLength(Element fam)
         {
             (Connector con1, Connector con2) = ConnectorUtils.GetMainConnectors(fam);
             return con1.Origin.DistanceTo(con2.Origin);

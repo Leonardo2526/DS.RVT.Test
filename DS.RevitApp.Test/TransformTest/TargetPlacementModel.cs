@@ -2,10 +2,10 @@
 
 namespace DS.RevitApp.Test.TransformTest
 {
-    internal class TargetLineModel
+    internal class TargetPlacementModel
     {
 
-        public TargetLineModel(LineModel lineModel, XYZ startPlacementPoint, XYZ entPlacementPoint,
+        public TargetPlacementModel(LineModel lineModel, XYZ startPlacementPoint, XYZ entPlacementPoint,
            XYZ startPoint, XYZ endPoint)
         {
             LineModel = lineModel;

@@ -12,13 +12,13 @@ namespace OLMP.RevitLib.MEPAC.Collisons.Resolvers.MEPBypass.ElementsTransfer
     {
         private readonly List<SolidElemCollision> _collisions;
         private readonly List<ICollisionChecker> _collisionCheckers;
-        private readonly TargetLineModel _targetModel;
+        private readonly TargetPlacementModel _targetModel;
         private XYZ _currentPoint;
         private readonly double _minCurveLength;
 
 
         public SolidCollisionClient(List<SolidElemCollision> collisions, List<ICollisionChecker> collisionChecker, 
-            TargetLineModel targetModel, double minCurveLength)
+            TargetPlacementModel targetModel, double minCurveLength)
         {
             _collisions = collisions;
             _collisionCheckers = collisionChecker;

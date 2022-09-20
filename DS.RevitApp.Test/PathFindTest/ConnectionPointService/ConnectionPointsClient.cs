@@ -37,7 +37,7 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
         private ConnectionPoint _point1;
         private ConnectionPoint _point2;
         private string _transactionPrefix;
-
+        private List<Element> _deletedElements;
 
         public ConnectionPointsClient(UIDocument uidoc)
         {
@@ -59,6 +59,7 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
             //var (point1, point2) = GetPointsManually();
             //List<XYZ> points = pathGenerator.FindPath(point1.Value, point2.Value);
             List<XYZ>  path = GetPath();
+            _deletedElements = _mEPSystemModel.Root.GetElements(_point1.Element, _point2.Element);
 
             //Show path
             var creator = new ModelCurveCreator(_doc);
@@ -70,22 +71,27 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
                 lines.Add(line);
             }
 
+            //_uidoc.RefreshActiveView();
+
+
             var lineModels = BuildLineModels(lines, _sketchSolutionModel);
 
-            var elems = _mEPSystemModel.Root.GetElements(_point1.Element, _point2.Element);
-            var allAccIds = _mEPSystemModel.Root.Accessories.Select(a => a.Id);
-            var accecoriesSpan = elems.Where(obj => allAccIds.Contains(obj.Id)).OfType<FamilyInstance>().ToList();
 
-            var builder = new FamToLineMultipleBuilder(accecoriesSpan, lineModels, path, 50.mmToFyt2(), null, _mEPCurveModel);
-            List<FamToLineTransformModel> transformModels = builder.Build().Cast<FamToLineTransformModel>().ToList();
+            var allAccIds = _mEPSystemModel.Root.Accessories.Select(a => a.Id);
+            var accecoriesSpan = _deletedElements.Where(obj => allAccIds.Contains(obj.Id)).OfType<FamilyInstance>().ToList();
+
+            var accecoriesExt = accecoriesSpan.Select(obj => new SolidModelExt(obj)).ToList();
+
+            var builder = new FamToLineMultipleBuilder(accecoriesExt, lineModels, path, 50.mmToFyt2(), null, _mEPCurveModel);
+            var transformModels = builder.Build().Cast<FamToLineTransformModel>().ToList();
 
 
             foreach (var model in transformModels)
             {
-                MEPElementUtils.Disconnect(model.SourceObject);
-                TransformElement(model.SourceObject, model.Transforms);
+                MEPElementUtils.Disconnect(model.SourceObject.Element);
+                TransformElement(model.SourceObject.Element, model.MoveVector, model.Rotations);
             }
-            
+
         }
 
         private (KeyValuePair<Element, XYZ> point1, KeyValuePair<Element, XYZ> point2) GetPointsManually()
@@ -113,12 +119,16 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
             var startLineModel = GetStartLineModel(sketchSolutionModel);
 
             Basis initBasis = startLineModel.Basis.Clone();
+            //initBasis.Show(_doc);
+            //_uidoc.RefreshActiveView();
 
             var lineModels = new List<LineModel>();
             foreach (var line in lines)
             {
                 var trModel = new BasisLineTransformBuilder(initBasis, line).Build();
                 initBasis.Transform(trModel.Transforms);
+                //initBasis.Show(_doc);
+                //_uidoc.RefreshActiveView();
 
                 var lineModel = new LineModel(line, initBasis);
                 lineModels.Add(lineModel);
@@ -132,6 +142,9 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
         {
             var p1 = sketchSolutionModel.Point1 as ConnectionPoint;
             MEPCurve startMEPCurve = null;
+
+            var deletedIds = _deletedElements.Select(obj => obj.Id);
+
             if (p1.Element is MEPCurve)
             {
                 startMEPCurve = p1.Element as MEPCurve;
@@ -141,6 +154,7 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
                 while (startMEPCurve is null)
                 {
                     var elems = ConnectorUtils.GetConnectedElements(p1.Element);
+                    elems = elems.Where(obj => !deletedIds.Contains(obj.Id)).ToList();
                     var mcurves = elems.OfType<MEPCurve>().ToList();
                     if (mcurves is not null && mcurves.Any())
                     {
@@ -153,18 +167,18 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
             return new LineModel(startMEPCurve);
         }
 
-        private Element TransformElement(Element element, TransformModel transformModel)
+        private Element TransformElement(Element element, XYZ moveVector, List<RotationModel> rotationModels)
         {
             using (Transaction transNew = new Transaction(_doc, _transactionPrefix + "Transform " + element.Id))
             {
                 try
                 {
                     transNew.Start();
-                    if (transformModel.MoveVector is not null)
+                    if (moveVector is not null)
                     {
-                        ElementTransformUtils.MoveElement(_doc, element.Id, transformModel.MoveVector);
+                        ElementTransformUtils.MoveElement(_doc, element.Id, moveVector);
                     }
-                    foreach (var rot in transformModel.Rotations)
+                    foreach (var rot in rotationModels)
                     {
                         ElementTransformUtils.RotateElement(_doc, element.Id, rot.Axis, rot.Angle);
                     }

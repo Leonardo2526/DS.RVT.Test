@@ -17,12 +17,12 @@ namespace OLMP.RevitLib.MEPAC.Collisons.Resolvers.MEPBypass.ElementsTransfer.Res
     {
         private readonly SolidModelExt _operationElement;
         private readonly XYZ _basePoint;
-        private readonly TargetLineModel _targetModel;
+        private readonly TargetPlacementModel _targetModel;
         private readonly Solid _totalIntersectionSolid;
         private readonly double _minCurveLength;
 
         public MoveResolver(SolidElemCollision collision, List<ICollisionChecker> collisionCheckers,
-            XYZ basePoint, TargetLineModel targetModel, Solid totalIntersectionSolid, double minCurveLength) :
+            XYZ basePoint, TargetPlacementModel targetModel, Solid totalIntersectionSolid, double minCurveLength) :
             base(collision, collisionCheckers)
         {
             _operationElement = collision.Object1;

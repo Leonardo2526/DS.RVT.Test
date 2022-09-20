@@ -105,10 +105,11 @@
     <Compile Include="TransformTest\LineModel.cs" />
     <Compile Include="TransformTest\PlacementOption.cs" />
     <Compile Include="TransformTest\PlacementPoint.cs" />
-    <Compile Include="TransformTest\TargetLineBuilder.cs" />
-    <Compile Include="TransformTest\TargetLineModel.cs" />
+    <Compile Include="TransformTest\TargetModelBuilder.cs" />
+    <Compile Include="TransformTest\TargetPlacementModel.cs" />
     <Compile Include="TransformTest\TransformBuilders\BasisLineTransformBuilder.cs" />
     <Compile Include="TransformTest\TransformBuilders\FamToLineTransformBuilder.cs" />
+    <Compile Include="TransformTest\TransformConvert.cs" />
     <Compile Include="TransformTest\TransformModels\BasisLineTransformModel.cs" />
     <Compile Include="TransformTest\TransformModels\FamToLineTransformModel.cs" />
     <Compile Include="TransformTest\TransformBuilders\FamToLineMultipleBuilder.cs" />

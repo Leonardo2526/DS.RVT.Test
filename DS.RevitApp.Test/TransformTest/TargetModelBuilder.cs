@@ -13,7 +13,7 @@ using static DS.ClassLib.VarUtils.DirPathBuilder;
 
 namespace DS.RevitApp.Test.TransformTest
 {
-    internal class TargetLineBuilder
+    internal class TargetModelBuilder
     {
         private readonly LineModel _lineModel;
         private readonly double _placementLength;
@@ -21,7 +21,7 @@ namespace DS.RevitApp.Test.TransformTest
         private readonly XYZ _p1;
         private readonly XYZ _p2;
 
-        public TargetLineBuilder(LineModel lineModel, double placementLength, List<XYZ> points)
+        public TargetModelBuilder(LineModel lineModel, double placementLength, List<XYZ> points)
         {
             _lineModel = lineModel;
             _placementLength = placementLength;
@@ -30,7 +30,7 @@ namespace DS.RevitApp.Test.TransformTest
             _p2 = _lineModel.Line.GetEndPoint(1);
         }
 
-        public TargetLineModel Build()
+        public TargetPlacementModel Build()
         {
             XYZ basePoint = GetBasePoint();
             XYZ startPlacementPoint = basePoint is null
@@ -45,7 +45,7 @@ namespace DS.RevitApp.Test.TransformTest
             XYZ vector = (endPoint - startPlacementPoint).RoundVector().Normalize();
             XYZ endPlacementPoint = endPoint - vector.Multiply(_placementLength / 2);
 
-            return new TargetLineModel(_lineModel, startPlacementPoint, endPlacementPoint, startPoint, endPoint);
+            return new TargetPlacementModel(_lineModel, startPlacementPoint, endPlacementPoint, startPoint, endPoint);
         }
 
         private XYZ GetBasePoint()
@@ -53,13 +53,12 @@ namespace DS.RevitApp.Test.TransformTest
             for (int i = 0; i < _points.Count - 1; i++)
             {
                 //check if points conicidence
-                XYZ coincidence = GetCoincidence(_p1, _p2, _points[i], _points[i + 1]);
-                if (coincidence is not null)
+                if (Math.Round(_points[i].DistanceTo(_p1) ,3) ==0 | Math.Round(_points[i].DistanceTo(_p2), 3) == 0)
                 {
-                    return coincidence;
+                    return _points[i];
                 }
 
-                if (_p2.IsBetweenPoints(_points[i], _points[i + 1]))
+                if (_p1.IsBetweenPoints(_points[i], _points[i + 1]) | _p2.IsBetweenPoints(_points[i], _points[i + 1]))
                 {
                     if (_points[i].DistanceTo(_p1) > _points[i].DistanceTo(_p2))
                     {
@@ -72,25 +71,5 @@ namespace DS.RevitApp.Test.TransformTest
 
             return null;
         }
-
-        private XYZ GetCoincidence(XYZ p0, XYZ p1, XYZ closest, XYZ farest)
-        {
-            var v11 = closest - p0;
-            var v12 = closest - p1;
-            var v21 = farest - p0;
-            var v22 = farest - p1;
-
-            if (v11.IsZeroLength() | v22.IsZeroLength())
-            {
-                return p0;
-            }
-            if (v12.IsZeroLength() | v21.IsZeroLength())
-            {
-                return p1;
-            }
-
-            return null;
-        }
-
     }
 }
