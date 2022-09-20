@@ -35,7 +35,7 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
 
         private readonly UIDocument _uidoc;
         private readonly Document _doc;
-        private readonly IPathFinder _pathFinder;
+        private IPathFinder _pathFinder;
         private MEPSystemModel _mEPSystemModel;
         private SketchSolutionModel _sketchSolutionModel;
         private ConnectionPoint _point1;
@@ -50,7 +50,6 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
         {
             _uidoc = uidoc;
             _doc = _uidoc.Document;
-            _pathFinder = new SimplePathFinder(2, 2);
         }
         
 
@@ -59,6 +58,7 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
             //Get MEPSystemModel
             Reference reference = _uidoc.Selection.PickObject(ObjectType.Element, "Select element");
             _baseMEPCurve = _doc.GetElement(reference) as MEPCurve;
+            _pathFinder = new BestSimplePathFinder(_baseMEPCurve.GetCenterLine(), 2, 2);
 
             var mEPSystemBuilder = new SimpleMEPSystemBuilder(_baseMEPCurve);
             _mEPSystemModel = mEPSystemBuilder.Build();
@@ -67,15 +67,15 @@ namespace DS.RevitApp.Test.PathFindTest.ConnectionPointService
             //List<XYZ> points = pathGenerator.FindPath(point1.Value, point2.Value);
             List<XYZ>  path = GetPath();
             _elementsToDelete = _mEPSystemModel.Root.GetElements(_point1.Element, _point2.Element);
-
             //Show path
-            //var creator = new ModelCurveCreator(_doc);
-            //for (int i = 0; i < path.Count - 1; i++)
-            //{
-            //    creator.Create(path[i], path[i + 1]);
-            //    var line = Line.CreateBound(path[i], path[i + 1]);
-            //}
+            var mcreator = new ModelCurveCreator(_doc);
+            for (int i = 0; i < path.Count - 1; i++)
+            {
+                mcreator.Create(path[i], path[i + 1]);
+                var line = Line.CreateBound(path[i], path[i + 1]);
+            }
 
+            return;
             //_uidoc.RefreshActiveView();
 
 

@@ -78,6 +78,7 @@
     <Compile Include="PathFindTest\ConnectionPointService\PointsToCheckStrategies\FreeConnectorsStrategy.cs" />
     <Compile Include="PathFindTest\ConnectionPointService\PointsToCheckStrategies\IPointsToCheckStrategy.cs" />
     <Compile Include="PathFindTest\ConnectionPointService\PointsToCheckStrategies\SpudPointsStrategy.cs" />
+    <Compile Include="PathFindTest\PathFinders\BestSimplePathFinder.cs" />
     <Compile Include="PathFindTest\Solution\Creators\ISolutionCreator.cs" />
     <Compile Include="PathFindTest\Solution\Creators\ISolutionCreatorStrategy.cs" />
     <Compile Include="PathFindTest\Solution\Creators\SketchSolutionCreator.cs" />
