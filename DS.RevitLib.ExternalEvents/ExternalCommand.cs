@@ -35,7 +35,7 @@ namespace DS.RevitLib.ExternalEvents
             if (m_MyForm == null || m_MyForm.IsDisposed)
             {
                 // A new handler to handle request posting by the dialog
-                ExternalEventExample handler = new ExternalEventExample();
+                var handler = new ExternalEventTransaction();
 
                 // External Event for the dialog to use (to post requests)
                 ExternalEvent exEvent = ExternalEvent.Create(handler);

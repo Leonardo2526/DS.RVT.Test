@@ -16,8 +16,6 @@ using DS.RevitLib.Utils;
 using DS.RevitLib.Utils.MEP.Creator;
 using DS.RevitLib.Utils.ModelCurveUtils;
 using DS.RevitLib.Utils.Collisions.Models;
-using DS.RevitApp.Test.PathFindTest.ConnectionPointService;
-using DS.RevitApp.Test.TransformTest;
 
 namespace DS.RevitApp.Test
 {
@@ -32,9 +30,6 @@ namespace DS.RevitApp.Test
 
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
-
-            var test = new ConnectionPointsClient(uidoc);
-            test.Run();
 
             //var t = new TransformConvert(uidoc, doc);
             //t.Run();
