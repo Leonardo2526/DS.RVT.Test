@@ -12,14 +12,9 @@ namespace DS.RevitLib.ExternalEvents
 {
     public class ExternalEventTransaction : IExternalEventHandler
     {
-        public void Execute(UIApplication app)
+        public void Execute(UIApplication uiApp)
         {
-            var uidoc = app.ActiveUIDocument;
-            var doc = uidoc.Document;
-            Reference reference = uidoc.Selection.PickObject(ObjectType.Element, "Select element1");
-            var baseMEPCurve = doc.GetElement(reference) as MEPCurve;
-
-            ElementUtils.DeleteElement(doc, baseMEPCurve);
+            new TransactionTest(uiApp);
         }
 
         public string GetName()

@@ -12,10 +12,11 @@ namespace DS.RevitLib.ExternalEvents
     public class ExternalCommand : IExternalCommand
     {
         private ExternalEventExampleDialog m_MyForm;
+        private UIApplication _uiapp;
 
         public virtual Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            UIApplication uiapp = commandData.Application;
+            _uiapp = commandData.Application;
             try
             {
                 ShowForm();
@@ -35,14 +36,15 @@ namespace DS.RevitLib.ExternalEvents
             if (m_MyForm == null || m_MyForm.IsDisposed)
             {
                 // A new handler to handle request posting by the dialog
-                var handler = new ExternalEventTransaction();
+                var handler = new TestCommand();
+                //var handler = new ExternalEventTransaction();
 
                 // External Event for the dialog to use (to post requests)
                 ExternalEvent exEvent = ExternalEvent.Create(handler);
 
                 // We give the objects to the new dialog;
                 // The dialog becomes the owner responsible for disposing them, eventually.
-                m_MyForm = new ExternalEventExampleDialog(exEvent, handler);
+                m_MyForm = new ExternalEventExampleDialog(exEvent, handler, _uiapp);
                 m_MyForm.Show();
             }
         }

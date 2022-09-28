@@ -1,12 +1,6 @@
 ﻿using Autodesk.Revit.UI;
+using DS.ClassLib.VarUtils;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DS.RevitLib.ExternalEvents
@@ -15,12 +9,14 @@ namespace DS.RevitLib.ExternalEvents
     {
         private ExternalEvent m_ExEvent;
         private IExternalEventHandler m_Handler;
+        private UIApplication _uiApp;
 
-        public ExternalEventExampleDialog(ExternalEvent exEvent, IExternalEventHandler handler)
+        public ExternalEventExampleDialog(ExternalEvent exEvent, IExternalEventHandler handler, UIApplication uiApp)
         {
             InitializeComponent();
             m_ExEvent = exEvent;
             m_Handler = handler;
+            this._uiApp = uiApp;
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)
@@ -42,7 +38,16 @@ namespace DS.RevitLib.ExternalEvents
 
         private void showMessageButton_Click(object sender, EventArgs e)
         {
-            m_ExEvent.Raise();
+            var command = (TestCommand)m_Handler;
+            command.Run(() => new TransactionTest(_uiApp));
+
+            //new TransactionTest(_uiApp);
+            //var command = new RelayCommand(p =>
+            //{
+            //    new TransactionTest(_uiApp);
+            //});
+            //command.Execute(this);
+            //m_ExEvent.Raise();
         }
 
     }
