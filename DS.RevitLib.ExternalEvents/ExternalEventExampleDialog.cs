@@ -14,9 +14,9 @@ namespace DS.RevitLib.ExternalEvents
     public partial class ExternalEventExampleDialog : Form
     {
         private ExternalEvent m_ExEvent;
-        private ExternalEventExample m_Handler;
+        private IExternalEventHandler m_Handler;
 
-        public ExternalEventExampleDialog(ExternalEvent exEvent, ExternalEventExample handler)
+        public ExternalEventExampleDialog(ExternalEvent exEvent, IExternalEventHandler handler)
         {
             InitializeComponent();
             m_ExEvent = exEvent;

@@ -69,29 +69,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CmdFailureGatherer.cs" />
-    <Compile Include="PathFindTest\ConnectionPointService\PointsToCheckStrategies\AbstractPointsToCheckStategy.cs" />
-    <Compile Include="PathFindTest\ConnectionPointService\PointsToCheckBuilder.cs" />
-    <Compile Include="PathFindTest\ConnectionPointService\ChildPointBuilder.cs" />
-    <Compile Include="PathFindTest\ConnectionPointService\ConnectionElementSelector.cs" />
-    <Compile Include="PathFindTest\ConnectionPointService\ConnectionPointsClient.cs" />
-    <Compile Include="PathFindTest\ConnectionPointService\PointsToCheckStrategies\FittingPointStrategy.cs" />
-    <Compile Include="PathFindTest\ConnectionPointService\PointsToCheckStrategies\FreeConnectorsStrategy.cs" />
-    <Compile Include="PathFindTest\ConnectionPointService\PointsToCheckStrategies\IPointsToCheckStrategy.cs" />
-    <Compile Include="PathFindTest\ConnectionPointService\PointsToCheckStrategies\SpudPointsStrategy.cs" />
-    <Compile Include="PathFindTest\Solution\Creators\ISolutionCreator.cs" />
-    <Compile Include="PathFindTest\Solution\Creators\ISolutionCreatorStrategy.cs" />
-    <Compile Include="PathFindTest\Solution\Creators\SketchSolutionCreator.cs" />
-    <Compile Include="PathFindTest\Solution\MEPSolutionModel.cs" />
-    <Compile Include="PathFindTest\Solution\SketchSolutionModel.cs" />
-    <Compile Include="PathFindTest\Solution\ICollisionSolutionModel.cs" />
-    <Compile Include="PathFindTest\PathFinders\IPathFinder.cs" />
-    <Compile Include="PathFindTest\ITransfromBuilder.cs" />
-    <Compile Include="PathFindTest\ConnectionPointService\PointModel\ConnectionPoint.cs" />
-    <Compile Include="PathFindTest\ConnectionPointService\PointModel\IConnectionPoint.cs" />
-    <Compile Include="PathFindTest\Solution\LoopCheckPointsStrategy.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="MessagesHandler.cs" />
-    <Compile Include="PathFindTest\PathFinders\SimplePathFinder.cs" />
     <Compile Include="SymbolPlacer\AvailableMEPCurves.cs" />
     <Compile Include="SymbolPlacer\FamiliesSelectorTest.cs" />
     <Compile Include="SymbolPlacer\PlacementOption.cs" />
