@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
 	<AddIn Type="Command">
-		<Name>Test</Name>
+		<Name>DS.RevitApp.Test</Name>
 		<FullClassName>DS.RevitApp.Test.ExternalCommand</FullClassName>
 		<Text>Test</Text>
 		<Description>Test</Description>

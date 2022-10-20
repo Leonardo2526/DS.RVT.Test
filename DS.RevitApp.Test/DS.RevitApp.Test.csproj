@@ -49,6 +49,9 @@
     <Reference Include="Nito.Collections.Deque, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Nito.Collections.Deque.1.1.1\lib\net461\Nito.Collections.Deque.dll</HintPath>
     </Reference>
+    <Reference Include="PathFinderLib">
+      <HintPath>..\..\Olimproekt\MEPAutoCoordination\OLMP.RevitLib.MEPAC\bin\Debug\PathFinderLib.dll</HintPath>
+    </Reference>
     <Reference Include="RevitAPI">
       <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
       <Private>False</Private>
@@ -71,6 +74,7 @@
     <Compile Include="CmdFailureGatherer.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="MessagesHandler.cs" />
+    <Compile Include="PathFinerTest.cs" />
     <Compile Include="SymbolPlacer\AvailableMEPCurves.cs" />
     <Compile Include="SymbolPlacer\FamiliesSelectorTest.cs" />
     <Compile Include="SymbolPlacer\PlacementOption.cs" />
