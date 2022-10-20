@@ -4,7 +4,7 @@
 		<Name>DS.RevitLib.ExternalEventsApp</Name>
 		<Assembly>DS.RevitLib.ExternalEvents\DS.RevitLib.ExternalEvents.dll</Assembly>
 		<ClientId>d5383be2-9c39-4453-83b4-7097f245fae3</ClientId>
-		<FullClassName>DS.RevitLib.ExternalEvents.ExternalEventExampleApp</FullClassName>
+		<FullClassName>DS.RevitLib.ExternalEvents.ExternalApplication</FullClassName>
 		<VendorId>DS</VendorId>
 	</AddIn>
 </RevitAddIns>

@@ -31,22 +31,30 @@ namespace DS.RevitApp.Test
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            var pathFinder = new PathFinerTest(doc);
-            pathFinder.Run();
+            try
+            {
+                ThrowException();
+            }
+            catch (AggregateException ex)
+            {
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            //var pathFinder = new PathFinerTest(doc);
+            //pathFinder.Run();
             //var t = new TransformConvert(uidoc, doc);
             //t.Run();
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }
 
-
-        private void Application_FailuresProcessing(object sender, Autodesk.Revit.DB.Events.FailuresProcessingEventArgs e)
+        private void ThrowException()
         {
-            FailuresAccessor fa = e.GetFailuresAccessor();
-            var failList = fa.GetFailureMessages();
-            TaskDialog.Show("Fails: ", failList.Count.ToString());
-
-            var messagesHandler = new MessagesHandler(e);
+            throw new ArgumentException("New exception.");
         }
     }
 

@@ -17,9 +17,10 @@ namespace DS.RevitLib.ExternalEvents
         public virtual Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             _uiapp = commandData.Application;
+                throw new Exception("New exception.");
             try
             {
-                ShowForm();
+                //ShowForm();
                 //ExternalEventExampleApp.thisApp.ShowForm(uiapp);
                 return Result.Succeeded;
             }

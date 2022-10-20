@@ -73,7 +73,6 @@
   <ItemGroup>
     <Compile Include="CmdFailureGatherer.cs" />
     <Compile Include="ExternalCommand.cs" />
-    <Compile Include="MessagesHandler.cs" />
     <Compile Include="PathFinerTest.cs" />
     <Compile Include="SymbolPlacer\AvailableMEPCurves.cs" />
     <Compile Include="SymbolPlacer\FamiliesSelectorTest.cs" />

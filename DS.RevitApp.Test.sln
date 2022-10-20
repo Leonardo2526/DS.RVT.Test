@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitApp.OpenDocTest", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitApp.Test", "DS.RevitApp.Test\DS.RevitApp.Test.csproj", "{5E7D867B-3629-46ED-A7D8-61EDDE093260}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitLib.MessageHandler", "DS.RevitLib.MessagedHandler\DS.RevitLib.MessageHandler.csproj", "{0F974B51-F8B3-42B2-8309-E097B1C0F116}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,12 +51,16 @@ Global
 		{BCF72AE9-2C4E-4DC9-A6A9-DAD6A63D4B4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCF72AE9-2C4E-4DC9-A6A9-DAD6A63D4B4E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4ACA3974-17D1-4532-B37D-5D0EA0D3BD57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4ACA3974-17D1-4532-B37D-5D0EA0D3BD57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4ACA3974-17D1-4532-B37D-5D0EA0D3BD57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4ACA3974-17D1-4532-B37D-5D0EA0D3BD57}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5E7D867B-3629-46ED-A7D8-61EDDE093260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E7D867B-3629-46ED-A7D8-61EDDE093260}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E7D867B-3629-46ED-A7D8-61EDDE093260}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E7D867B-3629-46ED-A7D8-61EDDE093260}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F974B51-F8B3-42B2-8309-E097B1C0F116}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F974B51-F8B3-42B2-8309-E097B1C0F116}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F974B51-F8B3-42B2-8309-E097B1C0F116}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F974B51-F8B3-42B2-8309-E097B1C0F116}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
