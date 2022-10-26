@@ -74,6 +74,7 @@
     <Compile Include="CmdFailureGatherer.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="PathFinerTest.cs" />
+    <Compile Include="SolidOperationTest.cs" />
     <Compile Include="SymbolPlacer\AvailableMEPCurves.cs" />
     <Compile Include="SymbolPlacer\FamiliesSelectorTest.cs" />
     <Compile Include="SymbolPlacer\PlacementOption.cs" />

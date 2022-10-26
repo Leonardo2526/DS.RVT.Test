@@ -31,30 +31,10 @@ namespace DS.RevitApp.Test
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            try
-            {
-                ThrowException();
-            }
-            catch (AggregateException ex)
-            {
-
-            }
-            catch (Exception ex)
-            {
-
-            }
-
-            //var pathFinder = new PathFinerTest(doc);
-            //pathFinder.Run();
-            //var t = new TransformConvert(uidoc, doc);
-            //t.Run();
+            var test = new SolidOperationTest(doc, uidoc);
+            test.Run();
 
             return Autodesk.Revit.UI.Result.Succeeded;
-        }
-
-        private void ThrowException()
-        {
-            throw new ArgumentException("New exception.");
         }
     }
 
