@@ -35,28 +35,64 @@ namespace DS.RevitApp.Test
             var element = _doc.GetElement(reference);
 
             var solid = ElementUtils.GetSolid(element);
+
+            Face face1 = solid.Faces.get_Item(0);
+            EdgeArray edgeArray1 = face1.EdgeLoops.get_Item(0);
+
+
             _dir = ElementUtils.GetMainDirection(element);
 
             XYZ center = solid.ComputeCentroid();
             center.Show(_doc);
 
-            var clonedSolid = SolidUtils.Clone(solid);
-            Plane plane = Plane.CreateByNormalAndOrigin(_dir, center);
-            BooleanOperationsUtils.CutWithHalfSpaceModifyingOriginalSolid(clonedSolid, plane);
+            List<Curve> faceCurves = GetFaceCurves(solid);
+            List<Curve> offsetCurves = GetOffsetCurves(solid, faceCurves);
+
+            //_trb.Build(() => offsetCurves.ForEach(obj => obj.Show(_doc)),"show offset");
+            //_uiDoc.RefreshActiveView();
+
+            List<Line> lines = offsetCurves.OfType<Line>().ToList();
+            List<Curve> connectedCurves = lines.Any() ? 
+                new LinesConnector(lines).Connect().Cast<Curve>().ToList() : 
+                offsetCurves;
+            //_trb.Build(() => connectedCurves.ForEach(obj => obj.Show(_doc)), "show offset");
+            //_uiDoc.RefreshActiveView();
+
+            //var clonedSolid = SolidUtils.Clone(solid);
+            //Plane plane = Plane.CreateByNormalAndOrigin(_dir, center);
+            //BooleanOperationsUtils.CutWithHalfSpaceModifyingOriginalSolid(clonedSolid, plane);
 
             //XYZ clonedCenter = clonedSolid.ComputeCentroid();
             //clonedCenter.Show(_doc);
 
-            Solid exSolid = CreateExtrudedSolid(solid);
+            Solid exSolid = CreateExtrudedSolid(connectedCurves);
+            _trb.Build(() => exSolid.Show(_doc), "show solid");
 
-            _trb.Build(() => 
-            { 
-                exSolid.ShowBB(_doc); 
-            }, "Show BB");
+            //_trb.Build(() => 
+            //{
+            //    exSolid.ShowBB(_doc);
+            //}, "Show BB");
         }
 
-        private Solid CreateExtrudedSolid(Solid solid)
+        private List<Curve> GetFaceCurves(Solid solid)
         {
+            var faceCurves = new List<Curve>();
+
+            Face face1 = solid.Faces.get_Item(0);
+            EdgeArray edgeArray1 = face1.EdgeLoops.get_Item(0);
+            for (int i = 0; i < 4; i++)
+            {
+                Edge edge = edgeArray1.get_Item(i);
+                var curve = edge.AsCurve();
+                faceCurves.Add(curve);
+            }
+
+            return faceCurves;
+        }
+
+        private List<Curve> GetOffsetCurves(Solid solid, List<Curve> curves)
+        {
+            var offsectCurves = new List<Curve>();
             Face face1 = solid.Faces.get_Item(0);
             EdgeArray edgeArray1 = face1.EdgeLoops.get_Item(0);
 
@@ -69,28 +105,26 @@ namespace DS.RevitApp.Test
             XYZ edgeAttayCenter2 = XYZUtils.GetAverage(edgeArrayPoints2);
             XYZ dir = edgeAttayCenter1 - edgeAttayCenter2;
 
-            edgeAttayCenter1.Show(_doc);
-            edgeAttayCenter2.Show(_doc);
             double offset = 50.mmToFyt2();
-            var cloop = new CurveLoop();
-            for (int i = 0; i < 4; i++)
+
+            foreach (var curve in curves)
             {
-                Edge edge = edgeArray1.get_Item(i);
-                var curve = edge.AsCurve();
-                _trb.Build(() => curve.Show(_doc), "Show curve");
-
-                XYZ curveCenter = curve.GetCenter();
-                //curveCenter.Show(_doc);
-
-                XYZ refVector = (curveCenter - edgeAttayCenter1);
-
-                var p = _dir.DotProduct(refVector);
-                var cross = _dir.CrossProduct(refVector);
                 var offsetCurve = curve.CreateOffset(offset, dir);
-                _trb.Build(() => offsetCurve.Show(_doc), "Show offsetCurve");
-
-                cloop.Append(offsetCurve);
+                offsectCurves.Add(offsetCurve);
             }
+           
+            return offsectCurves;
+        }
+
+        private Solid CreateExtrudedSolid(List<Curve> curves)
+        {           
+            var cloop = new CurveLoop();
+
+            foreach (var curve in curves)
+            {
+                cloop.Append(curve);
+            }
+
 
             IList<CurveLoop> loop = new List<CurveLoop>() { cloop };
 
