@@ -35,26 +35,18 @@ namespace DS.RevitApp.Test
             var element = _doc.GetElement(reference);
 
             var solid = ElementUtils.GetSolid(element);
-
-            Face face1 = solid.Faces.get_Item(0);
-            EdgeArray edgeArray1 = face1.EdgeLoops.get_Item(0);
-
-
             _dir = ElementUtils.GetMainDirection(element);
-
             XYZ center = solid.ComputeCentroid();
             center.Show(_doc);
 
             List<Curve> faceCurves = GetFaceCurves(solid);
             List<Curve> offsetCurves = GetOffsetCurves(solid, faceCurves);
 
-            //_trb.Build(() => offsetCurves.ForEach(obj => obj.Show(_doc)),"show offset");
-            //_uiDoc.RefreshActiveView();
-
             List<Line> lines = offsetCurves.OfType<Line>().ToList();
             List<Curve> connectedCurves = lines.Any() ? 
                 new LinesConnector(lines).Connect().Cast<Curve>().ToList() : 
                 offsetCurves;
+
             //_trb.Build(() => connectedCurves.ForEach(obj => obj.Show(_doc)), "show offset");
             //_uiDoc.RefreshActiveView();
 
@@ -62,16 +54,8 @@ namespace DS.RevitApp.Test
             //Plane plane = Plane.CreateByNormalAndOrigin(_dir, center);
             //BooleanOperationsUtils.CutWithHalfSpaceModifyingOriginalSolid(clonedSolid, plane);
 
-            //XYZ clonedCenter = clonedSolid.ComputeCentroid();
-            //clonedCenter.Show(_doc);
-
             Solid exSolid = CreateExtrudedSolid(connectedCurves);
-            _trb.Build(() => exSolid.Show(_doc), "show solid");
-
-            //_trb.Build(() => 
-            //{
-            //    exSolid.ShowBB(_doc);
-            //}, "Show BB");
+            _trb.Build(() => exSolid.ShowEdges(_doc), "show solid");
         }
 
         private List<Curve> GetFaceCurves(Solid solid)
