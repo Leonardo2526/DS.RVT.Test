@@ -34,6 +34,9 @@ namespace DS.RevitApp.Test
             var test = new SolidOperationTest(doc, uidoc);
             test.Run();
 
+            //var test = new DirectShapeTest(doc, uidoc);
+            //test.CreateSphereDirectShape();
+
             return Autodesk.Revit.UI.Result.Succeeded;
         }
     }

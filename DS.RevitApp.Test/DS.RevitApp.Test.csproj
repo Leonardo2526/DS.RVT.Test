@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CmdFailureGatherer.cs" />
+    <Compile Include="DirectShapeTest.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="PathFinerTest.cs" />
     <Compile Include="SolidOperationTest.cs" />
