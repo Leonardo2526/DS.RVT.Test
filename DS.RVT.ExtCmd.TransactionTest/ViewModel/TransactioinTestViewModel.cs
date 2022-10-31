@@ -1,16 +1,14 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using DS.RevitLib.Utils;
-using DS.RevitLib.Utils.MEP.Creator;
-using DS.RevitLib.Utils.ModelCurveUtils;
+using DS.RevitApp.TransactionTest.Model;
+using DS.RevitApp.TransactionTest.View;
 using Revit.Async;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -20,61 +18,71 @@ namespace DS.RevitApp.TransactionTest.ViewModel
     {
         private readonly Document _doc;
         private readonly UIDocument _uiDoc;
+        private readonly TransactionModel _model;
+        private readonly TransactionWindow _transactionWindow;
 
-        public TransactioinTestViewModel(Document doc, UIDocument uiDoc)
+        public TransactioinTestViewModel(Document doc, UIDocument uiDoc, TransactionWindow transactionWindow)
         {
             _doc = doc;
             _uiDoc = uiDoc;
+            _model = new TransactionModel(_doc, _uiDoc);
+            _transactionWindow = transactionWindow;
         }
 
-        public TransactionGroup Trg { get; set; }
-
-        public ICommand Commit => new RelayCommand(c =>
+        public ICommand Commit => new RelayCommand(async c =>
         {
-            var path = new List<XYZ>
+            using (TransactionGroup trg = new TransactionGroup(_doc))
             {
-                new XYZ(0,0,0),
-                new XYZ(5,0,0),
-                new XYZ(5,5,0),
-                new XYZ(10,5,0),
-                new XYZ(10,0,0)
-            };
+                trg.Start();
 
-            RevitTask.RunAsync(() =>
-            {
-                using (Trg = new TransactionGroup(_doc))
+                Task task = Task.Run(() =>
                 {
-                    Trg.Start();
+                    while (true)
+                    {
+                        _model.Create(trg);
+                        _uiDoc.RefreshActiveView();
 
-                    var trb = new TransactionBuilder<Element>(_doc);
-                    trb.Build(() => ShowLines(path), "show lines");
-                    trb.Build(() => Showcurves(path), "show curves");
+                        ClickAsync(_transactionWindow.RollBack).Wait();
+                        //MessageBox.Show($"I was clicked at {DateTime.Now:HH:mm:ss.fffff}!\r\n");
+                        break;
+                    }
+                });
 
-                    _uiDoc.RefreshActiveView();
+                await task;
 
-                    Trg.Commit();
+                if (trg.HasStarted())
+                {
+                    trg.RollBack();
                 }
-            });
+            }
 
+            //MessageBox.Show("Task completed!");
         });
 
-        private void ShowLines(List<XYZ> path)
+
+        private Task ClickAsync(Button button1)
         {
-            var mcreator = new ModelCurveCreator(_doc);
-            for (int i = 0; i < path.Count - 1; i++)
-            {
-                mcreator.Create(path[i], path[i + 1]);
-            }
+            var tcs = new TaskCompletionSource<object>();
+            void handler(object s, EventArgs e) => tcs.TrySetResult(null);
+            button1.Click += handler;
+            return tcs.Task.ContinueWith(_ => button1.Click -= handler);
         }
 
-        private void Showcurves(List<XYZ> path)
+        private Task EventAsync(object obj, string eventName)
         {
-            Reference reference = _uiDoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element, "Select element");
-            var mEPCurve = _doc.GetElement(reference) as MEPCurve;
-
-            var builder = new BuilderByPoints(mEPCurve, path).BuildMEPCurves().WithElbows();
+            var eventInfo = obj.GetType().GetEvent(eventName);
+            var tcs = new TaskCompletionSource<object>();
+            EventHandler handler = delegate (object s, EventArgs e) { tcs.TrySetResult(null); };
+            eventInfo.AddEventHandler(obj, handler);
+            return tcs.Task.ContinueWith(_ => eventInfo.RemoveEventHandler(obj, handler));
         }
 
+        public ICommand RollBack => new RelayCommand(c =>
+        {
+            //roll = true;
+            //_exEvent.Raise();
+            //Trg.RollBack();
+        });
 
 
         public event PropertyChangedEventHandler PropertyChanged;

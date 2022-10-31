@@ -2,7 +2,6 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using DS.RevitApp.TransactionTest.View;
-using System;
 
 namespace DS.RevitApp.TransactionTest
 {
@@ -18,7 +17,7 @@ namespace DS.RevitApp.TransactionTest
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            var startWindow = new TransactionWindow(doc, uidoc);
+            var startWindow = new TransactionWindow(doc, uidoc, uiapp);
             startWindow.Show();
 
             return Autodesk.Revit.UI.Result.Succeeded;

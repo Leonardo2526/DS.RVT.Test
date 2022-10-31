@@ -4,10 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DS.RevitApp.TransactionTest.View" 
-        xmlns:viewmodel="clr-namespace:DS.RevitApp.TransactionTest.ViewModel" 
-        SizeToContent="WidthAndHeight" 
+             xmlns:viewmodel="clr-namespace:DS.RevitApp.TransactionTest.ViewModel" 
+            SizeToContent="WidthAndHeight" 
             ResizeMode="NoResize"
-            WindowStartupLocation="CenterScreen">
+            WindowStartupLocation="CenterScreen"  Topmost="True" >
     
     <Window.Resources>
         <ResourceDictionary>
@@ -26,9 +26,9 @@
                     Commit
                 </TextBlock>
             </Button>
-            <Button x:Name="RollBack" Margin="10" 
+            <Button x:Name="RollBack" Margin="10"  Command="{Binding RollBack}"
                     Style="{StaticResource DS_Button}" 
-                    HorizontalAlignment="Left">
+                    HorizontalAlignment="Left" Click="RollBack_Click">
                 <TextBlock TextWrapping="Wrap" TextAlignment="Center">
                     RollBack
                 </TextBlock>
