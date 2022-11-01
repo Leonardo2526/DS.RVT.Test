@@ -10,7 +10,6 @@ namespace DS.RevitApp.TransactionTest.Model
 {
     internal class TransactionModel
     {
-
         private readonly Document _doc;
         private readonly UIDocument _uiDoc;
 
@@ -20,9 +19,23 @@ namespace DS.RevitApp.TransactionTest.Model
             _uiDoc = uiDoc;
         }
 
-        //public TransactionGroup Trg { get; set; }
+        public void Create()
+        {
+            var path = new List<XYZ>
+            {
+                new XYZ(0,0,0),
+                new XYZ(5,0,0),
+                new XYZ(5,5,0),
+                new XYZ(10,5,0),
+                new XYZ(10,0,0)
+            };
 
-        public void Create(TransactionGroup Trg)
+            var trb = new TransactionBuilder<Element>(_doc);
+            trb.Build(() => ShowLines(path), "show lines");
+            //trb.Build(() => ShowcCrves(path), "show curves");
+        }
+
+        public void CreateRevitTask()
         {
             var path = new List<XYZ>
             {
@@ -37,33 +50,8 @@ namespace DS.RevitApp.TransactionTest.Model
             {
                 var trb = new TransactionBuilder<Element>(_doc);
                 trb.Build(() => ShowLines(path), "show lines");
-                trb.Build(() => ShowcCrves(path), "show curves");
+                //trb.Build(() => ShowcCrves(path), "show curves");
             });
-        }
-        public void Create1(TransactionGroup Trg)
-        {
-            var path = new List<XYZ>
-            {
-                new XYZ(0,0,0),
-                new XYZ(5,0,0),
-                new XYZ(5,5,0),
-                new XYZ(10,5,0),
-                new XYZ(10,0,0)
-            };
-
-            var trb = new TransactionBuilder<Element>(_doc);
-            trb.Build(() => ShowLines(path), "show lines");
-
-            //using (Trg)
-            //{
-            //    Trg.Start();
-
-            //    var trb = new TransactionBuilder<Element>(_doc);
-            //    trb.Build(() => ShowLines(path), "show lines");
-            //    //trb.Build(() => Showcurves(path), "show curves");
-
-            //    //Trg.Commit();
-            //}
         }
 
         private void ShowLines(List<XYZ> path)
