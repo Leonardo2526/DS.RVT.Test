@@ -1,13 +1,14 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using DS.RevitApp.TransactionTest.View;
 
 namespace DS.RevitApp.TransactionTest
 {
     [Transaction(TransactionMode.Manual)]
     public class ExternalCommand : IExternalCommand
     {
-        public Result Execute(ExternalCommandData commandData,
+        public Autodesk.Revit.UI.Result Execute(ExternalCommandData commandData,
            ref string message, ElementSet elements)
         {
             UIApplication uiapp = commandData.Application;
@@ -16,12 +17,10 @@ namespace DS.RevitApp.TransactionTest
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            var window = new TransactionWindow();
-            window.Show();
+            var startWindow = new TransactionWindow(doc, uidoc, uiapp);
+            startWindow.Show();
 
-            //new TransactionTest(doc, uidoc).Run();
-
-            return Result.Succeeded;
+            return Autodesk.Revit.UI.Result.Succeeded;
         }
     }
 }

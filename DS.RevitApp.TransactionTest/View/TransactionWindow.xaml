@@ -3,21 +3,36 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:DS.RevitApp.TransactionTest"
-             mc:Ignorable="d" 
-        Width="300" Height="200">
+             xmlns:local="clr-namespace:DS.RevitApp.TransactionTest.View" 
+             xmlns:viewmodel="clr-namespace:DS.RevitApp.TransactionTest.ViewModel" 
+            SizeToContent="WidthAndHeight" 
+            ResizeMode="NoResize"
+            WindowStartupLocation="CenterScreen"  Topmost="True" >
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0">
-            <Button x:Name="Commit" Width="80" Margin="10, 10, 10, 10" HorizontalAlignment="Left">
-                Commit
+        <StackPanel Margin="10" Width="200">
+            <Button x:Name="Commit" Margin="10" Command="{Binding Commit}" 
+                    Style="{StaticResource DS_Button}" 
+                    HorizontalAlignment="Left">
+                <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                    Commit
+                </TextBlock>
             </Button>
-            <Button x:Name="RollBack" Width="80" Margin="10, 10, 10, 10" HorizontalAlignment="Left">
-                RollBack
+            <Button x:Name="RollBack" Margin="10"  Command="{Binding RollBack}"
+                    Style="{StaticResource DS_Button}" 
+                    HorizontalAlignment="Left" Click="RollBack_Click">
+                <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                    RollBack
+                </TextBlock>
             </Button>
-        </StackPanel>    
-        
+        </StackPanel>
     </Grid>
 </Window>

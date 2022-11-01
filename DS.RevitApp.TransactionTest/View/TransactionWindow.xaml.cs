@@ -1,28 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Events;
+using DS.RevitApp.TransactionTest.Model;
+using DS.RevitApp.TransactionTest.ViewModel;
+using System;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace DS.RevitApp.TransactionTest
+namespace DS.RevitApp.TransactionTest.View
 {
     /// <summary>
     /// Interaction logic for TransactionWindow.xaml
     /// </summary>
     public partial class TransactionWindow : Window
     {
-        public TransactionWindow()
+        private readonly Document _doc;
+        private readonly UIDocument _uiDoc;
+        private readonly UIApplication _uiapp;
+        private readonly TransactionGroup _trg;
+
+        public TransactionWindow(Document doc, UIDocument uiDoc, UIApplication uiapp)
         {
-            //InitializeComponent();
+            _doc = doc;
+            _uiDoc = uiDoc;
+            _uiapp = uiapp;
+
+            InitializeComponent();
+            DataContext = new TransactioinTestViewModel(doc, uiDoc, this);
+        }
+
+        private void OnIdling(object sender, IdlingEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void RollBack_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

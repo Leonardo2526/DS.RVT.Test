@@ -7,7 +7,7 @@
 		<Description>Test of transacions.</Description>
 		<VisibilityMode>AlwaysVisible</VisibilityMode>
 		<Assembly>.\DS.RevitApp.TransactionTest\DS.RevitApp.TransactionTest.dll</Assembly>
-		<AddInId>30c9f809-571c-4340-a465-2e55998dd98f</AddInId>
+		<AddInId>134a9289-d720-45ef-84ba-f12c5889f5a9</AddInId>
 		<VendorId>DS</VendorId>
-	</AddIn> 
+	</AddIn>
 </RevitAddIns>
