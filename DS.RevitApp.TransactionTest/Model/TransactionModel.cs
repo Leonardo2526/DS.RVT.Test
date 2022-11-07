@@ -5,6 +5,7 @@ using DS.RevitLib.Utils.MEP.Creator;
 using DS.RevitLib.Utils.ModelCurveUtils;
 using Revit.Async;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace DS.RevitApp.TransactionTest.Model
 {
@@ -30,8 +31,11 @@ namespace DS.RevitApp.TransactionTest.Model
                 new XYZ(10 + offset,0,0)
             };
 
+            Debug.Print($"Transaction started");
             var trb = new TransactionBuilder<Element>(_doc);
             trb.Build(() => ShowLines(path), trName);
+            Debug.Print($"Transaction executed");
+
             //trb.Build(() => ShowcCrves(path), "show curves");
         }
 

@@ -24,7 +24,7 @@ namespace DS.RevitApp.TransactionTest
             _uiDoc = uiDoc;
         }
 
-        public void CreateTransaction()
+        public void CreateTransaction_DeadLock()
         {
             var trModel = new TransactionModel(_doc, _uiDoc);
 
@@ -34,9 +34,54 @@ namespace DS.RevitApp.TransactionTest
 
             _uiDoc.RefreshActiveView();
             Debug.Print("Transaction executed.");
+
             Debug.Print("Start sleeping.");
             Thread.Sleep(3000);
             Debug.Print("End of sleeping.");
+
+            Debug.Print("End of method.");
+
+        }
+
+        public void CreateTransaction()
+        {
+            var trModel = new TransactionModel(_doc, _uiDoc);
+
+
+            Task task = Task.Run(() => RevitTask.RunAsync(() =>
+            {
+                Debug.Print("Start transaction.");
+                Task.Delay(3000).Wait();
+                trModel.Create(0, "line1");
+            }
+            ));
+            task.ContinueWith(t =>
+            {
+                _uiDoc.RefreshActiveView();
+                Debug.Print("Transaction executed.");
+
+                Debug.Print("Start sleeping.");
+                Thread.Sleep(3000);
+                Debug.Print("End of sleeping.");
+
+                Debug.Print("End of method.");
+
+            });
+        }
+
+        public async Task CreateTransactionAsync()
+        {
+            var trModel = new TransactionModel(_doc, _uiDoc);
+
+            Debug.Print("Start transaction.");
+            await RevitTask.RunAsync(() => trModel.Create(0, "line1"));
+            _uiDoc.RefreshActiveView();
+            Debug.Print("Transaction executed.");
+
+            Debug.Print("Start sleeping.");
+            Thread.Sleep(3000);
+            Debug.Print("End of sleeping.");
+
             Debug.Print("End of method.");
         }
     }

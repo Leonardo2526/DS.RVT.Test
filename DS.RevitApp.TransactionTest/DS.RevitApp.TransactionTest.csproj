@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExternalCommand.cs" />
+    <Compile Include="Model\TrgEventBuilder_1.cs" />
     <Compile Include="Model\ExternalEventMy.cs" />
     <Compile Include="Model\TransactionModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
