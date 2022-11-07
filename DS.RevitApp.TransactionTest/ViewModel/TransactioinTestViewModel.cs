@@ -1,17 +1,23 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using DS.ClassLib.VarUtils;
+using DS.ClassLib.VarUtils.TaskEvents;
 using DS.RevitApp.TransactionTest.Model;
 using DS.RevitApp.TransactionTest.View;
+using Revit.Async;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace DS.RevitApp.TransactionTest.ViewModel
 {
-    internal class TransactioinTestViewModel : INotifyPropertyChanged
+    public class TransactioinTestViewModel : INotifyPropertyChanged, IEventHandler
     {
         private readonly Document _doc;
         private readonly UIDocument _uiDoc;
@@ -28,17 +34,31 @@ namespace DS.RevitApp.TransactionTest.ViewModel
 
         public ICommand Commit => new RelayCommand(async c =>
         {
-            var taskEvent = new WindowTaskEvent(_transactionWindow, new List<Button> { _transactionWindow.RollBack });
-            await new TrgEventBuilder(_doc, taskEvent).
-            BuildAsync(() => _model.Create(), true);
+            new RevitAsyncTest(_doc, _uiDoc).CreateTransaction();
+
+            //var taskEvent = new WindowTaskEvent(_transactionWindow, new List<Button> { _transactionWindow.RollBack });
+            //await new TrgEventBuilder(_doc, taskEvent).
+
+            //IWindowTaskEvent taskEvent = new HandlerTaskEvent(this);
+            //await new TrgEventBuilder(_doc, taskEvent, 0).
+            //BuildAsync(() => _model.Create(), true);
 
         });
 
+        public event EventHandler RollBackHandler;
         public ICommand RollBack => new RelayCommand(c =>
         {
-            //roll = true;
-            //_exEvent.Raise();
-            //Trg.RollBack();
+            EventArgs eventArgs = null;
+            RollBackHandler?.Invoke(this, eventArgs);
+        });
+
+
+        public event EventHandler CloseWindowHandler;
+        public ICommand CloseWindow => new RelayCommand(c =>
+        {
+            EventArgs eventArgs = null;
+            CloseWindowHandler?.Invoke(this, eventArgs);
+            //TaskDialog.Show("revit", "CloseWindows");
         });
 
 

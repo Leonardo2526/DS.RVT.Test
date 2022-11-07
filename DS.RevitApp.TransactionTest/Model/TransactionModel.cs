@@ -19,19 +19,19 @@ namespace DS.RevitApp.TransactionTest.Model
             _uiDoc = uiDoc;
         }
 
-        public void Create()
+        public void Create(int offset = 0, string trName = "showLines")
         {
             var path = new List<XYZ>
             {
-                new XYZ(0,0,0),
-                new XYZ(5,0,0),
-                new XYZ(5,5,0),
-                new XYZ(10,5,0),
-                new XYZ(10,0,0)
+                new XYZ(0 + offset,0,0),
+                new XYZ(5 + offset,0,0),
+                new XYZ(5 + offset,5,0),
+                new XYZ(10 + offset,5,0),
+                new XYZ(10 + offset,0,0)
             };
 
             var trb = new TransactionBuilder<Element>(_doc);
-            trb.Build(() => ShowLines(path), "show lines");
+            trb.Build(() => ShowLines(path), trName);
             //trb.Build(() => ShowcCrves(path), "show curves");
         }
 
