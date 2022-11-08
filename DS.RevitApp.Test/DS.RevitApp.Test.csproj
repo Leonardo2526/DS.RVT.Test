@@ -50,7 +50,7 @@
       <HintPath>..\packages\Nito.Collections.Deque.1.1.1\lib\net461\Nito.Collections.Deque.dll</HintPath>
     </Reference>
     <Reference Include="PathFinderLib">
-      <HintPath>..\..\Olimproekt\MEPAutoCoordination\OLMP.RevitLib.MEPAC\bin\Debug\PathFinderLib.dll</HintPath>
+      <HintPath>bin\Debug\PathFinderLib.dll</HintPath>
     </Reference>
     <Reference Include="RevitAPI">
       <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>

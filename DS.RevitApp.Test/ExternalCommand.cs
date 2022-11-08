@@ -1,21 +1,6 @@
 ﻿using Autodesk.Revit.Attributes;
-using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DS.RevitLib.Utils.MEP.SystemTree;
-using System.Xml.Linq;
-using DS.RevitLib.Utils.MEP;
-using DS.RevitApp.Test.TransactionTests;
-using Autodesk.Revit.UI.Selection;
-using DS.RevitLib.Utils;
-using DS.RevitLib.Utils.MEP.Creator;
-using DS.RevitLib.Utils.ModelCurveUtils;
-using DS.RevitLib.Utils.Collisions.Models;
 
 namespace DS.RevitApp.Test
 {
@@ -31,7 +16,7 @@ namespace DS.RevitApp.Test
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            var test = new SolidOperationTest(doc, uidoc);
+            var test = new PathFinerTest(doc, uidoc);
             test.Run();
 
             //var test = new DirectShapeTest(doc, uidoc);
