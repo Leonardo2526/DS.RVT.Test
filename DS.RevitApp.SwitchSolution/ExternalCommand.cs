@@ -8,10 +8,16 @@ namespace DS.RevitApp.SwitchSolution
     [Transaction(TransactionMode.Manual)]
     public class ExternalCommand : IExternalCommand
     {
-        public Autodesk.Revit.UI.Result Execute(ExternalCommandData revit,
+        public Autodesk.Revit.UI.Result Execute(ExternalCommandData commandData,
            ref string message, ElementSet elements)
         {
-            StartWindow startWindow = new StartWindow();
+            UIApplication uiapp = commandData.Application;
+            Autodesk.Revit.ApplicationServices.Application application = uiapp.Application;
+
+            UIDocument uidoc = uiapp.ActiveUIDocument;
+            Document doc = uiapp.ActiveUIDocument.Document;
+
+            StartWindow startWindow = new StartWindow(doc, uidoc, uiapp);
             startWindow.Show();
 
             return Autodesk.Revit.UI.Result.Succeeded;
