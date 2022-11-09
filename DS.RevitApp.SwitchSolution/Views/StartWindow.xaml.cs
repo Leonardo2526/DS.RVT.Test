@@ -22,7 +22,7 @@ namespace DS.RevitApp.SwitchSolution
             _uiapp = uiapp;
 
             InitializeComponent();
-            DataContext = new StartWindowViewModel(doc, uiDoc, this);
+            DataContext = new StartWindowViewModel(doc, uiDoc);
         }
     }
 }

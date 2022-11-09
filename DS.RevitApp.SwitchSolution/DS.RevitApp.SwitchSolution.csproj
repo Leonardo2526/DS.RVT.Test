@@ -70,12 +70,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExternalCommand.cs" />
-    <Compile Include="Models\HandlerTaskEvent_1.cs" />
-    <Compile Include="Models\IEventHandler_1.cs" />
-    <Compile Include="Models\IWindowTaskEvent_1.cs" />
     <Compile Include="Models\Points.cs" />
     <Compile Include="Models\TransactionModel.cs" />
-    <Compile Include="Models\TrgEventBuilder_1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\StartWindowViewModel.cs" />
     <Compile Include="Views\StartWindow.xaml.cs">
