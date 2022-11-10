@@ -4,9 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DS.RevitApp.SwitchSolution"
-            xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             Title="StartWindow" SizeToContent="WidthAndHeight" ResizeMode="NoResize"
-            WindowStartupLocation="CenterScreen">
+            xmlns:i="http://schemas.microsoft.com/xaml/behaviors" 
+        xmlns:viewmodel="clr-namespace:DS.RevitApp.SwitchSolution.ViewModel" 
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=viewmodel:StartWindowViewModel}"
+        Title="StartWindow" SizeToContent="WidthAndHeight" ResizeMode="NoResize"
+            WindowStartupLocation="CenterScreen" Topmost="True">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
             <i:InvokeCommandAction x:Name="CloseCommand" 
@@ -21,8 +24,20 @@
         </ResourceDictionary>
     </Window.Resources>
     
-    <Grid>       
-        <StackPanel Margin="10" Width="Auto" Orientation="Horizontal" >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0">
+            <TextBlock.Text>
+                <MultiBinding StringFormat="Решение {0} из {1}">
+                    <Binding Path="CurrentSolutionInd" />
+                <Binding Path="SolutionsCount" />
+                </MultiBinding>
+            </TextBlock.Text>
+        </TextBlock>
+        <StackPanel Grid.Row="1" Margin="10" Width="Auto" Orientation="Horizontal" >
             <Button x:Name="Start" Command="{Binding Start}" 
                     Style="{StaticResource DS_Button}" 
                     Background="Green"
