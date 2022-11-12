@@ -51,39 +51,57 @@ namespace DS.RevitApp.TransactionTest.ViewModel
             Debug.Print("Command executed");
         });
 
-        public ICommand Commit => new RelayCommand(c =>
+        public ICommand Commit => new RelayCommand(async c =>
         {
+            Debug.Print($"Command started in thread {Thread.CurrentThread.ManagedThreadId}");
+
             Reference reference = _uiDoc.Selection.PickObject(ObjectType.Element, "Select MEPCurve");
             MEPCurve mEPCurve = _doc.GetElement(reference) as MEPCurve;
-            RevitTask.RunAsync(() => RunDeleteTransaction(mEPCurve));
+
+            var obj = new Class1(mEPCurve);
+            await RunDeleteTransactionAsync(mEPCurve, obj);
+
             Debug.Print("Command executed");
         });
 
-        private void RunDeleteTransaction(MEPCurve mEPCurve)
+        private async Task RunDeleteTransactionAsync(MEPCurve mEPCurve, Class1 class1)
         {
-
-            using (var trg = new TransactionGroup(_doc, $"delete elem"))
+            Task task = Task.Run(() =>
             {
-                trg.Start();
+               RunDeleteTransaction(mEPCurve, class1);
+            });
+            await task;
+        }
 
-                using (var tr = new Transaction(_doc, "del"))
+        private void RunDeleteTransaction(MEPCurve mEPCurve, Class1 class1)
+        {
+            RevitTask.RunAsync(() =>
+            {
+                using (var trg = new TransactionGroup(_doc, $"delete elem"))
                 {
-                    tr.Start();
-                    _doc.Delete(mEPCurve.Id);
-                    tr.Commit();
-                    _uiDoc.RefreshActiveView();
+                    trg.Start();
+                    Debug.Print($"TransactionGroup '{trg.GetName()}' started in thread {Thread.CurrentThread.ManagedThreadId}");
+
+                    using (var tr = new Transaction(_doc, "del"))
+                    {
+                        tr.Start();
+                        _doc.Delete(mEPCurve.Id);
+                        tr.Commit();
+                        _uiDoc.RefreshActiveView();
+                    }
+
+                    Debug.Print($"{mEPCurve.IsValidObject}, {class1.MEPCurve.IsValidObject}");
+
+                    if (trg.HasStarted())
+                    {
+                        trg.RollBack();
+                        Debug.Print($"TransactionGroup '{trg.GetName()}' rolled in thread {Thread.CurrentThread.ManagedThreadId}");
+                    }
+                    Debug.Print($"{mEPCurve.IsValidObject}, {class1.MEPCurve.IsValidObject}");
                 }
 
-                Debug.Print($"{mEPCurve.IsValidObject}");
-
-                if (trg.HasStarted())
-                {
-                    trg.RollBack();
-                }
-                Debug.Print($"{mEPCurve.IsValidObject}");
-            }
-
-            Debug.Print($"{mEPCurve.IsValidObject}");
+                Debug.Print($"{mEPCurve.IsValidObject}, {class1.MEPCurve.IsValidObject}");
+            });
         }
 
 
