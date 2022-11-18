@@ -35,22 +35,6 @@ namespace DS.RevitApp.TransactionTest.ViewModel
             _transactionWindow = transactionWindow;
         }
 
-        public ICommand CommitOld => new RelayCommand(async c =>
-        {
-
-            Debug.Print("\nCommand started");
-            Task task1 = Task.Run(async () =>
-            {
-                var taskEvent = new TaskComplition(this);
-                await new TrgEventBuilder(_doc).
-                      BuildAsync(() => _model.Create(), taskEvent, false);
-
-            });
-            await task1;
-
-            Debug.Print("Command executed");
-        });
-
         public ICommand Commit => new RelayCommand(async c =>
         {
             Debug.Print($"Command started in thread {Thread.CurrentThread.ManagedThreadId}");
