@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>	
+  <AddIn Type="Application">
+    <Name>DS.RevitApp.PostCommandTest</Name>
+    <Assembly>DS.RevitApp.PostCommandTest\DS.RevitApp.PostCommandTest.dll</Assembly>
+    <ClientId>93bd19e0-45cd-4177-8f00-3e628c1d8dd1</ClientId>
+    <FullClassName>DS.RevitApp.PostCommandTest.ExternalApplication</FullClassName>
+    <VendorId>DS</VendorId>
+  </AddIn>
+</RevitAddIns>
