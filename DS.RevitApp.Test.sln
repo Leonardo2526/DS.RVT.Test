@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitApp.SwitchSolution"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitApp.PostCommandTest", "DS.RevitApp.PostCommandTest\DS.RevitApp.PostCommandTest.csproj", "{BBAD4616-E191-48F9-9568-172261758C43}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitCommand.PostCommandTest", "DS.RevitCommand.PostCommandTest\DS.RevitCommand.PostCommandTest.csproj", "{6728409D-A460-4E06-A4F8-C0A9C0AA70A0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,7 +66,6 @@ Global
 		{4ACA3974-17D1-4532-B37D-5D0EA0D3BD57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4ACA3974-17D1-4532-B37D-5D0EA0D3BD57}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5E7D867B-3629-46ED-A7D8-61EDDE093260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5E7D867B-3629-46ED-A7D8-61EDDE093260}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E7D867B-3629-46ED-A7D8-61EDDE093260}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E7D867B-3629-46ED-A7D8-61EDDE093260}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0F974B51-F8B3-42B2-8309-E097B1C0F116}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -74,6 +75,7 @@ Global
 		{9873F185-F630-4BB2-94A4-D9665F32B802}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9873F185-F630-4BB2-94A4-D9665F32B802}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D6EDCB4C-E55E-4C43-816D-EE12684C9E6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6EDCB4C-E55E-4C43-816D-EE12684C9E6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6EDCB4C-E55E-4C43-816D-EE12684C9E6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6EDCB4C-E55E-4C43-816D-EE12684C9E6C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{97D2548B-BA7F-4C31-8F52-6BF929E0C37B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -83,9 +85,11 @@ Global
 		{03819F0D-7075-4054-AA69-F656152EF90B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03819F0D-7075-4054-AA69-F656152EF90B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BBAD4616-E191-48F9-9568-172261758C43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BBAD4616-E191-48F9-9568-172261758C43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBAD4616-E191-48F9-9568-172261758C43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BBAD4616-E191-48F9-9568-172261758C43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6728409D-A460-4E06-A4F8-C0A9C0AA70A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6728409D-A460-4E06-A4F8-C0A9C0AA70A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6728409D-A460-4E06-A4F8-C0A9C0AA70A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
