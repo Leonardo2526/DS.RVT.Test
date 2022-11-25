@@ -71,7 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
-    <Compile Include="ElementaryTransaction.cs" />
+    <Compile Include="Model\ElementaryTransaction.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="Model\ExternalEventMy.cs" />
     <Compile Include="Model\TransactionModel.cs" />

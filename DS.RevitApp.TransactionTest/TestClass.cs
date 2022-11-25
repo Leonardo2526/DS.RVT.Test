@@ -1,5 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using DS.RevitApp.TransactionTest.Model;
+using DS.RevitLib.Utils;
 using Revit.Async;
 using System;
 using System.Collections.Generic;
@@ -8,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace DS.RevitApp.TransactionTest
 {
@@ -66,22 +69,7 @@ namespace DS.RevitApp.TransactionTest
         /// </summary>
         public void RunWithDelay(CancellationToken token)
         {
-            //inititate delay
-            Debug.WriteLine("Delay started.");
-            try
-            {
-                Task.Delay(5000, token).Wait();
-            }
-            catch (Exception)
-            {
-                if (token.IsCancellationRequested)  // проверяем наличие сигнала отмены задачи
-                {
-                    Debug.WriteLine($"Delay was stopped.");
-                    return;     //  выходим из метода и тем самым завершаем задачу
-                }
-            }
-            Debug.WriteLine("Delay completed.");
-
+            if (!RunDelay(token)) { return; }
             RunWithCancelation(token);
         }
 
@@ -89,6 +77,29 @@ namespace DS.RevitApp.TransactionTest
         /// Async test with delay
         /// </summary>
         public async Task RunWithDelayAsync(CancellationToken token)
+        {
+           if(!RunDelay(token)) { return; }
+            await RunTransactionAsync();
+        }
+
+        /// <summary> 
+        /// Async test with delay and new transactionBuilder.
+        /// </summary>
+        public async Task TestNewBuilderAsync(CancellationToken token)
+        {
+            if (!RunDelay(token)) { return; }
+            await new NewTransactionBuilder(_doc).
+                BuildRevitTask(_doc.Regenerate, "Regenerate document");
+            //Action action = () =>
+            //{
+            //    var trModel = new TransactionModel(_doc, _uiDoc);
+            //    trModel.RegenerateDocumentWithDelay(token);
+            //};
+            //await new NewTransactionBuilder(_doc).
+            //   BuildRevitTask(action, "Regenerate document with delay");
+        }
+
+        private bool RunDelay(CancellationToken token)
         {
             //inititate delay
             Debug.WriteLine("Delay started.");
@@ -101,12 +112,11 @@ namespace DS.RevitApp.TransactionTest
                 if (token.IsCancellationRequested)  // проверяем наличие сигнала отмены задачи
                 {
                     Debug.WriteLine($"Delay was stopped.");
-                    return;     //  выходим из метода и тем самым завершаем задачу
+                    return false;     //  выходим из метода и тем самым завершаем задачу
                 }
             }
             Debug.WriteLine("Delay completed.");
-
-            await RunTransactionAsync();
+            return true;
         }
 
         public async Task RunMisc(CancellationToken token)

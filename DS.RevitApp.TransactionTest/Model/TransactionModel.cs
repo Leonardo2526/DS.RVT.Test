@@ -4,8 +4,11 @@ using DS.RevitLib.Utils;
 using DS.RevitLib.Utils.MEP.Creator;
 using DS.RevitLib.Utils.ModelCurveUtils;
 using Revit.Async;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace DS.RevitApp.TransactionTest.Model
 {
@@ -75,5 +78,42 @@ namespace DS.RevitApp.TransactionTest.Model
             var builder = new BuilderByPoints(mEPCurve, path).BuildMEPCurves().WithElbows();
         }
 
+        /// <summary>
+        /// Regenerate transaction with delay.
+        /// </summary>
+        /// <param name="token"></param>
+        public void RegenerateDocumentWithDelay(CancellationToken token)
+        {
+            if (!RunDelay(token)) { return; }
+
+            var st = new StackTrace();
+            var sf = st.GetFrame(0);
+            var currentMethodName = sf.GetMethod().Name;
+
+            _doc.Regenerate();
+
+            Debug.WriteLine($"'{currentMethodName}' executed.");
+        }
+
+
+        private bool RunDelay(CancellationToken token)
+        {
+            //inititate delay
+            Debug.WriteLine("Delay started.");
+            try
+            {
+                Task.Delay(5000, token).Wait();
+            }
+            catch (Exception)
+            {
+                if (token.IsCancellationRequested)  // проверяем наличие сигнала отмены задачи
+                {
+                    Debug.WriteLine($"Delay was stopped.");
+                    return false;     //  выходим из метода и тем самым завершаем задачу
+                }
+            }
+            Debug.WriteLine("Delay completed.");
+            return true;
+        }
     }
 }

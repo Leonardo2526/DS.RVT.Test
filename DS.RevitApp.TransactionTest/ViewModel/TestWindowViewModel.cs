@@ -97,13 +97,44 @@ namespace DS.RevitApp.TransactionTest.ViewModel
             _cancelTokenSource.CancelAfter(10000);
             var token = _cancelTokenSource.Token;
 
-             await _testedClass.RunWithDelayAsync(token);
+            Task task = Task.Run(async () =>
+            {
+                await _testedClass.RunWithDelayAsync(token);
+            });
+            await task;
+            //await _testedClass.RunWithDelayAsync(token);
 
             Debug.IndentLevel = 0;
             if (token.IsCancellationRequested) 
             { Debug.WriteLine($"'{nameof(RunTest5)}' was terminated!"); return; }
 
             Debug.WriteLine($"'{nameof(RunTest5)}' completed!");
+        });
+
+        public ICommand RunTest6 => new RelayCommand(async c =>
+        {
+            Debug.IndentLevel = 1;
+
+            Debug.WriteLine($"\n'{nameof(RunTest6)}' started!");
+
+            _cancelTokenSource = new CancellationTokenSource();
+            _cancelTokenSource.CancelAfter(10000);
+            var token = _cancelTokenSource.Token;
+
+
+            Task task = Task.Run(async () =>
+            {
+                await _testedClass.TestNewBuilderAsync(token);
+            });
+            await task;
+
+            //await _testedClass.TestNewBuilderAsync(token);
+
+            Debug.IndentLevel = 0;
+            if (token.IsCancellationRequested)
+            { Debug.WriteLine($"'{nameof(RunTest6)}' was terminated!"); return; }
+
+            Debug.WriteLine($"'{nameof(RunTest6)}' completed!");
         });
 
         public ICommand StopTest => new RelayCommand(c =>

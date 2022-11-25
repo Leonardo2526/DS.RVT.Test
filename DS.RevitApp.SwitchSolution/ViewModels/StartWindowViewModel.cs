@@ -67,7 +67,7 @@ namespace DS.RevitApp.SwitchSolution.ViewModel
             while (true && taskEvent?.EventType != EventType.Close)
             {
                 taskEvent = new TaskComplition(this);
-                await builder.BuildAsync(() => _model.Create(_stackPoints.Peek()), taskEvent, true);
+                //await builder.BuildAsync(() => _model.Create(_stackPoints.Peek()), taskEvent, true);
             }
 
             Debug.Print("Command executed");
