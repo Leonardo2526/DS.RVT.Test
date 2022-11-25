@@ -15,13 +15,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.AutoPipesCoordinario
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RVT.ModelSpaceFragmentation", "DS.RVT.ModelSpaceFragmentation\DS.RVT.ModelSpaceFragmentation.csproj", "{9208DCBD-3F74-477C-87E3-9598C551E538}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewTool1", "DS.RVT.ExtCmd.FW4.8.NewTool1\NewTool1.csproj", "{1477EE57-AE6D-436D-8446-274814E3F268}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitLib.ExternalEvents", "DS.RevitLib.ExternalEvents\DS.RevitLib.ExternalEvents.csproj", "{BCF72AE9-2C4E-4DC9-A6A9-DAD6A63D4B4E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitApp.OpenDocTest", "DS.RevitApp.OpenDocTest\DS.RevitApp.OpenDocTest.csproj", "{4ACA3974-17D1-4532-B37D-5D0EA0D3BD57}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitApp.Test", "DS.RevitApp.Test\DS.RevitApp.Test.csproj", "{5E7D867B-3629-46ED-A7D8-61EDDE093260}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitLib.MessageHandler", "DS.RevitLib.MessagedHandler\DS.RevitLib.MessageHandler.csproj", "{0F974B51-F8B3-42B2-8309-E097B1C0F116}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitLib.Utils", "..\DS.RevitLib.Utils\DS.RevitLib.Utils\DS.RevitLib.Utils.csproj", "{9873F185-F630-4BB2-94A4-D9665F32B802}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitApp.TransactionTest", "DS.RevitApp.TransactionTest\DS.RevitApp.TransactionTest.csproj", "{D6EDCB4C-E55E-4C43-816D-EE12684C9E6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.ClassLib.VarUtils", "..\DS.CommonLib.Utils\DS.ClassLib.VarUtils\DS.ClassLib.VarUtils.csproj", "{97D2548B-BA7F-4C31-8F52-6BF929E0C37B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitApp.SwitchSolution", "DS.RevitApp.SwitchSolution\DS.RevitApp.SwitchSolution.csproj", "{03819F0D-7075-4054-AA69-F656152EF90B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitApp.PostCommandTest", "DS.RevitApp.PostCommandTest\DS.RevitApp.PostCommandTest.csproj", "{BBAD4616-E191-48F9-9568-172261758C43}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitCommand.PostCommandTest", "DS.RevitCommand.PostCommandTest\DS.RevitCommand.PostCommandTest.csproj", "{6728409D-A460-4E06-A4F8-C0A9C0AA70A0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,9 +59,6 @@ Global
 		{9208DCBD-3F74-477C-87E3-9598C551E538}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9208DCBD-3F74-477C-87E3-9598C551E538}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9208DCBD-3F74-477C-87E3-9598C551E538}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1477EE57-AE6D-436D-8446-274814E3F268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1477EE57-AE6D-436D-8446-274814E3F268}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1477EE57-AE6D-436D-8446-274814E3F268}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BCF72AE9-2C4E-4DC9-A6A9-DAD6A63D4B4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BCF72AE9-2C4E-4DC9-A6A9-DAD6A63D4B4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCF72AE9-2C4E-4DC9-A6A9-DAD6A63D4B4E}.Release|Any CPU.Build.0 = Release|Any CPU
@@ -57,9 +66,30 @@ Global
 		{4ACA3974-17D1-4532-B37D-5D0EA0D3BD57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4ACA3974-17D1-4532-B37D-5D0EA0D3BD57}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5E7D867B-3629-46ED-A7D8-61EDDE093260}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5E7D867B-3629-46ED-A7D8-61EDDE093260}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E7D867B-3629-46ED-A7D8-61EDDE093260}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E7D867B-3629-46ED-A7D8-61EDDE093260}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F974B51-F8B3-42B2-8309-E097B1C0F116}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F974B51-F8B3-42B2-8309-E097B1C0F116}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F974B51-F8B3-42B2-8309-E097B1C0F116}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9873F185-F630-4BB2-94A4-D9665F32B802}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9873F185-F630-4BB2-94A4-D9665F32B802}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9873F185-F630-4BB2-94A4-D9665F32B802}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6EDCB4C-E55E-4C43-816D-EE12684C9E6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6EDCB4C-E55E-4C43-816D-EE12684C9E6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6EDCB4C-E55E-4C43-816D-EE12684C9E6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6EDCB4C-E55E-4C43-816D-EE12684C9E6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97D2548B-BA7F-4C31-8F52-6BF929E0C37B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97D2548B-BA7F-4C31-8F52-6BF929E0C37B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97D2548B-BA7F-4C31-8F52-6BF929E0C37B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03819F0D-7075-4054-AA69-F656152EF90B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03819F0D-7075-4054-AA69-F656152EF90B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03819F0D-7075-4054-AA69-F656152EF90B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBAD4616-E191-48F9-9568-172261758C43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBAD4616-E191-48F9-9568-172261758C43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBAD4616-E191-48F9-9568-172261758C43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6728409D-A460-4E06-A4F8-C0A9C0AA70A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6728409D-A460-4E06-A4F8-C0A9C0AA70A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6728409D-A460-4E06-A4F8-C0A9C0AA70A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

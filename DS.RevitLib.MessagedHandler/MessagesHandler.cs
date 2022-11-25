@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DS.RevitApp.Test
+namespace DS.RevitLib.MessageHandler
 {
-   
+
     internal class MessagesHandler
     {
         private readonly FailuresAccessor _failuresAccessor;
@@ -47,19 +47,19 @@ namespace DS.RevitApp.Test
                     var type = m.GetCurrentResolutionType();
                     m.SetCurrentResolutionType(type);
 
-                        if (!ShowFails)
-                        {
-                            //Set option for failure handling
-                            FailureHandlingOptions failureHandlingOptions = _failuresAccessor.GetFailureHandlingOptions();
-                            failureHandlingOptions.SetClearAfterRollback(true);
-                            _failuresAccessor.SetFailureHandlingOptions(failureHandlingOptions);
+                    if (!ShowFails)
+                    {
+                        //Set option for failure handling
+                        FailureHandlingOptions failureHandlingOptions = _failuresAccessor.GetFailureHandlingOptions();
+                        failureHandlingOptions.SetClearAfterRollback(true);
+                        _failuresAccessor.SetFailureHandlingOptions(failureHandlingOptions);
 
-                            _eventArgs.SetProcessingResult(FailureProcessingResult.ProceedWithRollBack);
-                        }
-                        else
-                        {
-                            _eventArgs.SetProcessingResult(FailureProcessingResult.ProceedWithRollBack);
-                        }
+                        _eventArgs.SetProcessingResult(FailureProcessingResult.ProceedWithRollBack);
+                    }
+                    else
+                    {
+                        _eventArgs.SetProcessingResult(FailureProcessingResult.ProceedWithRollBack);
+                    }
                     _failuresAccessor.SetTransactionName(_transactionName + "-RolledBack");
                     _failuresAccessor.DeleteWarning(m);
                 }
@@ -73,8 +73,8 @@ namespace DS.RevitApp.Test
                 TaskDialog.Show("warningMessages: ", warningMessages.Count.ToString());
                 foreach (var m in warningMessages)
                 {
-                        _failuresAccessor.SetTransactionName(_transactionName + "-Warning");
-                        _failuresAccessor.DeleteWarning(m);                  
+                    _failuresAccessor.SetTransactionName(_transactionName + "-Warning");
+                    _failuresAccessor.DeleteWarning(m);
                 }
             }
         }

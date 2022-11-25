@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+	<AddIn Type="Command">
+		<Name>DS.RVT.NewTool</Name>
+		<FullClassName>DS.RevitCommand.PostCommandTest.ExternalCommand</FullClassName>
+		<Text>DS.RevitCommand.PostCommandTest</Text>
+		<Description>Post command test</Description>
+		<VisibilityMode>AlwaysVisible</VisibilityMode>
+		<Assembly>.\DS.RevitCommand.PostCommandTest.dll</Assembly>
+		<AddInId>9e14829d-9080-421a-9ec7-6214ec77772f</AddInId>
+		<VendorId>DS</VendorId>
+	</AddIn> 
+</RevitAddIns>

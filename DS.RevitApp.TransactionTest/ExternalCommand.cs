@@ -1,8 +1,9 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using DS.RevitApp.TransactionTest.View;
 
-namespace DS.RevitApp.Test
+namespace DS.RevitApp.TransactionTest
 {
     [Transaction(TransactionMode.Manual)]
     public class ExternalCommand : IExternalCommand
@@ -16,15 +17,11 @@ namespace DS.RevitApp.Test
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            var test = new ConnectMEPCurveTest(doc, uidoc);
-            test.Run();
-
-            //var test = new DirectShapeTest(doc, uidoc);
-            //test.CreateSphereDirectShape();
+            var startWindow = new TestWindow(doc, uidoc, uiapp);
+            //var startWindow = new TransactionWindow(doc, uidoc, uiapp);
+            startWindow.Show();
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }
     }
-
-
 }

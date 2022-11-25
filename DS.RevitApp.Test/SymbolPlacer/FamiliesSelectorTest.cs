@@ -86,7 +86,7 @@ namespace DS.RevitApp.SymbolPlacerTest
             var comp = system.Composite.Root as MEPSystemComponent;
             MEPCurve baseMEPCurve = comp.BaseElement as MEPCurve;
             var builder = new BuilderByPoints(baseMEPCurve, Points);
-            var model = builder.BuildMEPCurves().WithFittings();
+            var model = builder.BuildMEPCurves();
             MEPCurves = model.MEPCurves.Cast<MEPCurve>().ToList();
 
             //var mEPCurveCreator = new MEPCurveCreator(MEPCurve);
