@@ -17,7 +17,8 @@ namespace DS.RevitApp.TransactionTest
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            var startWindow = new TransactionWindow(doc, uidoc, uiapp);
+            var startWindow = new TestWindow(doc, uidoc, uiapp);
+            //var startWindow = new TransactionWindow(doc, uidoc, uiapp);
             startWindow.Show();
 
             return Autodesk.Revit.UI.Result.Succeeded;

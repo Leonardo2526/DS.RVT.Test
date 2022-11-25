@@ -3,7 +3,7 @@
     <!--Set style for buttons-->
     <Style x:Key="DS_Button" TargetType="Button">
         <Setter Property="Width" Value="100"/>
-        <Setter Property="Height" Value="Auto"/>
+        <Setter Property="Height" Value="50"/>
         <Setter Property="Background" Value="LightBlue"/>
         <Setter Property="Padding" Value="10"/>
         <Setter Property="Margin" Value="5"/>
