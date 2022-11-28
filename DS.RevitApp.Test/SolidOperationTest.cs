@@ -14,7 +14,7 @@ namespace DS.RevitApp.Test
     {
         private readonly Document _doc;
         private readonly UIDocument _uiDoc;
-        private TransactionBuilder<Element> _trb;
+        private TransactionBuilder _trb;
 
         public SolidOperationTest(Document doc, UIDocument uiDoc)
         {
@@ -24,7 +24,7 @@ namespace DS.RevitApp.Test
 
         public void Run()
         {
-            _trb = new TransactionBuilder<Element>(_doc);
+            _trb = new TransactionBuilder(_doc);
 
             Reference reference = _uiDoc.Selection.PickObject(ObjectType.Element, "Select element");
             var element = _doc.GetElement(reference);

@@ -33,7 +33,7 @@ namespace DS.RevitApp.Test
             //Reference reference3 = _uiDoc.Selection.PickObject(ObjectType.Element, "Select MEPCurve3");
             //MEPCurve mEPCurve3 = _doc.GetElement(reference3) as MEPCurve;
 
-            var transactionBuilder = new TransactionBuilder<Element>(_doc);
+            var transactionBuilder = new TransactionBuilder(_doc);
             transactionBuilder.Build(() =>
             {
                 IConnectionFactory factory = new MEPCurveConnectionFactory(_doc, mEPCurve1, mEPCurve2, null);

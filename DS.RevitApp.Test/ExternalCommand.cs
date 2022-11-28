@@ -16,7 +16,7 @@ namespace DS.RevitApp.Test
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            var test = new ConnectMEPCurveTest(doc, uidoc);
+            var test = new PathFinerTest(doc, uidoc);
             test.Run();
 
             //var test = new DirectShapeTest(doc, uidoc);
