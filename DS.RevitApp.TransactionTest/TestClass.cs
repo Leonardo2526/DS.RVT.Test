@@ -88,7 +88,7 @@ namespace DS.RevitApp.TransactionTest
         public async Task TestNewBuilderAsync(CancellationToken token)
         {
             if (!RunDelay(token)) { return; }
-            await new NewTransactionBuilder(_doc).
+            await new TransactionBuilder(_doc).
                 BuildRevitTask(_doc.Regenerate, "Regenerate document");
             //Action action = () =>
             //{

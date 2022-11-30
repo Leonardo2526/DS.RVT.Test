@@ -35,13 +35,18 @@ namespace DS.RevitApp.Test
         {
             XYZ startPoint;
             XYZ endPoint;
+
             ObjectSnapTypes snapTypes = ObjectSnapTypes.Endpoints | ObjectSnapTypes.Intersections;
+
             var ref1 = _uIDoc.Selection.PickObject(ObjectType.PointOnElement, "Select startPoint");
             MEPCurve mEPCurve1 = _doc.GetElement(ref1) as MEPCurve;
             var ref2 = _uIDoc.Selection.PickObject(ObjectType.PointOnElement, "Select endPoint");
             MEPCurve mEPCurve2 = _doc.GetElement(ref2) as MEPCurve;
-            startPoint = _uIDoc.Selection.PickObject(ObjectType.PointOnElement, "Select startPoint").GlobalPoint;
-            endPoint = _uIDoc.Selection.PickObject(ObjectType.PointOnElement, "Select endPoint").GlobalPoint;
+            _uIDoc.Selection.SetElementIds(new List<ElementId> { mEPCurve1.Id });
+            _uIDoc.RefreshActiveView();
+
+            startPoint = ref1.GlobalPoint;
+            endPoint = ref2.GlobalPoint;
             //startPoint = _uIDoc.Selection.PickPoint(snapTypes, "Select startPoint");
             //endPoint = _uIDoc.Selection.PickPoint(snapTypes, "Select endPoint");
 

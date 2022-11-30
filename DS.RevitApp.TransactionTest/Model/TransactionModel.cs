@@ -35,7 +35,7 @@ namespace DS.RevitApp.TransactionTest.Model
             };
 
             Debug.Print($"Transaction started");
-            var trb = new TransactionBuilder<Element>(_doc);
+            var trb = new TransactionBuilder(_doc);
             trb.Build(() => ShowLines(path), trName);
             Debug.Print($"Transaction executed");
 
@@ -55,7 +55,7 @@ namespace DS.RevitApp.TransactionTest.Model
 
             RevitTask.RunAsync(() =>
             {
-                var trb = new TransactionBuilder<Element>(_doc);
+                var trb = new TransactionBuilder(_doc);
                 trb.Build(() => ShowLines(path), "show lines");
                 //trb.Build(() => ShowcCrves(path), "show curves");
             });

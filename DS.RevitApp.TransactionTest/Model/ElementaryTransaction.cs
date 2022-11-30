@@ -15,14 +15,14 @@ namespace DS.RevitApp.TransactionTest
     {
         private readonly Document _doc;
         private readonly UIDocument _uiDoc;
-        private readonly NewTransactionBuilder _transactionBuilder;
+        private readonly TransactionBuilder _transactionBuilder;
 
         public ElementaryTransaction(Document doc, UIDocument uiDoc)
         {
             Debug.IndentLevel = 1;
             _doc = doc;
             _uiDoc = uiDoc;
-            _transactionBuilder = new NewTransactionBuilder(doc);
+            _transactionBuilder = new TransactionBuilder(doc);
         }
 
         public void RegenerateDocument()
