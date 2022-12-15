@@ -137,6 +137,19 @@ namespace DS.RevitApp.TransactionTest.ViewModel
             Debug.WriteLine($"'{nameof(RunTest6)}' completed!");
         });
 
+        public ICommand RunTest7 => new RelayCommand(async c =>
+        {
+            Debug.WriteLine($"\n'{nameof(RunTest7)}' started!");
+
+            _cancelTokenSource = new CancellationTokenSource();
+            _cancelTokenSource.CancelAfter(5000);
+            var token = _cancelTokenSource.Token;
+            Task task = Task.Run(() => _testedClass.RunWithCancelation(token));
+            await task;
+
+            Debug.WriteLine($"'{nameof(RunTest7)}' completed!");
+        });
+
         public ICommand StopTest => new RelayCommand(c =>
         {
             _cancelTokenSource.Cancel();

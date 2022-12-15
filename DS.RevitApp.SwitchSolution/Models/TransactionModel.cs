@@ -1,11 +1,19 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
 using DS.RevitLib.Utils;
+using DS.RevitLib.Utils.Extensions;
+using DS.RevitLib.Utils.MEP;
 using DS.RevitLib.Utils.MEP.Creator;
+using DS.RevitLib.Utils.MEP.SystemTree;
 using DS.RevitLib.Utils.ModelCurveUtils;
 using Revit.Async;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DS.RevitApp.SwitchSolution.Models
 {
@@ -20,11 +28,35 @@ namespace DS.RevitApp.SwitchSolution.Models
             _uiDoc = uiDoc;
         }
 
+        public async Task CreateAsync(List<XYZ> path)
+        {
+            Debug.Print($"Transaction showLines started");
+            var trb = new TransactionBuilder(_doc);
+           await trb.BuildRevitTask(() => ShowLines(path), "showLines");
+            await RevitTask.RunAsync(() => _uiDoc.RefreshActiveView());
+            Debug.Print($"Transaction showLines executed");
+
+            //trb.Build(() => ShowcCrves(path), "show curves");
+        }
+
         public void Create(List<XYZ> path)
         {
             Debug.Print($"Transaction showLines started");
-            var trb = new TransactionBuilder<Element>(_doc);
-            trb.Build(() => ShowLines(path), "showLines");
+
+            RevitTask.RunAsync(() =>
+            {
+                using (var tr = new Transaction(_doc, "del"))
+                {
+                    tr.Start();
+                    ShowLines(path);
+                    tr.Commit();
+                    _uiDoc.RefreshActiveView();
+                }
+
+            });
+
+
+
             Debug.Print($"Transaction showLines executed");
 
             //trb.Build(() => ShowcCrves(path), "show curves");
@@ -54,6 +86,40 @@ namespace DS.RevitApp.SwitchSolution.Models
             var mEPCurve = _doc.GetElement(reference) as MEPCurve;
 
             var builder = new BuilderByPoints(mEPCurve, path).BuildMEPCurves().WithElbows();
+        }
+
+        public void RunSplitTransaction(MEPCurve mEPCurve, Element spud)
+        {
+            
+            RevitTask.RunAsync(() =>
+            {
+                using (var trg = new TransactionGroup(_doc, $"split elem"))
+                {
+                    trg.Start();
+                    Debug.Print($"TransactionGroup '{trg.GetName()}' started in thread {Thread.CurrentThread.ManagedThreadId}");
+
+                    using (var tr = new Transaction(_doc, "del"))
+                    {
+                        tr.Start();
+                        XYZ point = mEPCurve.GetCenterPoint();
+                        mEPCurve.Split(point);
+                        tr.Commit();
+                        _uiDoc.RefreshActiveView();
+                    }
+
+                    Debug.Print($"MEPCurve - {mEPCurve.IsValidObject}, spud - {spud.IsValidObject}");
+
+                    if (trg.HasStarted())
+                    {
+                        //trg.Commit();
+                        trg.RollBack();
+                        Debug.Print($"TransactionGroup '{trg.GetName()}' rolled in thread {Thread.CurrentThread.ManagedThreadId}");
+                    }
+                    Debug.Print($"MEPCurve - {mEPCurve.IsValidObject}, spud - {spud.IsValidObject}");
+                }
+
+                Debug.Print($"MEPCurve - {mEPCurve.IsValidObject}, spud - {spud.IsValidObject}");
+            });
         }
 
     }

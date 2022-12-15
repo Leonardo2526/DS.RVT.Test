@@ -1,8 +1,11 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
 using DS.ClassLib.VarUtils;
 using DS.ClassLib.VarUtils.Events;
 using DS.RevitApp.SwitchSolution.Models;
+using DS.RevitLib.Utils.MEP.SystemTree;
+using DS.RevitLib.Utils.TransactionCommitter;
 using DS.RevitLib.Utils.Transactions;
 using System;
 using System.Collections.Generic;
@@ -66,8 +69,17 @@ namespace DS.RevitApp.SwitchSolution.ViewModel
 
             while (true && taskEvent?.EventType != EventType.Close)
             {
+                //Reference reference = _uiDoc.Selection.PickObject(ObjectType.Element, "Select MEPCurve");
+                //MEPCurve mEPCurve = _doc.GetElement(reference) as MEPCurve;
+
+                //var mEPSystemBuilder = new SimpleMEPSystemBuilder(mEPCurve);
+                //var sourceMEPModel = mEPSystemBuilder.Build();
+                //var spud = sourceMEPModel.Root.ChildrenNodes.First().Element;
+
                 taskEvent = new TaskComplition(this);
-                //await builder.BuildAsync(() => _model.Create(_stackPoints.Peek()), taskEvent, true);
+                //await builder.BuildAsync(() => _model.RunSplitTransaction(mEPCurve, spud), new CommitOnClose(), taskEvent, false);
+                await builder.BuildAsync(async () => await _model.CreateAsync(_stackPoints.Peek()), new CommitOnClose(), taskEvent, false);
+                //await builder.BuildAsync(() => _model.Create(_stackPoints.Peek()), new CommitOnClose(), taskEvent, false);
             }
 
             Debug.Print("Command executed");

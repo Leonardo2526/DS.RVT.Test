@@ -10,10 +10,16 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
+using DS.ClassLib.VarUtils;
 using DS.RevitLib.Utils;
+using DS.RevitLib.Utils.Collisions.Models;
 using DS.RevitLib.Utils.Extensions;
 using DS.RevitLib.Utils.MEP;
+using DS.RevitLib.Utils.MEP.Models;
+using DS.RevitLib.Utils.MEP.SystemTree;
 using DS.RevitLib.Utils.ModelCurveUtils;
+using DS.RevitLib.Utils.PathFinders;
+using DS.RevitLib.Utils.Solids.Models;
 using PathFinderLib;
 
 namespace DS.RevitApp.Test
@@ -59,6 +65,15 @@ namespace DS.RevitApp.Test
             endPoint.Show(_doc, 1, _trb);
             _uIDoc.RefreshActiveView();
 
+
+            List<XYZ> path = IvanovPathFinderTest(mEPCurve1, mEPCurve2, startPoint, endPoint);
+            //List<XYZ> path = FindPath1(mEPCurve1, mEPCurve2, startPoint, endPoint, width, heigth);
+
+            _trb.Build(() => ShowPath(path), "show path");
+        }
+
+        private List<XYZ> FindPath1(MEPCurve mEPCurve1, MEPCurve mEPCurve2, XYZ startPoint, XYZ endPoint, double width, double heigth)
+        {
             //создаем опции поиска
             //параметр в конструкторе это Ширина отвода от оси до грани
             //исходя из этого параметра будет подбираться минимальный шаг поиска так, что
@@ -75,7 +90,7 @@ namespace DS.RevitApp.Test
 
             //ищем путь
             List<XYZ> path = new List<XYZ>();
-            Task<List<XYZ>> task = finder.FindPath(new CancellationTokenSource().Token);        
+            Task<List<XYZ>> task = finder.FindPath(new CancellationTokenSource().Token);
             task.Wait();
             path = task.Result;
 
@@ -85,10 +100,28 @@ namespace DS.RevitApp.Test
             }
 
             //объединяем прямые последовательные участки пути в один сегмент
-            path = Optimizer.MergeStraightSections(path, options);
-
-            _trb.Build(() => ShowPath(path), "show path");
+            return Optimizer.MergeStraightSections(path, options);
         }
+
+        private List<XYZ> IvanovPathFinderTest(MEPCurve mEPCurve1, MEPCurve mEPCurve2, XYZ startPoint, XYZ endPoint)
+        {
+            var mEPSystemBuilder = new SimpleMEPSystemBuilder(mEPCurve1);
+            var sourceMEPModel = mEPSystemBuilder.Build();
+            var mEPCurveModel = new MEPCurveModel(mEPCurve1, new SolidModel(ElementUtils.GetSolid(mEPCurve1)));
+
+                var elbowRadius = new ElbowRadiusCalc(mEPCurveModel, _trb).
+                GetRadius(90.DegToRad());
+
+            var pathFinder = new IvanovPathFinder(
+                _doc, _trb, elbowRadius, sourceMEPModel, new CancellationTokenSource().Token);
+
+            var elementsToDelete = new List<Element>() { mEPCurve1, mEPCurve2 };
+            pathFinder.ExceptionElements = elementsToDelete.Select(obj => obj.Id).ToList();
+
+
+            return pathFinder.Find(startPoint, endPoint);
+        }
+
         private void ShowPath(List<XYZ> path)
         {
             var mcreator = new ModelCurveCreator(_doc);
