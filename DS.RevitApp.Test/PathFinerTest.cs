@@ -113,7 +113,7 @@ namespace DS.RevitApp.Test
                 GetRadius(90.DegToRad());
 
             var pathFinder = new IvanovPathFinder(
-                _doc, _trb, elbowRadius, sourceMEPModel, new CancellationTokenSource().Token);
+                _doc, elbowRadius, sourceMEPModel, new CancellationTokenSource().Token);
 
             var elementsToDelete = new List<Element>() { mEPCurve1, mEPCurve2 };
             pathFinder.ExceptionElements = elementsToDelete.Select(obj => obj.Id).ToList();

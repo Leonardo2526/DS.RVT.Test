@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitApp.PostCommandTest
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitCommand.PostCommandTest", "DS.RevitCommand.PostCommandTest\DS.RevitCommand.PostCommandTest.csproj", "{6728409D-A460-4E06-A4F8-C0A9C0AA70A0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestLibrary", "TestLibrary\TestLibrary.csproj", "{72F953E2-3ECC-4663-8508-1969ECE4D1BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,6 +92,10 @@ Global
 		{6728409D-A460-4E06-A4F8-C0A9C0AA70A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6728409D-A460-4E06-A4F8-C0A9C0AA70A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6728409D-A460-4E06-A4F8-C0A9C0AA70A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72F953E2-3ECC-4663-8508-1969ECE4D1BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72F953E2-3ECC-4663-8508-1969ECE4D1BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72F953E2-3ECC-4663-8508-1969ECE4D1BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72F953E2-3ECC-4663-8508-1969ECE4D1BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
