@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using System.Diagnostics;
 
 namespace DS.RevitApp.Test
 {
@@ -16,7 +17,12 @@ namespace DS.RevitApp.Test
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            new TestClass().SomeTest();
+            TaskDialog.Show("message","Hello");
+
+            //var path = new PathCreatorClient(uidoc).GetPath();
+            //Debug.WriteLine(path?.Count);
+
+            //new TestClass().SomeTest();
 
             //var test = new PathFinerTest(doc, uidoc);
             //test.Run();
