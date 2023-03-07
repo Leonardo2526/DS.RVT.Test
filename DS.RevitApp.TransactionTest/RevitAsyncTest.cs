@@ -69,6 +69,31 @@ namespace DS.RevitApp.TransactionTest
             });
         }
 
+        public void RunRevitTask()
+        {
+            var trModel = new TransactionModel(_doc, _uiDoc);
+
+
+           var task = RevitTask.RunAsync(() =>
+            {
+                Debug.Print("Start transaction.");
+                Task.Delay(3000).Wait();
+                trModel.Create(0, "line1");
+            });
+            task.ContinueWith(t =>
+            {
+                _uiDoc.RefreshActiveView();
+                Debug.Print("Transaction executed.");
+
+                Debug.Print("Start sleeping.");
+                Thread.Sleep(3000);
+                Debug.Print("End of sleeping.");
+
+                Debug.Print("End of method.");
+
+            });
+        }
+
         public async Task CreateTransactionAsync()
         {
             var trModel = new TransactionModel(_doc, _uiDoc);

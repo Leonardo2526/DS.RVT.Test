@@ -236,6 +236,39 @@ namespace DS.RevitApp.TransactionTest.ViewModel
             Debug.WriteLine($"'{nameof(RunTest7)}' completed!");
         });
 
+        public ICommand RunTest8 => new RelayCommand(async c =>
+        {
+            Debug.WriteLine($"\n'{nameof(RunTest8)}' started!");
+
+            await RevitTask.RunAsync(() =>
+            {
+                Debug.Print("Start transaction.");
+                Task.Delay(3000).Wait();
+                Debug.Print("End transaction.");
+            });
+
+            Debug.WriteLine($"'{nameof(RunTest8)}' completed!");
+        });
+
+
+        public ICommand RunTest9 => new RelayCommand(c =>
+        {
+            Debug.WriteLine($"\n'{nameof(RunTest9)}' started!");
+
+            Task task = Task.Run(() => RevitTask.RunAsync(() =>
+            {
+                Debug.Print("Start transaction.");
+                Task.Delay(3000).Wait();
+                Debug.Print("End transaction.");
+            }));
+            task.ContinueWith(t =>
+            {
+                Debug.WriteLine($"transaction completed!");
+            });
+
+            Debug.WriteLine($"'{nameof(RunTest9)}' completed!");
+        });
+
         public ICommand StopTest => new RelayCommand(c =>
         {
             _cancelTokenSource.Cancel();

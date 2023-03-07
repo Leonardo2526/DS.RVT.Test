@@ -71,6 +71,20 @@
                     RunTest7
                 </TextBlock>
             </Button>
+            <Button Margin="10" Command="{Binding RunTest8}" 
+                    Style="{StaticResource DS_Button}" 
+                    HorizontalAlignment="Left">
+                <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                    RunTest8
+                </TextBlock>
+            </Button>
+            <Button Margin="10" Command="{Binding RunTest9}" 
+                    Style="{StaticResource DS_Button}" 
+                    HorizontalAlignment="Left">
+                <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                    RunTest9
+                </TextBlock>
+            </Button>
         </StackPanel>
         <Button Grid.Column="1" Margin="10" Command="{Binding StopTest}" 
                     Style="{StaticResource DS_Button}" Background="IndianRed"
