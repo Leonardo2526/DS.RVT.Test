@@ -18,7 +18,7 @@ using DS.RevitLib.Utils.MEP;
 using DS.RevitLib.Utils.MEP.Models;
 using DS.RevitLib.Utils.MEP.SystemTree;
 using DS.RevitLib.Utils.ModelCurveUtils;
-using DS.RevitLib.Utils.PathFinders;
+using DS.RevitLib.Utils.PathCreators;
 using DS.RevitLib.Utils.Solids.Models;
 using PathFinderLib;
 
@@ -111,15 +111,15 @@ namespace DS.RevitApp.Test
 
                 var elbowRadius = new ElbowRadiusCalc(mEPCurveModel, _trb).
                 GetRadius(90.DegToRad());
-
-            var pathFinder = new IvanovPathFinder(
+           
+            var pathFinder = new PathFindCreator().Create(
                 _doc, elbowRadius, sourceMEPModel, new CancellationTokenSource().Token);
 
             var elementsToDelete = new List<Element>() { mEPCurve1, mEPCurve2 };
             pathFinder.ExceptionElements = elementsToDelete.Select(obj => obj.Id).ToList();
 
 
-            return pathFinder.Find(startPoint, endPoint);
+            return pathFinder.Create(startPoint, endPoint);
         }
 
         private void ShowPath(List<XYZ> path)

@@ -12,7 +12,7 @@ namespace DS.RevitApp.TransactionTest.View
     {
         private readonly Document _doc;
         private readonly UIDocument _uiDoc;
-        private readonly UIApplication _uiapp;
+        public readonly UIApplication _uiapp;
 
         public TestWindow(Document doc, UIDocument uiDoc, UIApplication uiapp)
         {

@@ -37,7 +37,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestLibrary", "TestLibrary\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLib", "DataLib\DataLib.csproj", "{B02DBAA3-FCE1-41F0-BC2A-657AB1D9F0B8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitServer", "DS.RevitServer\DS.RevitServer.csproj", "{86A26214-03DE-4D11-A3F9-95F435CE7A0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DS.RevitServer", "DS.RevitServer\DS.RevitServer.csproj", "{86A26214-03DE-4D11-A3F9-95F435CE7A0F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.CableTests", "DS.CableTests\DS.CableTests.csproj", "{777C1185-5727-4FA4-B0C4-BF4FFDAA70EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.Plugin1", "DS.Plugin1\DS.Plugin1.csproj", "{D5AE0833-987C-4252-8840-DCD4FDC545D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.Plugin2", "DS.Plugin2\DS.Plugin2.csproj", "{1961BD21-29CC-49B4-9289-7A61FF45B5B9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -103,6 +109,18 @@ Global
 		{86A26214-03DE-4D11-A3F9-95F435CE7A0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86A26214-03DE-4D11-A3F9-95F435CE7A0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86A26214-03DE-4D11-A3F9-95F435CE7A0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{777C1185-5727-4FA4-B0C4-BF4FFDAA70EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{777C1185-5727-4FA4-B0C4-BF4FFDAA70EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{777C1185-5727-4FA4-B0C4-BF4FFDAA70EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{777C1185-5727-4FA4-B0C4-BF4FFDAA70EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5AE0833-987C-4252-8840-DCD4FDC545D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5AE0833-987C-4252-8840-DCD4FDC545D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5AE0833-987C-4252-8840-DCD4FDC545D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5AE0833-987C-4252-8840-DCD4FDC545D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1961BD21-29CC-49B4-9289-7A61FF45B5B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1961BD21-29CC-49B4-9289-7A61FF45B5B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1961BD21-29CC-49B4-9289-7A61FF45B5B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1961BD21-29CC-49B4-9289-7A61FF45B5B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

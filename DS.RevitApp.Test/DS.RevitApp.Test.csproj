@@ -26,7 +26,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>1</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -36,6 +36,12 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>key2.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DS.ClassLib.VarUtils, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -120,6 +126,7 @@
     <Compile Include="ConnectMEPCurveTest.cs" />
     <Compile Include="DirectShapeTest.cs" />
     <Compile Include="ExternalCommand.cs" />
+    <Compile Include="MessageCaller.cs" />
     <Compile Include="PathCreatorClient.cs" />
     <Compile Include="PathFinerTest.cs" />
     <Compile Include="SolidOperationTest.cs" />
@@ -135,6 +142,8 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="DS.RevitApp.Test.addin" />
+    <None Include="key1.snk" />
+    <None Include="key2.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+	<AddIn Type="Command">
+		<Name>DS.Plugin1</Name>
+		<FullClassName>DS.Plugin1.ExternalCommand</FullClassName>
+		<Text>DS.Plugin1</Text>
+		<Description>plugin1</Description>
+		<VisibilityMode>AlwaysVisible</VisibilityMode>
+		<Assembly>.\DS.Plugin1\DS.Plugin1.dll</Assembly>
+		<AddInId>c6677a8f-ac83-42d1-9cf8-bc7d001ec3a5</AddInId>
+		<VendorId>DS</VendorId>
+	</AddIn> 
+</RevitAddIns>
