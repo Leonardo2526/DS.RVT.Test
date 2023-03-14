@@ -21,17 +21,7 @@ using System.Windows.Threading;
 
 namespace DS.RevitApp.TransactionTest.ViewModel
 {
-    public static class Context
-    {
-        public static object StartContext { get; set; }
-        public static object CurrentContext { get; set; }
-        public static Dispatcher Dispatcher { get; set; }
-        public static ExternalEvent ExternalEvent { get; set; }
-        public static ExternalEventHandler EventHandler { get; set; }
-    }
-
-
-    public class TestWindowViewModel : INotifyPropertyChanged, IEvent<EventType>
+    public class TestWindowViewModel : INotifyPropertyChanged
     {
         private readonly Document _doc;
         private readonly UIDocument _uiDoc;
@@ -48,85 +38,27 @@ namespace DS.RevitApp.TransactionTest.ViewModel
         }
 
 
-        public ICommand RunTest1 => new RelayCommand(c =>
+        public ICommand RunTest1 => new RelayCommand(async c =>
         {
-            ExternalEventHandler handler = new ExternalEventHandler(_window._uiapp);
+            Debug.WriteLine($"\n'{nameof(RunTest1)}' started!");
 
-            // External Event for the dialog to use (to post requests)
-            //Context.EventHandler = handler;
-            ExternalEventRequest request = new ExternalEventRequest();
-           try
+            var action = () =>
             {
-                var ev = ExternalEvent.CreateJournalable(handler);
-                var exEvent = ExternalEvent.Create(handler);
-                exEvent.Raise();
-
-            }
-            catch (Exception)
-            {
-
-            }
-
-            //Task task = Task.Run(() => { Context.EventHandler.Execute(_window._uiapp); });
-            //task.Wait();
-            //Context.EventHandler.Execute(_window._uiapp);
-            //Context.ExternalEvent.Raise();
-
-            object scheduler = SynchronizationContext.Current;
-            Context.CurrentContext = scheduler;
-
-            if(Context.StartContext == Context.CurrentContext) 
-            { 
-
-            }
-
-
-            if (scheduler is null)
-            {
-                if (TaskScheduler.Current != TaskScheduler.Default)
+                try
                 {
-                    scheduler = TaskScheduler.Current;
+                    Debug.WriteLine($"Start\n");
+                    _testedClass.RunTransaction();
                 }
-            }
+                catch (Exception ex)
+                {
+                    Debug.Fail(ex.ToString());
+                }
+            };
 
-            if (TaskScheduler.Current != TaskScheduler.Default)
-            {
-                scheduler = TaskScheduler.Current;
-            }
+            await RevitTask.RunAsync(() => action());
 
-            var cesp = new System.Threading.Tasks.ConcurrentExclusiveSchedulerPair();
-            var b1 = TaskScheduler.Current == cesp.ExclusiveScheduler;
-            var b2 = TaskScheduler.Current == cesp.ConcurrentScheduler;
-            var b3 = TaskScheduler.Default == cesp.ExclusiveScheduler;
-            var b4 = TaskScheduler.Default == cesp.ConcurrentScheduler;
+            Debug.WriteLine($"'{nameof(RunTest1)}' completed!\n");
 
-            Dispatcher dispatcher = Context.Dispatcher;
-            //Dispatcher dispatcher = Dispatcher.FromThread(Thread.CurrentThread);
-            if (dispatcher != null)
-            {
-                dispatcher.VerifyAccess();
-                dispatcher.CheckAccess();
-                //Debug.WriteLine(dispatcher.VerifyAccess());
-            }
-
-            var mod = _doc.IsModifiable;
-
-            var current = TaskScheduler.FromCurrentSynchronizationContext();
-            if (current is not null)
-            {
-                var b11 = current == TaskScheduler.Current;
-                var b12 = current == TaskScheduler.Default;
-            }
-
-            try
-            {
-                _testedClass.RunTransaction();
-                Debug.WriteLine($"'{nameof(RunTest1)}' completed!\n");
-            }
-            catch (Exception ex)
-            {
-                Debug.Fail(ex.ToString());
-            }
         });
 
         public ICommand RunTest2 => new RelayCommand(c =>
@@ -155,8 +87,8 @@ namespace DS.RevitApp.TransactionTest.ViewModel
             Debug.WriteLine($"'{nameof(RunTest3)}' completed!");
         });
 
-        public ICommand RunTest4=> new RelayCommand(async c =>
-        {           
+        public ICommand RunTest4 => new RelayCommand(async c =>
+        {
             Debug.WriteLine($"\n'{nameof(RunTest4)}' started!");
 
             _cancelTokenSource = new CancellationTokenSource();
@@ -191,7 +123,7 @@ namespace DS.RevitApp.TransactionTest.ViewModel
             //await _testedClass.RunWithDelayAsync(token);
 
             Debug.IndentLevel = 0;
-            if (token.IsCancellationRequested) 
+            if (token.IsCancellationRequested)
             { Debug.WriteLine($"'{nameof(RunTest5)}' was terminated!"); return; }
 
             Debug.WriteLine($"'{nameof(RunTest5)}' completed!");

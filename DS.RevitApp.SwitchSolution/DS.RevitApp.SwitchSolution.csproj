@@ -45,7 +45,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="Revit.Async, Version=2.0.1.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\Revit.Async.2.0.1\lib\net45\Revit.Async.dll</HintPath>
+      <HintPath>..\..\DS.RevitLib.Utils\packages\Revit.Async.2.0.1\lib\net45\Revit.Async.dll</HintPath>
     </Reference>
     <Reference Include="RevitAPI">
       <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
