@@ -31,6 +31,7 @@ namespace DS.RevitApp.TransactionTest
             var sf = st.GetFrame(0);
             var currentMethodName = sf.GetMethod().Name;
 
+            Debug.IndentLevel = 2;
             Debug.WriteLine($"'{nameof(RegenerateDocument)}' started.");
 
             _transactionBuilder.Build(_doc.Regenerate, currentMethodName);

@@ -29,7 +29,13 @@ namespace DS.RevitApp.TransactionTest
 
         public void RunTransaction()
         {
+            Debug.IndentLevel = 1;
+            Debug.WriteLine($"Start transaction.");
+
             _transaction.RegenerateDocument();
+
+            Debug.IndentLevel = 1;
+            Debug.WriteLine($"Transaction completed!");
         }
 
         /// <summary>

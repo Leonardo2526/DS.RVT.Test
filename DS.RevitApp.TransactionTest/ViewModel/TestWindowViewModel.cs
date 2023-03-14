@@ -37,54 +37,45 @@ namespace DS.RevitApp.TransactionTest.ViewModel
             _testedClass = new TestClass(_doc, _uiDoc);
         }
 
-
+        //valid async
         public ICommand RunTest1 => new RelayCommand(async c =>
         {
             Debug.WriteLine($"\n'{nameof(RunTest1)}' started!");
 
-            var action = () =>
-            {
-                try
-                {
-                    Debug.WriteLine($"Start\n");
-                    _testedClass.RunTransaction();
-                }
-                catch (Exception ex)
-                {
-                    Debug.Fail(ex.ToString());
-                }
-            };
+            await RevitTask.RunAsync(() => _testedClass.RunTransaction());
 
-            await RevitTask.RunAsync(() => action());
-
+            Debug.Unindent();
             Debug.WriteLine($"'{nameof(RunTest1)}' completed!\n");
 
         });
 
-        public ICommand RunTest2 => new RelayCommand(c =>
+        //valid async
+        public ICommand RunTest2 => new RelayCommand(async c =>
         {
             Debug.WriteLine($"\n'{nameof(RunTest2)}' started!");
 
-            _cancelTokenSource = new CancellationTokenSource();
-            _cancelTokenSource.CancelAfter(5000);
-            var token = _cancelTokenSource.Token;
+            Task task = Task.Run(async () =>
+            {
+                await Task.Delay(1000);
+               await RevitTask.RunAsync(() => _testedClass.RunTransaction());
+            });
+            await task;
 
-            _testedClass.RunWithCancelation(token);
 
-            Debug.WriteLine($"'{nameof(RunTest2)}' completed!");
+            Debug.Unindent();
+            Debug.WriteLine($"'{nameof(RunTest2)}' completed!\n");
         });
 
+        //Sync. Transaction will be performed at the end.
         public ICommand RunTest3 => new RelayCommand(c =>
         {
             Debug.WriteLine($"\n'{nameof(RunTest3)}' started!");
 
-            _cancelTokenSource = new CancellationTokenSource();
-            _cancelTokenSource.CancelAfter(10000);
-            var token = _cancelTokenSource.Token;
+            //not awaited!
+            RevitTask.RunAsync(() => _testedClass.RunTransaction());
 
-            _testedClass.RunWithDelay(token);
-
-            Debug.WriteLine($"'{nameof(RunTest3)}' completed!");
+            Debug.Unindent();
+            Debug.WriteLine($"'{nameof(RunTest3)}' completed!\n");
         });
 
         public ICommand RunTest4 => new RelayCommand(async c =>
