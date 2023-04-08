@@ -109,9 +109,13 @@
     <Compile Include="Path\InputData.cs" />
     <Compile Include="Visualization\Visualizator.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="DS.RVT.ModelSpaceFragmentation.addin" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y  "$(TargetDir)" "$(AppData)\Autodesk\Revit\Addins\2020\$(TargetName)\"</PostBuildEvent>
+    <PostBuildEvent>xcopy /Y  "$(TargetDir)*.*" "C:\ProgramData\Autodesk\Revit\Addins\2020\$(TargetName)\" 
+Copy "$(ProjectDir)$(TargetName).addin" "C:\ProgramData\Autodesk\Revit\Addins\2020"
+</PostBuildEvent>
   </PropertyGroup>
 </Project>

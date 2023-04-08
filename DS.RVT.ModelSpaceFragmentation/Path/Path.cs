@@ -20,7 +20,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             foreach (PathFinderNode item in path)
             {
-                XYZ point = new XYZ(item.ANX, item.ANY, item.ANZ);
+                XYZ point = new XYZ(item.PX, item.PY, item.PZ);
                 XYZ pathpoint = ConvertToModel(point);
 
                 double xx = Math.Abs(pathCoords[pathCoords.Count - 1].X - pathpoint.X);
