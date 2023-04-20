@@ -16,8 +16,10 @@ namespace DS.RevitApp.Test
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            var test = new PathFinerTest(doc, uidoc);
-            test.Run();
+            new SerilogTest(uidoc);
+
+            //var test = new PathFinerTest(doc, uidoc);
+            //test.Run();
 
             //var test = new DirectShapeTest(doc, uidoc);
             //test.CreateSphereDirectShape();
