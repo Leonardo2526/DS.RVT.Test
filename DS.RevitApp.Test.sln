@@ -29,6 +29,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitApp.TransactionTest
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.ClassLib.VarUtils", "..\DS.CommonLib.Utils\DS.ClassLib.VarUtils\DS.ClassLib.VarUtils.csproj", "{97D2548B-BA7F-4C31-8F52-6BF929E0C37B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitCmd.Template1", "DS.RevitCmd.Template1\DS.RevitCmd.Template1.csproj", "{D234FD64-2F0D-4337-A52A-3CEAB9C960B6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitCmd.Template2", "DS.RevitCmd.Template2\DS.RevitCmd.Template2.csproj", "{5001871C-1085-4F99-AE94-542D4CD82E0B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +80,14 @@ Global
 		{97D2548B-BA7F-4C31-8F52-6BF929E0C37B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{97D2548B-BA7F-4C31-8F52-6BF929E0C37B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97D2548B-BA7F-4C31-8F52-6BF929E0C37B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D234FD64-2F0D-4337-A52A-3CEAB9C960B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D234FD64-2F0D-4337-A52A-3CEAB9C960B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D234FD64-2F0D-4337-A52A-3CEAB9C960B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D234FD64-2F0D-4337-A52A-3CEAB9C960B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5001871C-1085-4F99-AE94-542D4CD82E0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5001871C-1085-4F99-AE94-542D4CD82E0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5001871C-1085-4F99-AE94-542D4CD82E0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5001871C-1085-4F99-AE94-542D4CD82E0B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

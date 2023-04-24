@@ -1,6 +1,9 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+//using ClassLibrary1;
+using ConsoleApp2;
+using System.Net.Http;
 
 namespace DS.RevitApp.Test
 {
@@ -16,7 +19,12 @@ namespace DS.RevitApp.Test
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            new SerilogTest(uidoc);
+            //PersonClient.Test5(new HttpClient(), "addj");
+
+
+            //new MongoTest();
+
+            //new SerilogTest(uidoc);
 
             //var test = new PathFinerTest(doc, uidoc);
             //test.Run();

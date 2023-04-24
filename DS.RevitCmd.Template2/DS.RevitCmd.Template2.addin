@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+	<AddIn Type="Command">
+		<Name>DS.RevitCmd.Template2</Name>
+		<FullClassName>DS.RevitCmd.Template2.ExternalCommand</FullClassName>
+		<Text>DS.RevitCmd.Template2</Text>
+		<Description>New revit plugin</Description>
+		<VisibilityMode>AlwaysVisible</VisibilityMode>
+		<Assembly>.\DS.RevitCmd.Template2\DS.RevitCmd.Template2.dll</Assembly>
+		<AddInId>1a1b0517-391e-43ae-8c72-bfd7bccd1b64</AddInId>
+		<VendorId>DS</VendorId>
+	</AddIn> 
+</RevitAddIns>
