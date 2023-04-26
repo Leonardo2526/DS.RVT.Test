@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using ConsoleAppNet48;
 using System;
 using System.Net.Http;
 
@@ -18,11 +19,14 @@ namespace DS.RevitCmd.Template1
             UIDocument uiDoc = uiApp.ActiveUIDocument;
             Document doc = uiApp.ActiveUIDocument.Document;
 
-            var value = "AliceJ";
-            var path = "addq";
+
+            var account = new AccountDoc(1230, 456, "Resolved", "RevitModel", "LinkModel");
+            MEPACRequest.Post(account);
+            //var value = "AliceJ";
+            //var path = "addq";
             //TestHtmlClass.Test6(new HttpClient(), path, value);
             //HtmlClass.RunJson(new HttpClient(), "addq", value);
-            HtmlClass.RunQuery(new HttpClient(), path, value);
+            //HtmlClass.RunQuery(new HttpClient(), path, value);
             //PersonClient.Test5(new HttpClient(), "addj");
 
             return Autodesk.Revit.UI.Result.Succeeded;

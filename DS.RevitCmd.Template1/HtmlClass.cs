@@ -7,6 +7,7 @@ using System.Net;
 using System.Diagnostics;
 using System.Collections.Specialized;
 using System.Net.Http;
+using System.IO;
 
 namespace DS.RevitCmd.Template1
 {

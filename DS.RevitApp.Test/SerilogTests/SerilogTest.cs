@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using DS.RevitApp.Test.SerilogTests;
 using DS.RevitLib.Utils.Various;
 using PathFinderLib;
 using Serilog;
@@ -20,21 +21,22 @@ namespace DS.RevitApp.Test
     {
         private readonly UIDocument _uiDoc;
         private readonly Document _doc;
+        private readonly AccountDoc _accountDoc;
         private string _path;
 
         public SerilogTest(UIDocument uiDoc)
         {
             _uiDoc = uiDoc;
             _doc = uiDoc.Document;
-
             var dir = new DirectoryInfo(LogPath);
             if(dir.Exists ) { dir.Delete(true); }
             
+            _accountDoc = new AccountDoc(123, 456, "Resolved", "RevitModel", "LinkModel");
 
             BuildLog();
             Log.Debug("Foo started");
-
-            Run();
+            Log.Verbose("{@AccountDoc} logged.", _accountDoc);
+            //Run();
 
             Log.CloseAndFlush();
         }
@@ -60,7 +62,11 @@ namespace DS.RevitApp.Test
       .MinimumLevel.Debug()
       .WriteTo.Debug()
       .WriteTo.File(LogPath + "//my_log.log", rollingInterval: RollingInterval.Day)
-       .WriteTo.RollingFile(new CompactJsonFormatter(), LogPath + "//app-{Date}.json", Serilog.Events.LogEventLevel.Information)
+        .WriteTo.Http(
+                    requestUri: "http://localhost:3000/accountItem",
+                    queueLimitBytes: null,
+                    httpClient: new CustomHttpClient())
+      //.WriteTo.RollingFile(new CompactJsonFormatter(), LogPath + "//app-{Date}.json", Serilog.Events.LogEventLevel.Information)
       .CreateLogger();
         }
 

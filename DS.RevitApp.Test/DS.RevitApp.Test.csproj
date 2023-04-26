@@ -110,6 +110,9 @@
     <Reference Include="Serilog.Sinks.File, Version=5.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.Sinks.File.5.0.0\lib\net45\Serilog.Sinks.File.dll</HintPath>
     </Reference>
+    <Reference Include="Serilog.Sinks.Http, Version=8.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.Sinks.Http.8.0.0\lib\net461\Serilog.Sinks.Http.dll</HintPath>
+    </Reference>
     <Reference Include="Serilog.Sinks.RollingFile, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.Sinks.RollingFile.3.3.0\lib\net45\Serilog.Sinks.RollingFile.dll</HintPath>
     </Reference>
@@ -171,14 +174,19 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Unidecode.NET, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unidecode.NET.2.1.0\lib\netstandard2.0\Unidecode.NET.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SerilogTests\AccountDoc.cs" />
     <Compile Include="CmdFailureGatherer.cs" />
+    <Compile Include="SerilogTests\CustomHttpClient.cs" />
     <Compile Include="DirectShapeTest.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="MongoTest.cs" />
     <Compile Include="PathFinerTest.cs" />
-    <Compile Include="SerilogTest.cs" />
+    <Compile Include="SerilogTests\SerilogTest.cs" />
     <Compile Include="SolidOperationTest.cs" />
     <Compile Include="SymbolPlacer\AvailableMEPCurves.cs" />
     <Compile Include="SymbolPlacer\FamiliesSelectorTest.cs" />

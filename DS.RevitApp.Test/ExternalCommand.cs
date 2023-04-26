@@ -24,7 +24,7 @@ namespace DS.RevitApp.Test
 
             //new MongoTest();
 
-            //new SerilogTest(uidoc);
+            new SerilogTest(uidoc);
 
             //var test = new PathFinerTest(doc, uidoc);
             //test.Run();
