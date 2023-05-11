@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitCmd.Template1", "DS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitCmd.Template2", "DS.RevitCmd.Template2\DS.RevitCmd.Template2.csproj", "{5001871C-1085-4F99-AE94-542D4CD82E0B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitCmd.MVVMTemplate3", "DS.RevitCmd.MVVMTemplate3\DS.RevitCmd.MVVMTemplate3.csproj", "{986618ED-6F85-4BA4-9E6A-F3B42870E1DB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +90,10 @@ Global
 		{5001871C-1085-4F99-AE94-542D4CD82E0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5001871C-1085-4F99-AE94-542D4CD82E0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5001871C-1085-4F99-AE94-542D4CD82E0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{986618ED-6F85-4BA4-9E6A-F3B42870E1DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{986618ED-6F85-4BA4-9E6A-F3B42870E1DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{986618ED-6F85-4BA4-9E6A-F3B42870E1DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{986618ED-6F85-4BA4-9E6A-F3B42870E1DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
