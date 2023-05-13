@@ -16,6 +16,9 @@ using DS.RevitLib.Utils.Collisions.Detectors;
 using DS.RevitLib.Utils.Elements.MEPElements;
 using DS.RevitLib.Utils.Elements;
 using System.Windows.Media.Media3D;
+using DS.RevitLib.Utils.MEP.Creator;
+using DS.RevitLib.Utils;
+using System.Linq;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -25,6 +28,7 @@ namespace DS.RVT.ModelSpaceFragmentation
         public static UIDocument Uidoc;
         public static Document Doc { get; set; }
         public static UIApplication Uiapp;
+        private readonly TransactionBuilder _trb;
 
         public Main(Application app, UIApplication uiapp, UIDocument uidoc, Document doc)
         {
@@ -32,7 +36,8 @@ namespace DS.RVT.ModelSpaceFragmentation
             Uiapp = uiapp;
             Uidoc = uidoc;
             Doc = doc;
-            PointsStep = 20;
+            PointsStep = 100;
+            _trb = new TransactionBuilder(doc);
         }
 
         public static Element CurrentElement { get; set; }
@@ -40,6 +45,7 @@ namespace DS.RVT.ModelSpaceFragmentation
         private MEPCurve _baseMEPCurve;
 
         public static int PointsStep { get; set; }
+
 
         public static double PointsStepF { get; set; }
 
@@ -59,8 +65,8 @@ namespace DS.RVT.ModelSpaceFragmentation
             ElementInfo pointsInfo = new ElementInfo();
             pointsInfo.GetPoints(CurrentElement);
 
-            var uCS1BasePoint =new Point3D(ElementInfo.MinBoundPoint.X, ElementInfo.MinBoundPoint.Y, ElementInfo.MinBoundPoint.Z);
-            var uCS2BasePoint = new Point3D(0,0,0);
+            var uCS1BasePoint = new Point3D(ElementInfo.MinBoundPoint.X, ElementInfo.MinBoundPoint.Y, ElementInfo.MinBoundPoint.Z);
+            var uCS2BasePoint = new Point3D(0, 0, 0);
             var pointConverter = new PointConverter(uCS1BasePoint, uCS2BasePoint, PointsStepF);
 
             var (elements, linkElementsDict) = new ElementsExtractor(Doc).GetAll();
@@ -76,14 +82,14 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             var solidModel = new RevitLib.Utils.Solids.Models.SolidModel(CurrentElement.Solid());
             MEPCurveModel mEPCurveModel = new MEPCurveModel(CurrentElement as MEPCurve, solidModel);
-            var radius = new ElbowRadiusCalc(mEPCurveModel).GetRadius(90.DegToRad());
+            var radius = new ElbowRadiusCalc(mEPCurveModel).GetRadius(90.DegToRad()).Result;
             var minDistPoint = 2 * radius + 50.MMToFeet();
             minDistPoint = Math.Ceiling(minDistPoint / PointsStepF);
 
             var minDistPointByte = Convert.ToByte(minDistPoint);
 
             //return;
-            var requirement = new BestPathRequirement(1, minDistPointByte);
+            var requirement = new BestPathRequirement(0, minDistPointByte);
 
             //Path finding initiation
             PathFinder pathFinder = new PathFinder();
@@ -95,8 +101,14 @@ namespace DS.RVT.ModelSpaceFragmentation
                 TaskDialog.Show("Error", "No available path exist!");
             else
             {
-                List<XYZ> pathCoords = Path.PathRefinement(path, pointConverter);
-                Path.ShowPath(pathCoords);
+                var pathCoords = Path.Refine(path);
+                List<XYZ> xYZPathCoords = Path.Convert(pathCoords, pointConverter);
+                //List<XYZ> xYZPathCoords = Path.PathRefinement(path, pointConverter);
+                Path.ShowPath(xYZPathCoords);
+                var builder = new BuilderByPoints(_baseMEPCurve, xYZPathCoords);
+                var mEPElements = builder.BuildSystem(_trb);
+
+                _trb.Build(() => Doc.Delete(_baseMEPCurve.Id), "delete baseMEPCurve");
             }
 
             //CLZVisualizator.ShowCLZOfPoint(PointsInfo.StartElemPoint); 

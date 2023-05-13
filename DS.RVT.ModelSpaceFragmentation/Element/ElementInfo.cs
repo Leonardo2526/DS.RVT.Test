@@ -20,7 +20,7 @@ namespace DS.RVT.ModelSpaceFragmentation
         public static XYZ MaxBoundPoint { get; set; }
         public static double OffsetFromOriginByX { get; } = 1000;
         public static double OffsetFromOriginByY { get; } = 1000;
-        public static double OffsetFromOriginByZ { get; } = 1000;
+        public static double OffsetFromOriginByZ { get; } = 2000;
 
         public static XYZ CenterElemPoint { get; set; }
         public static XYZ StartElemPoint { get; set; }
