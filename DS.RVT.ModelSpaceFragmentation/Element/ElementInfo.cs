@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Windows.Media.Media3D;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -22,29 +22,32 @@ namespace DS.RVT.ModelSpaceFragmentation
         public static double OffsetFromOriginByY { get; } = 1000;
         public static double OffsetFromOriginByZ { get; } = 2000;
 
-        public static XYZ CenterElemPoint { get; set; }
         public static XYZ StartElemPoint { get; set; }
         public static XYZ EndElemPoint { get; set; }
 
         double OffsetFromOriginByXInFeets;
         double OffsetFromOriginByYInFeets;
         double OffsetFromOriginByZInFeets;
+        private readonly Vector3D _stepVector;
+        private readonly XYZ _startPoint;
+        private readonly XYZ _endPoint;
+
+        public ElementInfo(Vector3D stepVector, XYZ startPoint, XYZ endPoint)
+        {
+            _stepVector = stepVector;
+            _startPoint = startPoint;
+            _endPoint = endPoint;
+        }
 
         public List<XYZ> GetPoints(Element element)
         {
             ConvertToFeets();
 
             List<XYZ> elementPoints = new List<XYZ>();
-
-            ElementUtils elementUtils = new ElementUtils();
-
-            //Get bound points
-            elementUtils.GetPoints(element, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint);
-            elementPoints.Add(startPoint);
-            elementPoints.Add(endPoint);
-            CenterElemPoint = centerPoint;
-            StartElemPoint = startPoint;
-            EndElemPoint = endPoint;
+            elementPoints.Add(_startPoint);
+            elementPoints.Add(_endPoint);
+            StartElemPoint = _startPoint;
+            EndElemPoint = _endPoint;
 
             //GetOffset();
 
@@ -67,6 +70,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         void ConvertToFeets()
         {
+
             OffsetFromOriginByXInFeets = UnitUtils.Convert((double)OffsetFromOriginByX / 1000,
                                           DisplayUnitType.DUT_METERS,
                                           DisplayUnitType.DUT_DECIMAL_FEET);
@@ -76,6 +80,19 @@ namespace DS.RVT.ModelSpaceFragmentation
             OffsetFromOriginByZInFeets = UnitUtils.Convert((double)OffsetFromOriginByZ / 1000,
                                            DisplayUnitType.DUT_METERS,
                                            DisplayUnitType.DUT_DECIMAL_FEET);
+
+            var ofx = OffsetFromOriginByXInFeets / _stepVector.X;
+            int ofxr = (int)Math.Round(ofx);
+            OffsetFromOriginByXInFeets = ofxr * _stepVector.X;
+
+
+            var ofy= OffsetFromOriginByYInFeets / _stepVector.Y;
+            int ofyr = (int)Math.Round(ofy);
+            OffsetFromOriginByYInFeets = ofyr * _stepVector.Y;
+
+            var ofz = OffsetFromOriginByZInFeets / _stepVector.Z;
+            int ofzr = (int)Math.Round(ofz);
+            OffsetFromOriginByZInFeets = ofzr * _stepVector.Z;
         }
 
         //void GetOffset()

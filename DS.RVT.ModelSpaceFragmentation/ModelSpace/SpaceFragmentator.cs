@@ -27,7 +27,7 @@ namespace DS.RVT.ModelSpaceFragmentation
         public void FragmentSpace(Element element)
         {
 
-            ElementInfo pointsInfo = new ElementInfo();
+            ElementInfo pointsInfo = null;
             pointsInfo.GetPoints(element);
 
             ModelSpacePointsGenerator modelSpacePointsGenerator =
