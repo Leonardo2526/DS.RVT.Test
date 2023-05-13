@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using DS.RevitLib.Utils.Various;
 using DS.RVT.ModelSpaceFragmentation.Lines;
 using FrancoGustavo;
 using System;
@@ -6,12 +7,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Media3D;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
     static class Path
     {
-        public static List<XYZ> PathRefinement(List<PathFinderNode> path)
+        public static List<XYZ> PathRefinement(List<PathFinderNode> path, IPointConverter pointConverter)
+        {
+
+            //Convert path to revit coordinates                
+            List<XYZ> pathCoords = new List<XYZ>();
+            //pathCoords.Add(ElementInfo.StartElemPoint);
+
+            foreach (PathFinderNode item in path)
+            {
+                Point3D point = new Point3D(item.PX, item.PY, item.PZ);
+                Point3D ucs1Point = pointConverter.ConvertToUSC1(point);
+                var xYZ = new XYZ(ucs1Point.X, ucs1Point.Y, ucs1Point.Z);
+                pathCoords.Add(xYZ);
+            }
+
+            return pathCoords;
+
+        }
+
+        public static List<XYZ> OldPathRefinement(List<PathFinderNode> path)
         {
 
             //Convert path to revit coordinates                

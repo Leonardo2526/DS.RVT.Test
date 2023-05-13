@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DS.RevitLib.Utils.Extensions;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -41,9 +42,11 @@ namespace DS.RVT.ModelSpaceFragmentation
                 List<XYZ> pointsForSearch = GetPointsInSolids(keyValue.Value, solids);
 
                 foreach (XYZ point in pointsForSearch)
-                {
+                {                    
                     if (pointInSolidChecker.IsPointInSolid(point, solids))
                         UnpassablePoints.Add(point);
+                    else
+                    { PassablePoints.Add(point); }
                 }
             }
 
