@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using DS.ClassLib.VarUtils;
+using DS.ClassLib.VarUtils.Events;
 using Revit.Async;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace DS.RevitApp.TransactionTest.Model
         private readonly Document _doc;
         private readonly UIDocument _uiDoc;
         private readonly Task _task;
-        private readonly IWindowTaskEvent _taskEvent;
+        private readonly TaskComplition _taskEvent;
         private readonly int _id;
 
         /// <summary>
@@ -28,7 +29,7 @@ namespace DS.RevitApp.TransactionTest.Model
         /// </summary>
         /// <param name="doc"></param>
         /// <param name="taskEvent"><see cref="WindowTaskEvent"/> to create a new event task.</param>
-        public TrgEventBuilder_1(Document doc, UIDocument uiDoc, IWindowTaskEvent taskEvent, int id)
+        public TrgEventBuilder_1(Document doc, UIDocument uiDoc, TaskComplition taskEvent, int id)
         {
             _doc = doc;
             _uiDoc = uiDoc;
@@ -57,6 +58,16 @@ namespace DS.RevitApp.TransactionTest.Model
             }
         }
 
+        public async Task BuildAsync2(Action operation, bool revitAsync = false)
+        {
+            using (var trg = new TransactionGroup(_doc, $"{_id}"))
+            {
+                trg.Start();
+                var st = trg.GetStatus();
+                await CreateTask(operation, revitAsync);
+                TrgCommitter(trg);
+            }
+        }
 
         public async Task BuildAsync1(Action operation, bool revitAsync = false)
         {
@@ -72,8 +83,7 @@ namespace DS.RevitApp.TransactionTest.Model
 
         private async Task CreateTask(Action operation, bool wrapRevitAsync = false)
         {
-            while (true)
-            {
+            
                 if (wrapRevitAsync)
                 {
                     await RevitTask.RunAsync(() => operation.Invoke());
@@ -87,10 +97,9 @@ namespace DS.RevitApp.TransactionTest.Model
                 Debug.Print($"await action task {Task.CurrentId} started.");
                 _task.Wait();
                 //await task;
-                Debug.Print($"Task {Task.CurrentId} executed.");
-                break;
+                Debug.Print($"Task {Task.CurrentId} executed.");               
             }
-        }
+       
 
         private Task CreateTaskAsync(Action operation, bool wrapRevitAsync = false)
         {
@@ -120,12 +129,17 @@ namespace DS.RevitApp.TransactionTest.Model
         /// <param name="trg">Current opened transaction group.</param>
         private void TrgCommitter(TransactionGroup trg)
         {
-            if (trg.HasStarted() && !_taskEvent.WindowClosed)
+            if (trg.HasStarted() && _taskEvent.EventType == EventType.Rollback )
             {
                 trg.RollBack();
                 TaskDialog.Show($"{GetType().Name}", $"trg {_id} rolled");
             }
-            else if (trg.HasStarted() && _taskEvent.WindowClosed)
+            else if (trg.HasStarted() && _taskEvent.EventType == EventType.Close)
+            {
+                trg.Commit();
+                TaskDialog.Show($"{GetType().Name}", $"trg {_id} committed");
+            }
+            else if (trg.HasStarted() && _taskEvent.EventType == EventType.Apply)
             {
                 trg.Commit();
                 TaskDialog.Show($"{GetType().Name}", $"trg {_id} committed");

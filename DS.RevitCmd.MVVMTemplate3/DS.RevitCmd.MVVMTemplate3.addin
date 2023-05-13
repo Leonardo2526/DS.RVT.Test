@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+	<AddIn Type="Command">
+		<Name>DS.RevitCmd.MVVMTemplate3</Name>
+		<FullClassName>DS.RevitCmd.MVVMTemplate3.ExternalCommand</FullClassName>
+		<Text>DS.RevitCmd.MVVMTemplate3</Text>
+		<Description>New revit WPF plugin</Description>
+		<VisibilityMode>AlwaysVisible</VisibilityMode>
+		<Assembly>.\DS.RevitCmd.MVVMTemplate3\DS.RevitCmd.MVVMTemplate3.dll</Assembly>
+		<AddInId>aac0b1fb-2811-4f4f-9a7d-f7d4512b3f1a</AddInId>
+		<VendorId>DS</VendorId>
+	</AddIn> 
+</RevitAddIns>

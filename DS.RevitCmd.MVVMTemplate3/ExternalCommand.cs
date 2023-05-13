@@ -1,15 +1,13 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using DS.RevitApp.TransactionTest.Model;
-using DS.RevitApp.TransactionTest.View;
-using DS.RevitApp.TransactionTest.ViewModel;
 using Revit.Async;
+using System;
 
-namespace DS.RevitApp.TransactionTest
+namespace DS.RevitCmd.MVVMTemplate3
 {
     [Transaction(TransactionMode.Manual)]
-    [Regeneration(RegenerationOption.Manual)]
+    //[Regeneration(RegenerationOption.Manual)]
     public class ExternalCommand : IExternalCommand
     {
         public Autodesk.Revit.UI.Result Execute(ExternalCommandData commandData,
@@ -21,15 +19,12 @@ namespace DS.RevitApp.TransactionTest
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            var tr = new TransactioinTestViewModel(doc, uidoc);
-            tr.CreateTransaction(doc, uiapp);
-            //tr.SynchronizeWithCentralWindow(doc, uiapp);
+            RevitTask.Initialize(uiapp);
 
 
-            //RevitTask.Initialize(uiapp);
-
-            //var startWindow = new TransactionWindow(doc, uidoc, uiapp);
-            //startWindow.Show();
+            var testModel = new TestViewModel(uidoc);
+            StartWindow startWindow = new StartWindow(testModel);
+            startWindow.Show();
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }

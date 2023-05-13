@@ -39,6 +39,13 @@
                     RollBack
                 </TextBlock>
             </Button>
+            <Button x:Name="Apply" Margin="10"  Command="{Binding Apply}"
+                    Style="{StaticResource DS_Button}" 
+                    HorizontalAlignment="Left">
+                <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                    Apply
+                </TextBlock>
+            </Button>
         </StackPanel>
     </Grid>
 </Window>

@@ -2,16 +2,13 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D6EDCB4C-E55E-4C43-816D-EE12684C9E6C}</ProjectGuid>
+    <ProjectGuid>{986618ED-6F85-4BA4-9E6A-F3B42870E1DB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DS.RevitApp.TransactionTest</RootNamespace>
-    <AssemblyName>DS.RevitApp.TransactionTest</AssemblyName>
+    <RootNamespace>DS.RevitCmd.MVVMTemplate3</RootNamespace>
+    <AssemblyName>DS.RevitCmd.MVVMTemplate3</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -36,16 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DS.ClassLib.VarUtils, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\DS.CommonLib.Utils\DS.ClassLib.VarUtils\bin\Debug\DS.ClassLib.VarUtils.dll</HintPath>
-    </Reference>
-    <Reference Include="iUtils">
-      <HintPath>..\..\VAR.RevitLib.Utils\iUtils\bin\Debug\iUtils.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.39\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="Revit.Async, Version=2.0.1.0, Culture=neutral, processorArchitecture=AMD64">
@@ -74,36 +61,41 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExternalCommand.cs" />
-    <Compile Include="Model\Class1.cs" />
-    <Compile Include="Model\ExternalEventMy.cs" />
-    <Compile Include="Model\TransactionModel.cs" />
-    <Compile Include="Model\TrgEventBuilder_1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RevitAsyncTest.cs" />
-    <Compile Include="ViewModel\TransactioinTestViewModel.cs" />
-    <Compile Include="View\TransactionWindow.xaml.cs">
-      <DependentUpon>TransactionWindow.xaml</DependentUpon>
+    <Compile Include="StartWindow.xaml.cs">
+      <DependentUpon>StartWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\TestViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="DS.RevitApp.TransactionTest.addin" />
+    <None Include="DS.RevitCmd.MVVMTemplate3.addin" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="View\Resources.xaml">
+    <Page Include="DS.WPF.Dictionary.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\TransactionWindow.xaml">
+    <Page Include="StartWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ProjectDescription.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\DS.CommonLib.Utils\DS.ClassLib.VarUtils\DS.ClassLib.VarUtils.csproj">
+      <Project>{97D2548B-BA7F-4C31-8F52-6BF929E0C37B}</Project>
+      <Name>DS.ClassLib.VarUtils</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\DS.RevitLib.Utils\DS.RevitLib.Utils\DS.RevitLib.Utils.csproj">
       <Project>{9873F185-F630-4BB2-94A4-D9665F32B802}</Project>
       <Name>DS.RevitLib.Utils</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

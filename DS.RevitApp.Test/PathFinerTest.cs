@@ -56,11 +56,12 @@ namespace DS.RevitApp.Test
             //создаем опции поиска
             //параметр в конструкторе это Ширина отвода от оси до грани
             //исходя из этого параметра будет подбираться минимальный шаг поиска так, что
-            //минимальная длина прямого участка 50 мм + 2 * Ширина отвода
-            var options = new FinderOptions(200.mmToFyt2());
+            //минимальная длина прямого участка 50 мм + 2* Ширина отвода
+            var options = new FinderOptions(new List<int>());
 
             //класс анализирует геометрию
-            var geometryDocuments = new GeometryDocuments(_doc, options, null);
+            GeometryDocuments geometryDocuments = null;
+            //var geometryDocuments = new GeometryDocuments(_doc, options, null);
 
             //класс для поиска пути
             var finder = new PathFinderToOnePoint(startPoint, endPoint,
@@ -80,7 +81,7 @@ namespace DS.RevitApp.Test
             //объединяем прямые последовательные участки пути в один сегмент
             path = Optimizer.MergeStraightSections(path, options);
 
-            var trb = new TransactionBuilder<Element>(_doc);
+            var trb = new TransactionBuilder(_doc);
             trb.Build(() => ShowPath(path), "show path");
         }
         private void ShowPath(List<XYZ> path)

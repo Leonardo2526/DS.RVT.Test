@@ -1,0 +1,28 @@
+﻿<Window x:Class="DS.RevitCmd.MVVMTemplate3.StartWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DS.RevitCmd.MVVMTemplate3"
+             Title="StartWindow" SizeToContent="WidthAndHeight" 
+        ResizeMode="NoResize"
+            WindowStartupLocation="CenterScreen">
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="DS.WPF.Dictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    
+    <Grid>       
+        <StackPanel Margin="10" Width="200">       
+            <Button x:Name="AddeNew" Margin="10" Width="100" 
+                    Command="{Binding Run}"
+                    Style="{StaticResource DS_Button}">
+                <TextBlock TextWrapping="Wrap" TextAlignment="Center">Add new item</TextBlock>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>

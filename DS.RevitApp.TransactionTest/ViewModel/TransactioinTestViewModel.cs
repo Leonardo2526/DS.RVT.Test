@@ -1,16 +1,13 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using DS.ClassLib.VarUtils;
-using DS.ClassLib.VarUtils.TaskEvents;
 using DS.RevitApp.TransactionTest.Model;
-using DS.RevitApp.TransactionTest.View;
+using DS.RevitLib.Utils.Elements;
 using Revit.Async;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -18,35 +15,23 @@ using System.Windows.Input;
 
 namespace DS.RevitApp.TransactionTest.ViewModel
 {
-    public class TransactioinTestViewModel : INotifyPropertyChanged, IEventHandler
+    public class TransactioinTestViewModel
     {
         private readonly Document _doc;
         private readonly UIDocument _uiDoc;
         private readonly TransactionModel _model;
-        private readonly TransactionWindow _transactionWindow;
 
-        public TransactioinTestViewModel(Document doc, UIDocument uiDoc, TransactionWindow transactionWindow)
+        public TransactioinTestViewModel(Document doc, UIDocument uiDoc)
         {
             _doc = doc;
             _uiDoc = uiDoc;
             _model = new TransactionModel(_doc, _uiDoc);
-            _transactionWindow = transactionWindow;
         }
 
+
         public ICommand Commit => new RelayCommand(async c =>
-        {           
-
-            Debug.Print("\nCommand started");
-            Task task1 = Task.Run(async () =>
-            {
-            IWindowTaskEvent taskEvent = new HandlerTaskEvent(this);
-                await new TrgEventBuilder_1(_doc, _uiDoc, taskEvent, 0).
-                      BuildAsync(() => _model.Create(), false);
-
-            });
-            await task1;
-
-            Debug.Print("Command executed");
+        {
+            await CreateTransactionAsync();
         });
 
         public ICommand CommitOld => new RelayCommand(async c =>
@@ -60,7 +45,7 @@ namespace DS.RevitApp.TransactionTest.ViewModel
 
             Task task1 = Task.Run(async () =>
             {
-               await RunTransaction(1, 0, 4000);
+                await RunTransaction(1, 0, 4000);
             });
             Task task2 = Task.Run(async () =>
             {
@@ -114,51 +99,106 @@ namespace DS.RevitApp.TransactionTest.ViewModel
             }
         }
 
-        /// <summary>
-        /// Perform action to close transaction group.
-        /// </summary>
-        /// <param name="trg">Current opened transaction group.</param>
-        private void TrgCommitter(TransactionGroup trg, IWindowTaskEvent taskEvent)
+
+        public ICommand Apply => new RelayCommand(c =>
         {
-            if (trg.HasStarted() && !taskEvent.WindowClosed)
-            {
-                trg.RollBack();
-                //TaskDialog.Show($"{GetType().Name}", $"trg {_id} rolled");
-            }
-            else if (trg.HasStarted() && taskEvent.WindowClosed)
-            {
-                trg.Commit();
-                //TaskDialog.Show($"{GetType().Name}", $"trg {_id} committed");
-            }
-            else
-            {
-                TaskDialog.Show($"{GetType().Name}", "trg is not closed due to it hasn't been started.");
-            }
-        }
+            _model?.Apply();
+        });
 
-
-        public event EventHandler RollBackHandler;
         public ICommand RollBack => new RelayCommand(c =>
         {
-            EventArgs eventArgs = null;
-            RollBackHandler?.Invoke(this, eventArgs);
+            _model?.RollBack();
         });
 
-
-        public event EventHandler CloseWindowHandler;
         public ICommand CloseWindow => new RelayCommand(c =>
         {
-            EventArgs eventArgs = null;
-            CloseWindowHandler?.Invoke(this, eventArgs);
-            //TaskDialog.Show("revit", "CloseWindows");
+            _model?.Close();
         });
 
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged([CallerMemberName] string prop = "")
+        public async Task CreateTransactionAsync()
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(prop));
+            Debug.Print("\nCommand started");
+
+            List<Element> docElements = new List<Element>();
+            Dictionary<RevitLinkInstance, List<Element>> linkElementsDict = new Dictionary<RevitLinkInstance, List<Element>>();
+            (docElements, linkElementsDict) = new ElementsExtractor(_doc).GetAll();
+
+            Debug.WriteLine("docElements: " + docElements.Count());
+
+            var elements = _model.MEPSystem.AllElements.Where(obj => obj.IsValidObject).ToList();
+            Debug.WriteLine("validElements: " + elements.Count());
+            //try
+            //{
+            //}
+            //catch (System.Exception ex)
+            //{
+            //    Debug.WriteLine(ex);
+            //}
+
+            await _model.DeleteElementsAsync();
+
+
+            elements = elements.Where(obj => obj.IsValidObject).ToList();
+            Debug.WriteLine("validElements: " + elements.Count());
+
+            //(docElements, linkElementsDict) = new ElementsExtractor(_doc).GetAll();
+            docElements = docElements.Where(obj => obj.IsValidObject).ToList();
+            Debug.WriteLine("docElements: " + docElements.Count());
+
+            Debug.Print("Command executed");
+        }
+
+        public void CreateTransaction(Document doc, UIApplication uiapp)
+        {
+            Debug.Print("\nCommand started");
+
+            List<Element> docElements = new List<Element>();
+            Dictionary<RevitLinkInstance, List<Element>> linkElementsDict = new Dictionary<RevitLinkInstance, List<Element>>();
+            (docElements, linkElementsDict) = new ElementsExtractor(_doc).GetAll();
+
+            docElements = docElements.Where(obj => obj.IsValidObject).ToList();
+            Debug.WriteLine("docElements: " + docElements.Count());
+
+            //var elements = _model.MEPSystem.AllElements.Where(obj => obj.IsValidObject).ToList();
+            //Debug.WriteLine("validElements: " + elements.Count());
+            //try
+            //{
+            //}
+            //catch (System.Exception ex)
+            //{
+            //    Debug.WriteLine(ex);
+            //}
+
+            //_model.DeleteElementsWtihSingleTransactionAndDisconnect(docElements);
+            //_model.DeleteElementsWithDisconnect(docElements);
+            _model.DeleteElementsWtihSingleTransaction(docElements);
+
+            SynchronizeWithCentralWindow(doc, uiapp);
+
+            Debug.WriteLine("Transaction was rolled back");
+            //elements = elements.Where(obj => obj.IsValidObject).ToList();
+            //Debug.WriteLine("validElements: " + elements.Count());
+
+            //(docElements, linkElementsDict) = new ElementsExtractor(_doc).GetAll();
+            docElements = docElements.Where(obj => obj.IsValidObject).ToList();
+            Debug.WriteLine("docElements: " + docElements.Count());
+
+            Debug.Print("Command executed");
+        }
+
+        public void SynchronizeWithCentralWindow(Document doc, UIApplication uiapp)
+        {
+            var syncCmd = RevitCommandId.LookupPostableCommandId(PostableCommand.Undo);
+            try
+            {
+                uiapp.PostCommand(syncCmd);
+
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
         }
     }
 }
