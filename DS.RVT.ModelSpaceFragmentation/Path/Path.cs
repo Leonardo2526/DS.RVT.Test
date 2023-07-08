@@ -24,7 +24,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             foreach (PathFinderNode item in path)
             {
                 Point3D point = new Point3D(item.X, item.Y, item.Z);
-                Point3D ucs1Point = pointConverter.ConvertToUSC1(point);
+                Point3D ucs1Point = pointConverter.ConvertToUCS1(point);
                 var xYZ = new XYZ(ucs1Point.X, ucs1Point.Y, ucs1Point.Z);
                 pathCoords.Add(xYZ);
             }
@@ -49,7 +49,7 @@ namespace DS.RVT.ModelSpaceFragmentation
                 if (currentDir.Length != 0)
                 { currentDir.Normalize(); }
 
-                if(baseDir.Length == 0 || !currentDir.IsAlmostEqual(baseDir))
+                if(baseDir.Length == 0 || !currentDir.IsAlmostEqualTo(baseDir))
                 {
                     points.Add(basePoint);
                     baseDir = currentDir;
@@ -70,7 +70,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             foreach (var point in path)
             {
-                Point3D ucs1Point = pointConverter.ConvertToUSC1(point);
+                Point3D ucs1Point = pointConverter.ConvertToUCS1(point);
                 var xYZ = new XYZ(ucs1Point.X, ucs1Point.Y, ucs1Point.Z);
                 pathCoords.Add(xYZ);
             }

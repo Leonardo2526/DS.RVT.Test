@@ -76,7 +76,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             var uCS1BasePoint = new Point3D(ElementInfo.MinBoundPoint.X, ElementInfo.MinBoundPoint.Y, ElementInfo.MinBoundPoint.Z);
             var uCS2BasePoint = new Point3D(0, 0, 0);
-            var pointConverter = new BestPointConverter(uCS1BasePoint, uCS2BasePoint, stepVector);
+            var pointConverter = new VectorPointConverter(uCS1BasePoint, uCS2BasePoint, stepVector);
 
             var (elements, linkElementsDict) = new ElementsExtractor(Doc).GetAll();
             var traceSettings = new TraceSettings();

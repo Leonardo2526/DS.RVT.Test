@@ -45,7 +45,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\DS.RevitUtils.MEP.dll</HintPath>
     </Reference>
-    <Reference Include="FrancoGustavo, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="FrancoGustavo, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\DS.WindowsApp.Programs\PathSearchAlgorythms\FrancoGustavo\bin\Debug\FrancoGustavo.dll</HintPath>
     </Reference>
