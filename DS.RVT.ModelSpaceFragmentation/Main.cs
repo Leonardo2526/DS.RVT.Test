@@ -42,7 +42,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             Uiapp = uiapp;
             Uidoc = uidoc;
             Doc = doc;
-            PointsStep = 300;
+            PointsStep = 100;
             _trb = new TransactionBuilder(doc);
         }
 
@@ -84,7 +84,8 @@ namespace DS.RVT.ModelSpaceFragmentation
             //Get bound points
             elementUtils.GetPoints(CurrentElement, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint);
 
-            var stepVector = GetStepVector(PointsStepF, startPoint, endPoint);
+            var stepVector = new Vector3D(PointsStepF, PointsStepF, PointsStepF);
+            //var stepVector = GetStepVector(PointsStepF, startPoint, endPoint);
 
             ElementInfo pointsInfo = new ElementInfo(stepVector, startPoint, endPoint);
             pointsInfo.GetPoints(CurrentElement);
@@ -95,7 +96,10 @@ namespace DS.RVT.ModelSpaceFragmentation
             var pointConverter = new ClassLib.VarUtils.Points.VectorPointConverter(uCS1BasePoint, uCS2BasePoint, stepVector);
 
             var (elements, linkElementsDict) = new ElementsExtractor(Doc).GetAll();
-            var traceSettings = new TraceSettings();
+            var traceSettings = new TraceSettings()
+            {
+                B = 100.MMToFeet()
+            };
             var collisionDetector = new CollisionDetectorByTrace(Doc, _baseMEPCurve, traceSettings, elements, linkElementsDict);
             collisionDetector.ObjectsToExclude = new List<Element>() { _baseMEPCurve };
 
@@ -136,9 +140,9 @@ namespace DS.RVT.ModelSpaceFragmentation
                 List<XYZ> xYZPathCoords = Path.Convert(pathCoords, pointConverter);
                 //List<XYZ> xYZPathCoords = Path.PathRefinement(path, pointConverter);
                 Path.ShowPath(xYZPathCoords);
-                //var builder = new BuilderByPoints(_baseMEPCurve, xYZPathCoords);
-                //var mEPElements = builder.BuildSystem(_trb);
-
+                var builder = new BuilderByPoints(_baseMEPCurve, xYZPathCoords);
+                var mEPElements = builder.BuildSystem(_trb);
+                //return;
                 _trb.Build(() => Doc.Delete(_baseMEPCurve.Id), "delete baseMEPCurve");
             }
 

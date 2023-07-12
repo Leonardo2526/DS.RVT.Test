@@ -39,13 +39,13 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             var firstNode = path[0];
             Point3D basePoint = new(firstNode.X, firstNode.Y, firstNode.Z);
-            Vector3D baseDir = new(0, 0, 0);
+            Vector3D baseDir = firstNode.Dir;
 
             for (int i = 1; i < path.Count; i++)
             {
                 var currentNode = path[i];
                 var currentPoint = new Point3D(currentNode.X, currentNode.Y, currentNode.Z);
-                var currentDir = currentPoint - basePoint;
+                var currentDir = path[i].Dir;
                 if (currentDir.Length != 0)
                 { currentDir.Normalize(); }
 

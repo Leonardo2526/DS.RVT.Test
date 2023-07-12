@@ -21,12 +21,32 @@ namespace DS.RVT.ModelSpaceFragmentation
         {
             //InputData data = new InputData(startPoint, endPoint, unpassablePoints);
             //data.ConvertToPlane();
-            var uCS2startPoint =  new Point3D(startPoint.X, startPoint.Y, startPoint.Z).Round(3);
-            var uCS2endPoint =  new Point3D(endPoint.X, endPoint.Y, endPoint.Z).Round(3);
+            var uCS2startPoint = new Point3D(startPoint.X, startPoint.Y, startPoint.Z).Round(3);
+            var uCS2endPoint = new Point3D(endPoint.X, endPoint.Y, endPoint.Z).Round(3);
 
             var uCS2minPoint = new Point3D(ElementInfo.MinBoundPoint.X, ElementInfo.MinBoundPoint.Y, ElementInfo.MinBoundPoint.Z).Round(3);
-            var uCS2maxPoint = new Point3D(ElementInfo.MaxBoundPoint.X, ElementInfo.MaxBoundPoint.Y, ElementInfo.MaxBoundPoint.Z).Round(3);        
+            var uCS2maxPoint = new Point3D(ElementInfo.MaxBoundPoint.X, ElementInfo.MaxBoundPoint.Y, ElementInfo.MaxBoundPoint.Z).Round(3);
 
+
+            List<FloatPathFinderNode> path = new List<FloatPathFinderNode>();
+
+            var mPathFinder = new TestPathFinder(uCS2maxPoint, uCS2minPoint, pathRequiment, collisionDetector, stepVector)
+            {
+                PunishAngles = new List<int>() { 90},
+                HeuristicEstimate = 10
+            };
+
+            var userDirectionFactory = directionFactory as UserDirectionFactory;
+            if (userDirectionFactory == null) { return null; }
+
+            var YZdirs = userDirectionFactory.Plane1_Directions;
+            path = mPathFinder.FindPath(
+                   uCS2startPoint,
+                    uCS2endPoint, YZdirs);
+            if (path != null)
+                return path;
+
+            return path;
 
             List<FloatPathFinderNode> pathNodes = FGAlgorythm.GetFloatPathByMap(
                 uCS2maxPoint, uCS2minPoint, uCS2startPoint, uCS2endPoint,
