@@ -9,6 +9,8 @@ using DS.RevitLib.Utils.Various;
 using System.Windows.Media.Media3D;
 using DS.ClassLib.VarUtils.Points;
 using DS.ClassLib.VarUtils.Directions;
+using FrancoGustavo.Algorithm;
+using System.Threading;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -16,24 +18,27 @@ namespace DS.RVT.ModelSpaceFragmentation
     {
         public List<XYZ> PathCoords { get; set; }
 
-        public List<FloatPathFinderNode> AStarPath(XYZ startPoint, XYZ endPoint, List<XYZ> unpassablePoints,
+        public List<PointPathFinderNode> AStarPath(XYZ startPoint, XYZ endPoint, List<XYZ> unpassablePoints,
             IDoublePathRequiment pathRequiment, CollisionDetectorByTrace collisionDetector, IDirectionFactory directionFactory, Vector3D stepVector)
         {
             //InputData data = new InputData(startPoint, endPoint, unpassablePoints);
             //data.ConvertToPlane();
-            var uCS2startPoint = new Point3D(startPoint.X, startPoint.Y, startPoint.Z).Round(3);
-            var uCS2endPoint = new Point3D(endPoint.X, endPoint.Y, endPoint.Z).Round(3);
+            var uCS2startPoint = new Point3D(startPoint.X, startPoint.Y, startPoint.Z);
+            var uCS2endPoint = new Point3D(endPoint.X, endPoint.Y, endPoint.Z);
 
             var uCS2minPoint = new Point3D(ElementInfo.MinBoundPoint.X, ElementInfo.MinBoundPoint.Y, ElementInfo.MinBoundPoint.Z).Round(3);
             var uCS2maxPoint = new Point3D(ElementInfo.MaxBoundPoint.X, ElementInfo.MaxBoundPoint.Y, ElementInfo.MaxBoundPoint.Z).Round(3);
 
 
-            List<FloatPathFinderNode> path = new List<FloatPathFinderNode>();
+            List<PointPathFinderNode> path = new List<PointPathFinderNode>();
 
-            var mPathFinder = new TestPathFinder(uCS2maxPoint, uCS2minPoint, pathRequiment, collisionDetector, stepVector)
+            var mHEstimate = 100;
+            var fractPrec = 7;
+            var nodeBuilder = new NodeBuilder(HeuristicFormula.Manhattan, mHEstimate, uCS2startPoint, uCS2endPoint, stepVector, true, fractPrec);
+            var mPathFinder = new TestPathFinder(uCS2maxPoint, uCS2minPoint, pathRequiment, collisionDetector, stepVector, nodeBuilder, fractPrec)
             {
-                PunishAngles = new List<int>() { 90},
-                HeuristicEstimate = 10
+                PunishAngles = new List<int>() { 90 },
+                TokenSource = new CancellationTokenSource(10000)
             };
 
             var userDirectionFactory = directionFactory as UserDirectionFactory;
@@ -47,12 +52,6 @@ namespace DS.RVT.ModelSpaceFragmentation
                 return path;
 
             return path;
-
-            List<FloatPathFinderNode> pathNodes = FGAlgorythm.GetFloatPathByMap(
-                uCS2maxPoint, uCS2minPoint, uCS2startPoint, uCS2endPoint,
-                pathRequiment, collisionDetector, directionFactory, stepVector);
-
-            return pathNodes;
         }
     }
 }

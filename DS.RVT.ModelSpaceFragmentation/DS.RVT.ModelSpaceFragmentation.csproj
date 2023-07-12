@@ -42,10 +42,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\DS.CommonLib.Utils\DS.Utils\bin\Debug\DS.PathSearch.dll</HintPath>
     </Reference>
-    <Reference Include="DS.RevitLib.Utils, Version=2.0.0.4, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\DS.RevitLib.Utils\DS.RevitLib.Utils\bin\Debug\DS.RevitLib.Utils.dll</HintPath>
-    </Reference>
     <Reference Include="DS.RevitUtils.MEP, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\DS.RevitUtils.MEP.dll</HintPath>
@@ -132,6 +128,10 @@
     <ProjectReference Include="..\..\DS.CommonLib.Utils\DS.ClassLib.VarUtils\DS.ClassLib.VarUtils.csproj">
       <Project>{97D2548B-BA7F-4C31-8F52-6BF929E0C37B}</Project>
       <Name>DS.ClassLib.VarUtils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\DS.RevitLib.Utils\DS.RevitLib.Utils\DS.RevitLib.Utils.csproj">
+      <Project>{9873f185-f630-4bb2-94a4-d9665f32b802}</Project>
+      <Name>DS.RevitLib.Utils</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

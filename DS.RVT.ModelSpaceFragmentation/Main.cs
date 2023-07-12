@@ -42,7 +42,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             Uiapp = uiapp;
             Uidoc = uidoc;
             Doc = doc;
-            PointsStep = 100;
+            PointsStep = 50;
             _trb = new TransactionBuilder(doc);
         }
 
@@ -119,7 +119,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             //return;
             var requirement = new BestPathRequirement(0, minDistPoint);
 
-            var angles = new List<int> { 60 };
+            var angles = new List<int> { 30 };
            var main = new Vector3D(basis.X.X, basis.X.Y, basis.X.Z).Round();
            var normal = new Vector3D(basis.Z.X, basis.Z.Y, basis.Z.Z).Round();
 
@@ -129,7 +129,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             //Path finding initiation
             PathFinder pathFinder = new PathFinder();
             var unpassPoints = SpaceFragmentator.UnpassablePoints ?? new List<XYZ>();
-            List<FloatPathFinderNode> path = pathFinder.AStarPath(ElementInfo.StartElemPoint,
+            List<PointPathFinderNode> path = pathFinder.AStarPath(ElementInfo.StartElemPoint,
                 ElementInfo.EndElemPoint, unpassPoints, requirement, collisionDetector, directionFactory, stepVector);
 
             if (path == null)
