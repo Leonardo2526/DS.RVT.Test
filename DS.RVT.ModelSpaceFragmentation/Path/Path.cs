@@ -33,7 +33,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
         }
 
-        public static List<Point3D> Refine(List<PathFinderNode> path)
+        public static List<Point3D> Refine(List<FloatPathFinderNode> path)
         {
             List<Point3D> points = new List<Point3D>();
 
@@ -70,7 +70,8 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             foreach (var point in path)
             {
-                Point3D ucs1Point = pointConverter.ConvertToUCS1(point);
+                Point3D ucs1Point = point;
+                //Point3D ucs1Point = pointConverter.ConvertToUCS1(point);
                 var xYZ = new XYZ(ucs1Point.X, ucs1Point.Y, ucs1Point.Z);
                 pathCoords.Add(xYZ);
             }

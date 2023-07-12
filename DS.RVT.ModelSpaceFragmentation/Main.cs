@@ -21,6 +21,10 @@ using DS.RevitLib.Utils;
 using System.Linq;
 using System.Net;
 using System.Windows;
+using DS.ClassLib.VarUtils.Points;
+using DS.RevitLib.Utils.Solids.Models;
+using DS.RevitLib.Utils.Models;
+using DS.ClassLib.VarUtils.Directions;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -65,6 +69,18 @@ namespace DS.RVT.ModelSpaceFragmentation
             CurrentElement = elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
             _baseMEPCurve = CurrentElement as MEPCurve;
 
+
+            var element2 = elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
+            var mEPCurve2 = element2 as MEPCurve;
+
+
+            var line1 = _baseMEPCurve.GetCenterLine();
+            var line2 = mEPCurve2.GetCenterLine();
+            var x = line1.Direction;
+            var z = x.CrossProduct(line2.Direction);
+            var y = x.CrossProduct(z);
+            var basis = new Basis(x, y, z, _baseMEPCurve.GetCenterPoint());
+
             //Get bound points
             elementUtils.GetPoints(CurrentElement, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint);
 
@@ -76,7 +92,7 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             var uCS1BasePoint = new Point3D(ElementInfo.MinBoundPoint.X, ElementInfo.MinBoundPoint.Y, ElementInfo.MinBoundPoint.Z);
             var uCS2BasePoint = new Point3D(0, 0, 0);
-            var pointConverter = new VectorPointConverter(uCS1BasePoint, uCS2BasePoint, stepVector);
+            var pointConverter = new ClassLib.VarUtils.Points.VectorPointConverter(uCS1BasePoint, uCS2BasePoint, stepVector);
 
             var (elements, linkElementsDict) = new ElementsExtractor(Doc).GetAll();
             var traceSettings = new TraceSettings();
@@ -93,18 +109,24 @@ namespace DS.RVT.ModelSpaceFragmentation
             MEPCurveModel mEPCurveModel = new MEPCurveModel(CurrentElement as MEPCurve, solidModel);
             var radius = new ElbowRadiusCalc(mEPCurveModel).GetRadius(90.DegToRad()).Result;
             var minDistPoint = 2 * radius + 50.MMToFeet();
-            minDistPoint = Math.Ceiling(minDistPoint / PointsStepF);
-
-            var minDistPointByte = Convert.ToByte(minDistPoint);
+            //minDistPoint = Math.Ceiling(minDistPoint / PointsStepF);
+            //var minDistPointByte = Convert.ToByte(minDistPoint);
 
             //return;
-            var requirement = new BestPathRequirement(0, minDistPointByte);
+            var requirement = new BestPathRequirement(0, minDistPoint);
+
+            var angles = new List<int> { 60 };
+           var main = new Vector3D(basis.X.X, basis.X.Y, basis.X.Z).Round();
+           var normal = new Vector3D(basis.Z.X, basis.Z.Y, basis.Z.Z).Round();
+
+            IDirectionFactory directionFactory = new UserDirectionFactory();
+            directionFactory.Build(main, normal, angles);
 
             //Path finding initiation
             PathFinder pathFinder = new PathFinder();
             var unpassPoints = SpaceFragmentator.UnpassablePoints ?? new List<XYZ>();
-            List<PathFinderNode> path = pathFinder.AStarPath(ElementInfo.StartElemPoint,
-                ElementInfo.EndElemPoint, unpassPoints, requirement, collisionDetector, pointConverter);
+            List<FloatPathFinderNode> path = pathFinder.AStarPath(ElementInfo.StartElemPoint,
+                ElementInfo.EndElemPoint, unpassPoints, requirement, collisionDetector, directionFactory, stepVector);
 
             if (path == null)
                 TaskDialog.Show("Error", "No available path exist!");
@@ -114,8 +136,8 @@ namespace DS.RVT.ModelSpaceFragmentation
                 List<XYZ> xYZPathCoords = Path.Convert(pathCoords, pointConverter);
                 //List<XYZ> xYZPathCoords = Path.PathRefinement(path, pointConverter);
                 Path.ShowPath(xYZPathCoords);
-                var builder = new BuilderByPoints(_baseMEPCurve, xYZPathCoords);
-                var mEPElements = builder.BuildSystem(_trb);
+                //var builder = new BuilderByPoints(_baseMEPCurve, xYZPathCoords);
+                //var mEPElements = builder.BuildSystem(_trb);
 
                 _trb.Build(() => Doc.Delete(_baseMEPCurve.Id), "delete baseMEPCurve");
             }

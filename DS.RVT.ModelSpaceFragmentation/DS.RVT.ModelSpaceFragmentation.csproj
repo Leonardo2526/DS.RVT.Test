@@ -3,6 +3,8 @@
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -36,7 +38,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DS.PathSearch, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="DS.PathSearch, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\DS.CommonLib.Utils\DS.Utils\bin\Debug\DS.PathSearch.dll</HintPath>
+    </Reference>
     <Reference Include="DS.RevitLib.Utils, Version=2.0.0.4, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\DS.RevitLib.Utils\DS.RevitLib.Utils\bin\Debug\DS.RevitLib.Utils.dll</HintPath>

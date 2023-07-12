@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
-    internal class BestPathRequirement : IPathRequiment
+    internal class BestPathRequirement : IDoublePathRequiment
     {
-        public BestPathRequirement(byte clearance, byte minAngleDistance)
+        public BestPathRequirement(double clearance, double minAngleDistance)
         {
             Clearance = clearance;
             MinAngleDistance = minAngleDistance;
         }
 
-        public byte Clearance { get; }
+        public double Clearance { get; }
 
-        public byte MinAngleDistance {get; }
+        public double MinAngleDistance {get; }
     }
 }
