@@ -1,4 +1,6 @@
 ﻿using Autodesk.Revit.DB;
+using DS.ClassLib.VarUtils.Points;
+using DS.RevitLib.Utils.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,31 +20,26 @@ namespace DS.RVT.ModelSpaceFragmentation
         /// Maximium point of zone for fragmentation
         /// </summary>
         public static XYZ MaxBoundPoint { get; set; }
-        public static double OffsetFromOriginByX { get; } = 1000;
-        public static double OffsetFromOriginByY { get; } = 1000;
+        public static double OffsetFromOriginByX { get; } = 2000;
+        public static double OffsetFromOriginByY { get; } = 2000;
         public static double OffsetFromOriginByZ { get; } = 2000;
 
         public static XYZ StartElemPoint { get; set; }
         public static XYZ EndElemPoint { get; set; }
 
-        double OffsetFromOriginByXInFeets;
-        double OffsetFromOriginByYInFeets;
-        double OffsetFromOriginByZInFeets;
-        private readonly Vector3D _stepVector;
+        private readonly OrthoNormBasis _basis;
         private readonly XYZ _startPoint;
         private readonly XYZ _endPoint;
 
-        public ElementInfo(Vector3D stepVector, XYZ startPoint, XYZ endPoint)
+        public ElementInfo(OrthoNormBasis basis, XYZ startPoint, XYZ endPoint)
         {
-            _stepVector = stepVector;
+            _basis = basis;
             _startPoint = startPoint;
             _endPoint = endPoint;
         }
 
         public List<XYZ> GetPoints(Element element)
         {
-            ConvertToFeets();
-
             List<XYZ> elementPoints = new List<XYZ>();
             elementPoints.Add(_startPoint);
             elementPoints.Add(_endPoint);
@@ -56,56 +53,28 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             List<XYZ> boundPoints = new List<XYZ>();
 
-            minPoint = new XYZ(minPoint.X - OffsetFromOriginByXInFeets, minPoint.Y - OffsetFromOriginByYInFeets, minPoint.Z - OffsetFromOriginByZInFeets);
-            maxPoint = new XYZ(maxPoint.X + OffsetFromOriginByXInFeets, maxPoint.Y + OffsetFromOriginByYInFeets, maxPoint.Z + OffsetFromOriginByZInFeets);
+            Vector3D moveVector = _basis.X + _basis.Y + _basis.Z;
+            var xYZMoveVector = new XYZ(
+                moveVector.X * OffsetFromOriginByX.MMToFeet(), 
+                moveVector.Y * OffsetFromOriginByY.MMToFeet(), 
+                moveVector.Z * OffsetFromOriginByZ.MMToFeet());
 
-            boundPoints.Add(minPoint);
-            boundPoints.Add(maxPoint);
+            var p1 = minPoint + xYZMoveVector;
+            var p2 = minPoint - xYZMoveVector;
 
-            MinBoundPoint = minPoint;
-            MaxBoundPoint = maxPoint;
+            pointUtils.FindMinMaxPointByPoints(new List<XYZ>() { p1, p2}, out XYZ minOffsetPoint, out XYZ maxOffsetPoint);
+            MinBoundPoint = minOffsetPoint;
+
+            p1 = maxPoint + xYZMoveVector;
+            p2 = maxPoint - xYZMoveVector;
+
+            pointUtils.FindMinMaxPointByPoints(new List<XYZ>() { p1, p2 }, out minOffsetPoint, out maxOffsetPoint);
+            MaxBoundPoint = maxOffsetPoint;
+
+            boundPoints.Add(MinBoundPoint);
+            boundPoints.Add(MaxBoundPoint);
 
             return boundPoints;
         }
-
-        void ConvertToFeets()
-        {
-
-            OffsetFromOriginByXInFeets = UnitUtils.Convert((double)OffsetFromOriginByX / 1000,
-                                          DisplayUnitType.DUT_METERS,
-                                          DisplayUnitType.DUT_DECIMAL_FEET);
-            OffsetFromOriginByYInFeets = UnitUtils.Convert((double)OffsetFromOriginByY / 1000,
-                                          DisplayUnitType.DUT_METERS,
-                                          DisplayUnitType.DUT_DECIMAL_FEET); 
-            OffsetFromOriginByZInFeets = UnitUtils.Convert((double)OffsetFromOriginByZ / 1000,
-                                           DisplayUnitType.DUT_METERS,
-                                           DisplayUnitType.DUT_DECIMAL_FEET);
-
-            var ofx = OffsetFromOriginByXInFeets / _stepVector.X;
-            int ofxr = (int)Math.Round(ofx);
-            OffsetFromOriginByXInFeets = ofxr * _stepVector.X;
-
-
-            var ofy= OffsetFromOriginByYInFeets / _stepVector.Y;
-            int ofyr = (int)Math.Round(ofy);
-            OffsetFromOriginByYInFeets = ofyr * _stepVector.Y;
-
-            var ofz = OffsetFromOriginByZInFeets / _stepVector.Z;
-            int ofzr = (int)Math.Round(ofz);
-            OffsetFromOriginByZInFeets = ofzr * _stepVector.Z;
-        }
-
-        //void GetOffset()
-        //{
-        //    CLZInfo cLZInfo = new CLZInfo();
-
-        //    if (Math.Abs(StartElemPoint.X - EndElemPoint.X)<0.01)
-        //        OffsetFromOriginByYInFeets = CLZInfo.WidthClearanceF;
-        //    else if (Math.Abs(StartElemPoint.Y - EndElemPoint.Y) < 0.01)
-        //        OffsetFromOriginByXInFeets = CLZInfo.WidthClearanceF;
-        //    else if (Math.Abs(StartElemPoint.X - EndElemPoint.X) < 0.01 && 
-        //        Math.Abs(StartElemPoint.Y - EndElemPoint.Y) < 0.01)
-        //        OffsetFromOriginByZInFeets = CLZInfo.HeightClearanceF;
-        //}
     }
 }

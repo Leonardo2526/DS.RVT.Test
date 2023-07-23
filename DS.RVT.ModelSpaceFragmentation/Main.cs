@@ -25,6 +25,10 @@ using DS.ClassLib.VarUtils.Points;
 using DS.RevitLib.Utils.Solids.Models;
 using DS.RevitLib.Utils.Models;
 using DS.ClassLib.VarUtils.Directions;
+using System.Diagnostics;
+using System.Reflection;
+using DS.RevitLib.Utils.Connections.PointModels;
+using DS.RevitLib.Utils.Geometry.Points;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -42,13 +46,15 @@ namespace DS.RVT.ModelSpaceFragmentation
             Uiapp = uiapp;
             Uidoc = uidoc;
             Doc = doc;
-            PointsStep = 50;
+            PointsStep = 400;
             _trb = new TransactionBuilder(doc);
         }
 
         public static Element CurrentElement { get; set; }
 
         private MEPCurve _baseMEPCurve;
+        private MEPCurve _mEPCurve2;
+        private readonly int _tolarance = 3;
 
         public static int PointsStep { get; set; }
 
@@ -65,84 +71,96 @@ namespace DS.RVT.ModelSpaceFragmentation
 
 
 
-            ElementUtils elementUtils = new ElementUtils();
-            CurrentElement = elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
+            CurrentElement = new PickedElement(Uidoc, Doc).GetElement();
             _baseMEPCurve = CurrentElement as MEPCurve;
 
 
-            var element2 = elementUtils.GetCurrent(new PickedElement(Uidoc, Doc));
-            var mEPCurve2 = element2 as MEPCurve;
+            var element2 = new PickedElement(Uidoc, Doc).GetElement();
+            _mEPCurve2 = element2 as MEPCurve;
 
-
+            //get basis
             var line1 = _baseMEPCurve.GetCenterLine();
-            var line2 = mEPCurve2.GetCenterLine();
+            var line2 = _mEPCurve2.GetCenterLine();
             var x = line1.Direction;
             var z = x.CrossProduct(line2.Direction);
+            //var z = x.CrossProduct(line2.Direction).RoundVector(_tolarance);
             var y = x.CrossProduct(z);
-            var basis = new Basis(x, y, z, _baseMEPCurve.GetCenterPoint());
+            //var y = x.CrossProduct(z).RoundVector(_tolarance);
+            var main = new Vector3D(x.X, x.Y, x.Z).Round();
+            var normal = new Vector3D(z.X, z.Y, z.Z).Round();
+            var crossProduct = new Vector3D(y.X, y.Y, y.Z).Round();
+            var basis = new OrthoNormBasis(main, normal, crossProduct);
+
 
             //Get bound points
-            elementUtils.GetPoints(CurrentElement, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint);
+            Element startElement = null; Element endElement= null;
+            //var (startPoint, endPoint) = GetEdgePoints(out startElement, out endElement);
+            var (startPoint, endPoint) = GetPointsByConnectors(_baseMEPCurve);
+            if (startPoint is null || endPoint is null) { return; }
 
-            var stepVector = new Vector3D(PointsStepF, PointsStepF, PointsStepF);
+            OrthoBasis stepVector = GetStepBasis(PointsStepF, startPoint, endPoint, basis);
+            //var stepVector = new Vector3D(PointsStepF, PointsStepF, PointsStepF);
             //var stepVector = GetStepVector(PointsStepF, startPoint, endPoint);
 
-            ElementInfo pointsInfo = new ElementInfo(stepVector, startPoint, endPoint);
+            ElementInfo pointsInfo = new ElementInfo(basis, startPoint, endPoint);
             pointsInfo.GetPoints(CurrentElement);
 
 
             var uCS1BasePoint = new Point3D(ElementInfo.MinBoundPoint.X, ElementInfo.MinBoundPoint.Y, ElementInfo.MinBoundPoint.Z);
             var uCS2BasePoint = new Point3D(0, 0, 0);
-            var pointConverter = new ClassLib.VarUtils.Points.VectorPointConverter(uCS1BasePoint, uCS2BasePoint, stepVector);
 
             var (elements, linkElementsDict) = new ElementsExtractor(Doc).GetAll();
             var traceSettings = new TraceSettings()
             {
                 B = 100.MMToFeet()
             };
+
+            double offset = _baseMEPCurve.GetMaxSize() / 2 + _baseMEPCurve.GetInsulationThickness() + traceSettings.B;
+
             var collisionDetector = new CollisionDetectorByTrace(Doc, _baseMEPCurve, traceSettings, elements, linkElementsDict);
-            collisionDetector.ObjectsToExclude = new List<Element>() { _baseMEPCurve };
+            collisionDetector.ObjectsToExclude = new List<Element>() { _baseMEPCurve,};
+            if(startElement is not null && 
+                !collisionDetector.ObjectsToExclude.Select(obj => obj.Id).Contains(startElement.Id)) 
+            { collisionDetector.ObjectsToExclude.Add(startElement); }
+            if(endElement is not null &&
+                !collisionDetector.ObjectsToExclude.Select(obj => obj.Id).Contains(endElement.Id)) 
+            { collisionDetector.ObjectsToExclude.Add(endElement); }
 
             ElementSize elementSize = new ElementSize();
             elementSize.GetElementSizes(CurrentElement as MEPCurve);
-
-            //SpaceFragmentator spaceFragmentator = new SpaceFragmentator(App, Uiapp, Uidoc, Doc);
-            //spaceFragmentator.FragmentSpace(CurrentElement);
 
             var solidModel = new RevitLib.Utils.Solids.Models.SolidModel(CurrentElement.Solid());
             MEPCurveModel mEPCurveModel = new MEPCurveModel(CurrentElement as MEPCurve, solidModel);
             var radius = new ElbowRadiusCalc(mEPCurveModel).GetRadius(90.DegToRad()).Result;
             var minDistPoint = 2 * radius + 50.MMToFeet();
-            //minDistPoint = Math.Ceiling(minDistPoint / PointsStepF);
-            //var minDistPointByte = Convert.ToByte(minDistPoint);
 
             //return;
             var requirement = new BestPathRequirement(0, minDistPoint);
 
-            var angles = new List<int> { 30 };
-           var main = new Vector3D(basis.X.X, basis.X.Y, basis.X.Z).Round();
-           var normal = new Vector3D(basis.Z.X, basis.Z.Y, basis.Z.Z).Round();
+            var angles = new List<int> {  };
+         
 
             IDirectionFactory directionFactory = new UserDirectionFactory();
-            directionFactory.Build(main, normal, angles);
+            directionFactory.Build(basis, angles);
 
             //Path finding initiation
             PathFinder pathFinder = new PathFinder();
             var unpassPoints = SpaceFragmentator.UnpassablePoints ?? new List<XYZ>();
+            IPointVisualisator<Point3D> pointVisualisator = new PointVisualisator(Uidoc, 100.MMToFeet(), null, true);
             List<PointPathFinderNode> path = pathFinder.AStarPath(ElementInfo.StartElemPoint,
-                ElementInfo.EndElemPoint, unpassPoints, requirement, collisionDetector, directionFactory, stepVector);
+                ElementInfo.EndElemPoint, unpassPoints, requirement, collisionDetector, directionFactory, PointsStepF, stepVector, offset, pointVisualisator);
 
-            if (path == null)
+            if (path == null || path.Count == 0)
                 TaskDialog.Show("Error", "No available path exist!");
             else
             {
                 var pathCoords = Path.Refine(path);
-                List<XYZ> xYZPathCoords = Path.Convert(pathCoords, pointConverter);
-                //List<XYZ> xYZPathCoords = Path.PathRefinement(path, pointConverter);
+                List<XYZ> xYZPathCoords = Path.Convert(pathCoords);
                 Path.ShowPath(xYZPathCoords);
-                var builder = new BuilderByPoints(_baseMEPCurve, xYZPathCoords);
-                var mEPElements = builder.BuildSystem(_trb);
-                //return;
+                if(xYZPathCoords.Count == 0) { return; }
+                //var builder = new BuilderByPoints(_baseMEPCurve, xYZPathCoords);
+                //var mEPElements = builder.BuildSystem(_trb);
+                return;
                 _trb.Build(() => Doc.Delete(_baseMEPCurve.Id), "delete baseMEPCurve");
             }
 
@@ -152,7 +170,10 @@ namespace DS.RVT.ModelSpaceFragmentation
         private Vector3D GetStepVector(double step, XYZ startPoint, XYZ endPoint)
         {
             var vector = endPoint - startPoint;
-            //vector = vector.RoundVector();
+            double length = vector.GetLength();
+            int newCount = (int) Math.Round(length / step);
+            var realStep = length / newCount;
+            return new Vector3D(realStep, realStep, realStep);
 
             int xs = (int)Math.Round(vector.X / step);
             double x = xs == 0 ? step : vector.X / xs;
@@ -164,6 +185,62 @@ namespace DS.RVT.ModelSpaceFragmentation
             double z = zs == 0 ? step : vector.Z / zs;
 
             return new Vector3D(x, y, z);
+        }
+
+        private OrthoBasis GetStepBasis(double step, XYZ startPoint, XYZ endPoint, OrthoNormBasis basis)
+        {          
+            var main = new Vector3D(basis.X.X, basis.X.Y, basis.X.Z).Round();
+            var normal = new Vector3D(basis.Y.X, basis.Y.Y, basis.Y.Z).Round();
+            var cross = new Vector3D(basis.Z.X, basis.Z.Y, basis.Z.Z).Round();
+
+            var vector = endPoint - startPoint;
+            var start_end_Vector = new Vector3D(vector.X, vector.Y, vector.Z).Round();
+
+            double xs = GetStep(start_end_Vector, main, step);
+            double ys = GetStep(start_end_Vector, normal, step);
+            double zs = GetStep(start_end_Vector, cross, step);
+
+            return new OrthoBasis(
+                Vector3D.Multiply(main, xs),
+                Vector3D.Multiply(normal, ys),
+                Vector3D.Multiply(cross, zs)
+                );
+        }
+
+        private double GetStep(Vector3D start_end_Vector, Vector3D orthVector, double step)
+        {
+            var angle = Vector3D.AngleBetween(start_end_Vector, orthVector);
+            double vectorLength = start_end_Vector.Length * Math.Cos(angle.DegToRad());
+
+            if (Math.Round(vectorLength, _tolarance) == 0)
+            { return step;}
+
+            int stepsCount = (int)Math.Floor(vectorLength / step);
+            return stepsCount == 0 ? step : vectorLength / stepsCount;
+        }
+
+        private (XYZ startPoint, XYZ endPoint) GetEdgePoints(out Element startElement, out Element endElement)
+        {
+            startElement = null;
+            endElement = null;
+
+            var pointStrategy = new PointCreator(Uidoc);
+            ConnectionPoint connectionPoint1 = pointStrategy.GetPoint(1) as ConnectionPoint;
+            if (connectionPoint1.IsValid)
+            {
+                ConnectionPoint connectionPoint2 = pointStrategy.GetPoint(2) as ConnectionPoint;
+                startElement = connectionPoint1.Element;
+                endElement = connectionPoint2.Element;
+                return (connectionPoint1.Point, connectionPoint2.Point);
+            }
+
+            return (null, null);
+        }
+
+        private (XYZ startPoint, XYZ endPoint) GetPointsByConnectors(MEPCurve mEPCurve)
+        {
+            ElementUtils.GetPoints(mEPCurve, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint);
+            return (startPoint, endPoint);
         }
     }
 }

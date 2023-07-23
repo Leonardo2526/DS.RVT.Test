@@ -83,7 +83,6 @@ namespace DS.RVT.ModelSpaceFragmentation.Visualization
                 point = new XYZ(InputData.ZonePoint1.X + x * InputData.PointsStepF, 
                     InputData.ZonePoint1.Y + y * InputData.PointsStepF, InputData.ZonePoint1.Z + z * InputData.PointsStepF);
 
-            ElementUtils elementUtils = new ElementUtils();
             foreach (ElementId elementId in VisiblePointsCreator.InstancesIds)
             {
                 Element familyInstance = Main.Doc.GetElement(elementId);

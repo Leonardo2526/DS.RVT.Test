@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using DS.RevitUtils.MEP;
 using System.Linq;
+using DS.RevitLib.Utils;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -15,8 +16,6 @@ namespace DS.RVT.ModelSpaceFragmentation
         {
             Doc = doc;
         }
-
-        ElementUtils ElemUtils = new ElementUtils();
 
         public static Dictionary<Element, List<Solid>> SolidsInModel { get; set; }
 
@@ -57,7 +56,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             List<Solid> solids = new List<Solid>();
             foreach (Element elem in intersectedElementsBox)
             {
-                solids = ElemUtils.GetSolids(elem);
+                solids = ElementUtils.GetSolids(elem);
                 if (solids.Count != 0)
                 {
                     solidsDictionary.AddRange(solids);

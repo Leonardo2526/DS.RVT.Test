@@ -63,6 +63,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -88,6 +89,7 @@
     <Compile Include="Path\PathRequiment.cs" />
     <Compile Include="Path\Priority.cs" />
     <Compile Include="BoundingBox\BoundingBoxCreator.cs" />
+    <Compile Include="PointCreator.cs" />
     <Compile Include="Points\Convertor\PointsConvertor.cs" />
     <Compile Include="ModelSpace\SpaceZone.cs" />
     <Compile Include="Points\PointsSeparator.cs" />
@@ -97,7 +99,6 @@
     <Compile Include="Points\StepsPriority.cs" />
     <Compile Include="Points\Convertor\PointConvertor.cs" />
     <Compile Include="Element\ElementInfo.cs" />
-    <Compile Include="Element\ElementUtils.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="Interfaces\Interfaces.cs" />
     <Compile Include="Main.cs" />

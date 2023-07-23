@@ -36,6 +36,8 @@ namespace DS.RVT.ModelSpaceFragmentation
         public static List<Point3D> Refine(List<PointPathFinderNode> path)
         {
             List<Point3D> points = new List<Point3D>();
+            if (path == null || path.Count == 0)
+            { return points; }
 
             var firstNode = path[0];
             Point3D basePoint = firstNode.Point;
@@ -62,7 +64,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             return points;
         }
 
-        public static List<XYZ> Convert(List<Point3D> path, IPointConverter pointConverter)
+        public static List<XYZ> Convert(List<Point3D> path)
         {
             //Convert path to revit coordinates                
             List<XYZ> pathCoords = new List<XYZ>();
