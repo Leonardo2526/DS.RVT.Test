@@ -29,6 +29,12 @@ using System.Diagnostics;
 using System.Reflection;
 using DS.RevitLib.Utils.Connections.PointModels;
 using DS.RevitLib.Utils.Geometry.Points;
+using Rhino.Geometry;
+using Transform = Rhino.Geometry.Transform;
+using Autodesk.Revit.DB.Visual;
+using System.Windows.Media;
+using Rhino.Geometry.Intersect;
+using Plane = Rhino.Geometry.Plane;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
@@ -85,12 +91,18 @@ namespace DS.RVT.ModelSpaceFragmentation
             var z = x.CrossProduct(line2.Direction);
             //var z = x.CrossProduct(line2.Direction).RoundVector(_tolarance);
             var y = x.CrossProduct(z);
+
             //var y = x.CrossProduct(z).RoundVector(_tolarance);
             var main = new Vector3D(x.X, x.Y, x.Z).Round();
             var normal = new Vector3D(z.X, z.Y, z.Z).Round();
             var crossProduct = new Vector3D(y.X, y.Y, y.Z).Round();
-            var basis = new OrthoNormBasis(main, normal, crossProduct);
+            var basis = new OrthoNormBasis(new Vector3D(1, 0, 0), new Vector3D(0, 1, 0), new Vector3D(0, 0, 1));
+            //var basis1 = new OrthoNormBasis(main, normal, crossProduct);
 
+            var (transforms, reverseTransforms) = GetTransforms(x, y, z, out Transform transform, out Transform inversedTransform);
+            IPoint3dConverter pointConverter = new Point3dConverter(transform, inversedTransform);
+
+            //return;
 
             //Get bound points
             Element startElement = null; Element endElement= null;
@@ -102,12 +114,8 @@ namespace DS.RVT.ModelSpaceFragmentation
             //var stepVector = new Vector3D(PointsStepF, PointsStepF, PointsStepF);
             //var stepVector = GetStepVector(PointsStepF, startPoint, endPoint);
 
-            ElementInfo pointsInfo = new ElementInfo(basis, startPoint, endPoint);
-            pointsInfo.GetPoints(CurrentElement);
+           
 
-
-            var uCS1BasePoint = new Point3D(ElementInfo.MinBoundPoint.X, ElementInfo.MinBoundPoint.Y, ElementInfo.MinBoundPoint.Z);
-            var uCS2BasePoint = new Point3D(0, 0, 0);
 
             var (elements, linkElementsDict) = new ElementsExtractor(Doc).GetAll();
             var traceSettings = new TraceSettings()
@@ -137,7 +145,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             //return;
             var requirement = new BestPathRequirement(0, minDistPoint);
 
-            var angles = new List<int> {  };
+            var angles = new List<int> { 30  };
          
 
             IDirectionFactory directionFactory = new UserDirectionFactory();
@@ -147,21 +155,22 @@ namespace DS.RVT.ModelSpaceFragmentation
             PathFinder pathFinder = new PathFinder();
             var unpassPoints = SpaceFragmentator.UnpassablePoints ?? new List<XYZ>();
             IPointVisualisator<Point3D> pointVisualisator = new PointVisualisator(Uidoc, 100.MMToFeet(), null, true);
-            List<PointPathFinderNode> path = pathFinder.AStarPath(ElementInfo.StartElemPoint,
-                ElementInfo.EndElemPoint, unpassPoints, requirement, collisionDetector, directionFactory, PointsStepF, stepVector, offset, pointVisualisator);
+            List<PointPathFinderNode> path = pathFinder.AStarPath(startPoint,
+               endPoint, unpassPoints, requirement, collisionDetector, directionFactory, PointsStepF, offset,
+                pointConverter, pointVisualisator);
 
             if (path == null || path.Count == 0)
                 TaskDialog.Show("Error", "No available path exist!");
             else
             {
                 var pathCoords = Path.Refine(path);
-                List<XYZ> xYZPathCoords = Path.Convert(pathCoords);
+                List<XYZ> xYZPathCoords = Path.Convert(pathCoords, pointConverter);
                 Path.ShowPath(xYZPathCoords);
                 if(xYZPathCoords.Count == 0) { return; }
                 //var builder = new BuilderByPoints(_baseMEPCurve, xYZPathCoords);
                 //var mEPElements = builder.BuildSystem(_trb);
-                return;
-                _trb.Build(() => Doc.Delete(_baseMEPCurve.Id), "delete baseMEPCurve");
+                //return;
+                //_trb.Build(() => Doc.Delete(_baseMEPCurve.Id), "delete baseMEPCurve");
             }
 
             //CLZVisualizator.ShowCLZOfPoint(PointsInfo.StartElemPoint); 
@@ -241,6 +250,69 @@ namespace DS.RVT.ModelSpaceFragmentation
         {
             ElementUtils.GetPoints(mEPCurve, out XYZ startPoint, out XYZ endPoint, out XYZ centerPoint);
             return (startPoint, endPoint);
+        }
+      
+
+        private (List<Transform> transforms, List<Transform> reverseTransforms) GetTransforms(XYZ finalBasisX, XYZ finalBasisY, XYZ finalBasisZ, 
+            out Transform transform, out Transform inversedTransform)
+        {
+            var initialBasis = XYZUtils.ToBasis3d(XYZ.BasisX, XYZ.BasisY, XYZ.BasisZ);
+            var finalBasis = XYZUtils.ToBasis3d(finalBasisX, finalBasisY, finalBasisZ);
+
+            bool initialRightHanded = Vector3d.AreRighthanded(initialBasis.basisX, initialBasis.basisY, initialBasis.basisZ);
+            bool finalRightHanded = Vector3d.AreRighthanded(finalBasis.basisX, finalBasis.basisY, finalBasis.basisZ);
+            bool orthonormal = Vector3d.AreOrthonormal(finalBasis.basisX, finalBasis.basisY, finalBasis.basisZ);
+
+            if(!finalRightHanded) { finalBasis.basisZ = Vector3d.Negate(finalBasis.basisZ); }
+            finalRightHanded = Vector3d.AreRighthanded(finalBasis.basisX, finalBasis.basisY, finalBasis.basisZ);
+            orthonormal = Vector3d.AreOrthonormal(finalBasis.basisX, finalBasis.basisY, finalBasis.basisZ);
+
+
+            transform = Transform.ChangeBasis(
+                initialBasis.basisX, initialBasis.basisY, initialBasis.basisZ,
+                finalBasis.basisX, finalBasis.basisY, finalBasis.basisZ);
+            transform.GetEulerZYZ(out double alpha1, out double beta1, out double gamma1);
+
+            transform.TryGetInverse(out Transform inverseTransform);
+            inversedTransform = inverseTransform;
+
+            double alpha = alpha1.RadToDeg();
+            double beta = beta1.RadToDeg();
+            double gamma = gamma1.RadToDeg();
+
+            var transforms = new List<Transform>();
+            var reverseTransforms = new List<Transform>();
+
+            Point3d zeroPoint = new Point3d(0, 0, 0);
+
+            Plane xy1 = new Plane(zeroPoint, initialBasis.basisX, initialBasis.basisY);
+            Plane xy2 = new Plane(zeroPoint, finalBasis.basisX, finalBasis.basisY);
+            var intersection = Intersection.PlanePlane(xy1, xy2, out Rhino.Geometry.Line intersectionLine);
+            Vector3d N = intersectionLine.Direction;
+            N = new Vector3d(Math.Round(N.X, _tolarance), Math.Round(N.Y, _tolarance), Math.Round(N.Z, _tolarance));
+
+            if (Math.Round(alpha) != 0)
+            //if (alpha % 180 != 0)
+                {
+                transforms.Add(Transform.Rotation(alpha1, initialBasis.basisZ, zeroPoint));
+                reverseTransforms.Add(Transform.Rotation(-alpha1, initialBasis.basisZ, zeroPoint));
+            }
+
+            if (Math.Round(beta) != 0)
+            //if (beta % 180 != 0)
+                {
+                transforms.Add(Transform.Rotation(beta1, N, zeroPoint));
+                reverseTransforms.Add(Transform.Rotation(-beta1, N, zeroPoint));
+            }
+
+            if (Math.Round(gamma) != 0)
+            //if (gamma % 180 != 0)
+                {
+                transforms.Add(Transform.Rotation(gamma1, finalBasis.basisZ, zeroPoint));
+                reverseTransforms.Add(Transform.Rotation(-gamma1, finalBasis.basisZ, zeroPoint));
+            }
+
+            return (transforms, reverseTransforms); 
         }
     }
 }

@@ -9,25 +9,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Media3D;
+using Transform = Rhino.Geometry.Transform;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
     static class Path
     {
-        public static List<XYZ> PathRefinement(List<PathFinderNode> path, IPointConverter pointConverter)
+        public static List<XYZ> PathRefinement(List<PathFinderNode> path, IPoint3dConverter pointConverter, List<Transform> reverseTransforms)
         {
 
             //Convert path to revit coordinates                
             List<XYZ> pathCoords = new List<XYZ>();
             //pathCoords.Add(ElementInfo.StartElemPoint);
 
-            foreach (PathFinderNode item in path)
-            {
-                Point3D point = new Point3D(item.X, item.Y, item.Z);
-                Point3D ucs1Point = pointConverter.ConvertToUCS1(point);
-                var xYZ = new XYZ(ucs1Point.X, ucs1Point.Y, ucs1Point.Z);
-                pathCoords.Add(xYZ);
-            }
+            //foreach (PathFinderNode item in path)
+            //{
+            //    Point3D point = new Point3D(item.X, item.Y, item.Z);
+            //    Point3D ucs1Point = pointConverter.ConvertToUCS1(point);
+            //    var xYZ = new XYZ(ucs1Point.X, ucs1Point.Y, ucs1Point.Z);
+            //    pathCoords.Add(xYZ);
+            //}
 
             return pathCoords;
 
@@ -64,7 +65,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             return points;
         }
 
-        public static List<XYZ> Convert(List<Point3D> path)
+        public static List<XYZ> Convert(List<Point3D> path, IPoint3dConverter pointConverter)
         {
             //Convert path to revit coordinates                
             List<XYZ> pathCoords = new List<XYZ>();
@@ -72,9 +73,10 @@ namespace DS.RVT.ModelSpaceFragmentation
 
             foreach (var point in path)
             {
-                Point3D ucs1Point = point;
-                //Point3D ucs1Point = pointConverter.ConvertToUCS1(point);
-                var xYZ = new XYZ(ucs1Point.X, ucs1Point.Y, ucs1Point.Z);
+                //Point3D ucs1Point = point;
+                var ucs1Point3d = point.Convert();
+                ucs1Point3d = pointConverter.ConvertToUCS1(ucs1Point3d);
+                var xYZ = new XYZ(ucs1Point3d.X, ucs1Point3d.Y, ucs1Point3d.Z);
                 pathCoords.Add(xYZ);
             }
 

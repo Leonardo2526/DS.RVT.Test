@@ -28,7 +28,7 @@ namespace DS.RVT.ModelSpaceFragmentation
         {
 
             ElementInfo pointsInfo = null;
-            pointsInfo.GetPoints(element);
+            pointsInfo.GetPoints();
 
             ModelSpacePointsGenerator modelSpacePointsGenerator =
             new ModelSpacePointsGenerator(ElementInfo.MinBoundPoint, ElementInfo.MaxBoundPoint);

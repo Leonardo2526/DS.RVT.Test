@@ -38,7 +38,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             _endPoint = endPoint;
         }
 
-        public List<XYZ> GetPoints(Element element)
+        public List<XYZ> GetPoints()
         {
             List<XYZ> elementPoints = new List<XYZ>();
             elementPoints.Add(_startPoint);
