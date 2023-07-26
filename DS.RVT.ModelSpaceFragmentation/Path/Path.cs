@@ -15,25 +15,6 @@ namespace DS.RVT.ModelSpaceFragmentation
 {
     static class Path
     {
-        public static List<XYZ> PathRefinement(List<PathFinderNode> path, IPoint3dConverter pointConverter, List<Transform> reverseTransforms)
-        {
-
-            //Convert path to revit coordinates                
-            List<XYZ> pathCoords = new List<XYZ>();
-            //pathCoords.Add(ElementInfo.StartElemPoint);
-
-            //foreach (PathFinderNode item in path)
-            //{
-            //    Point3D point = new Point3D(item.X, item.Y, item.Z);
-            //    Point3D ucs1Point = pointConverter.ConvertToUCS1(point);
-            //    var xYZ = new XYZ(ucs1Point.X, ucs1Point.Y, ucs1Point.Z);
-            //    pathCoords.Add(xYZ);
-            //}
-
-            return pathCoords;
-
-        }
-
         public static List<Point3D> Refine(List<PointPathFinderNode> path)
         {
             List<Point3D> points = new List<Point3D>();
@@ -81,39 +62,6 @@ namespace DS.RVT.ModelSpaceFragmentation
             }
 
             return pathCoords;
-        }
-
-
-        public static List<XYZ> OldPathRefinement(List<PathFinderNode> path)
-        {
-
-            //Convert path to revit coordinates                
-            List<XYZ> pathCoords = new List<XYZ>();
-            pathCoords.Add(ElementInfo.StartElemPoint);
-
-            foreach (PathFinderNode item in path)
-            {
-                XYZ point = new XYZ(item.PX, item.PY, item.PZ);
-                XYZ pathpoint = ConvertToModel(point);
-
-                double xx = Math.Abs(pathCoords[pathCoords.Count - 1].X - pathpoint.X);
-                double xy = Math.Abs(pathCoords[pathCoords.Count - 1].Y - pathpoint.Y);
-                double xz = Math.Abs(pathCoords[pathCoords.Count - 1].Z - pathpoint.Z);
-
-                if (xx > 0.01 || xy > 0.01 || xz > 0.01)
-                    pathCoords.Add(pathpoint);
-
-            }
-
-            //check min distance
-            double minDist = 1.5 * ElementSize.ElemDiameterF;
-            if (Math.Abs(pathCoords[pathCoords.Count - 2].X - pathCoords[pathCoords.Count - 1].X) <= minDist &&
-                Math.Abs(pathCoords[pathCoords.Count - 2].Y - pathCoords[pathCoords.Count - 1].Y) <= minDist &&
-                Math.Abs(pathCoords[pathCoords.Count - 2].Z - pathCoords[pathCoords.Count - 1].Z) <= minDist)
-                pathCoords.RemoveAt(pathCoords.Count - 2);
-
-            return pathCoords;
-
         }
 
         public static void ShowPath(List<XYZ> pathCoords)

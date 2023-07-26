@@ -1,9 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using DS.RVT.ModelSpaceFragmentation;
-using DS.PathSearch.GridMap;
 using FrancoGustavo;
 using System.Collections.Generic;
-using Location = DS.PathSearch.Location;
 using DS.RevitLib.Utils.Collisions.Detectors;
 using DS.RevitLib.Utils.Various;
 using System.Windows.Media.Media3D;
@@ -30,7 +28,7 @@ namespace DS.RVT.ModelSpaceFragmentation
         public List<XYZ> PathCoords { get; set; }
 
         public List<PointPathFinderNode> AStarPath(XYZ startPoint, XYZ endPoint, List<XYZ> unpassablePoints,
-            IDoublePathRequiment pathRequiment, CollisionDetectorByTrace collisionDetector, IDirectionFactory directionFactory,
+            double minAngleDistance, CollisionDetectorByTrace collisionDetector, IDirectionFactory directionFactory,
             double step, double offset, IPoint3dConverter pointConverter,
             IPointVisualisator<Point3D> pointVisualisator = null)
         {
@@ -67,7 +65,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             HeuristicFormula formula = HeuristicFormula.Manhattan;
 
             var nodeBuilder = new NodeBuilder(formula, mHEstimate, uCS2startPoint, uCS2endPoint, step, orths, collisionDetector, offset, true, false);
-            var mPathFinder = new TestPathFinder(uCS2maxPoint, uCS2minPoint, pathRequiment, collisionDetector, nodeBuilder,
+            var mPathFinder = new TestPathFinder(uCS2maxPoint, uCS2minPoint, minAngleDistance, collisionDetector, nodeBuilder,
                 pointConverter, fractPrec, pointVisualisator)
             {
                 PunishAngles = new List<int>() {   },

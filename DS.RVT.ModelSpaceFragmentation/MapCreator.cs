@@ -1,5 +1,4 @@
 ﻿using DS.ClassLib.VarUtils.GridMap;
-using DS.PathSearch;
 using System.Windows.Media.Media3D;
 
 namespace DS.RVT.ModelSpaceFragmentation

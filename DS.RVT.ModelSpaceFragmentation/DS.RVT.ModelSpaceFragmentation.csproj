@@ -39,17 +39,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DS.PathSearch, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\DS.CommonLib.Utils\DS.Utils\bin\Debug\DS.PathSearch.dll</HintPath>
+    <Reference Include="DS.PathFinder">
+      <HintPath>..\..\DS.CommonLib.Utils\PathFinders\DS.PathFinder\bin\Debug\DS.PathFinder.dll</HintPath>
     </Reference>
     <Reference Include="DS.RevitUtils.MEP, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\DS.RevitUtils.MEP.dll</HintPath>
-    </Reference>
-    <Reference Include="FrancoGustavo, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\DS.WindowsApp.Programs\PathSearchAlgorythms\FrancoGustavo\bin\Debug\FrancoGustavo.dll</HintPath>
     </Reference>
     <Reference Include="iUtils">
       <HintPath>..\..\VAR.RevitLib.Utils\iUtils\bin\Debug\iUtils.dll</HintPath>
@@ -88,9 +83,7 @@
     <Compile Include="MapCreator.cs" />
     <Compile Include="BoundingBox\BoundigBoxVizualizator.cs" />
     <Compile Include="ParallelSort.cs" />
-    <Compile Include="Path\BestPathRequirement.cs" />
     <Compile Include="Path\Path.cs" />
-    <Compile Include="Path\PathRequiment.cs" />
     <Compile Include="Path\Priority.cs" />
     <Compile Include="BoundingBox\BoundingBoxCreator.cs" />
     <Compile Include="PointCreator.cs" />

@@ -143,7 +143,6 @@ namespace DS.RVT.ModelSpaceFragmentation
             var minDistPoint = 2 * radius + 50.MMToFeet();
 
             //return;
-            var requirement = new BestPathRequirement(0, minDistPoint);
 
             var angles = new List<int> { 30  };
          
@@ -156,7 +155,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             var unpassPoints = SpaceFragmentator.UnpassablePoints ?? new List<XYZ>();
             IPointVisualisator<Point3D> pointVisualisator = new PointVisualisator(Uidoc, 100.MMToFeet(), null, true);
             List<PointPathFinderNode> path = pathFinder.AStarPath(startPoint,
-               endPoint, unpassPoints, requirement, collisionDetector, directionFactory, PointsStepF, offset,
+               endPoint, unpassPoints, minDistPoint, collisionDetector, directionFactory, PointsStepF, offset,
                 pointConverter, pointVisualisator);
 
             if (path == null || path.Count == 0)

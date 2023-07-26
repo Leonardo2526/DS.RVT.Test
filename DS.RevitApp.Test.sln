@@ -35,7 +35,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitCmd.Template2", "DS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitCmd.MVVMTemplate3", "DS.RevitCmd.MVVMTemplate3\DS.RevitCmd.MVVMTemplate3.csproj", "{986618ED-6F85-4BA4-9E6A-F3B42870E1DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrancoGustavo", "..\DS.WindowsApp.Programs\PathSearchAlgorythms\FrancoGustavo\FrancoGustavo.csproj", "{F42C671B-41AF-4CD6-8DA8-C75EAE032D73}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.PathFinder", "..\DS.CommonLib.Utils\PathFinders\DS.PathFinder\DS.PathFinder.csproj", "{F42C671B-41AF-4CD6-8DA8-C75EAE032D73}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
