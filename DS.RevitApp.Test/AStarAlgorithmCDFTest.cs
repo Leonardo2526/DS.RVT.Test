@@ -1,31 +1,23 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using DS.PathFinder;
-using DS.RevitLib.Utils.Connections.PointModels;
+using DS.ClassLib.VarUtils;
 using DS.RevitLib.Utils;
+using DS.RevitLib.Utils.Bases;
+using DS.RevitLib.Utils.Connections.PointModels;
+using DS.RevitLib.Utils.Creation.Transactions;
+using DS.RevitLib.Utils.Elements;
+using DS.RevitLib.Utils.Elements.MEPElements;
+using DS.RevitLib.Utils.Extensions;
+using DS.RevitLib.Utils.MEP;
+using DS.RevitLib.Utils.MEP.Creator;
+using DS.RevitLib.Utils.MEP.Models;
+using DS.RevitLib.Utils.ModelCurveUtils;
 using DS.RevitLib.Utils.PathCreators;
-using System;
+using DS.RevitLib.Utils.Solids.Models;
+using DS.RevitLib.Utils.Various;
+using DS.RevitLib.Utils.Various.Selections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DS.RevitLib.Utils.Various.Selections;
-using System.Configuration;
-using System.Xml.Linq;
-using DS.RevitLib.Utils.Various;
-using DS.RevitLib.Utils.Bases;
-using DS.RevitLib.Utils.Extensions;
-using DS.ClassLib.VarUtils.Points;
-using DS.RevitLib.Utils.Elements;
-using DS.RevitLib.Utils.Collisions.Detectors;
-using DS.RevitLib.Utils.Creation.Transactions;
-using DS.RevitLib.Utils.ModelCurveUtils;
-using DS.RevitLib.Utils.MEP.Creator;
-using DS.ClassLib.VarUtils;
-using DS.RevitLib.Utils.Elements.MEPElements;
-using DS.RevitLib.Utils.MEP.Models;
-using DS.RevitLib.Utils.MEP;
-using DS.RevitLib.Utils.Solids.Models;
 
 namespace DS.RevitApp.Test
 {
@@ -43,11 +35,11 @@ namespace DS.RevitApp.Test
             _trb = new ContextTransactionFactory(_doc);
             var path = Run();
 
-            if (path != null && path.Count != 0) 
-            { 
-                
+            if (path != null && path.Count != 0)
+            {
+
                 ShowLines(path);
-                ShowMEPCurves(path, _baseMEPCurve);
+                //ShowMEPCurves(path, _baseMEPCurve);
             }
         }
 
@@ -65,18 +57,18 @@ namespace DS.RevitApp.Test
 
             var (docElements, linkElementsDict) = new ElementsExtractor(_doc).GetAll();
             var objectsToExclude = new List<Element>() { startConnectionPoint.Element };
-            if(startConnectionPoint.Element.Id != endConnectionPoint.Element.Id) 
-            { objectsToExclude.Add(endConnectionPoint.Element); }            
+            if (startConnectionPoint.Element.Id != endConnectionPoint.Element.Id)
+            { objectsToExclude.Add(endConnectionPoint.Element); }
 
             var pathFindFactory = new xYZPathFinder(_uiDoc, basisStrategy, traceSettings, docElements, linkElementsDict);
-            pathFindFactory.Build(step, objectsToExclude);
+            pathFindFactory.Build(_baseMEPCurve, step, objectsToExclude);
 
             return pathFindFactory.FindPath(startConnectionPoint.Point, endConnectionPoint.Point);
         }
 
         private (ConnectionPoint startPoint, ConnectionPoint endPoint) GetEdgePoints()
         {
-            var selector = new PointSelector(_uiDoc) { AllowLink = false }; 
+            var selector = new PointSelector(_uiDoc) { AllowLink = false };
 
             var element = selector.Pick($"Укажите точку присоединения 1 на элементе.");
             ConnectionPoint connectionPoint1 = new ConnectionPoint(element, selector.Point);
@@ -123,7 +115,7 @@ namespace DS.RevitApp.Test
             {
                 var mcreator = new ModelCurveCreator(_doc);
                 for (int i = 0; i < path.Count - 1; i++)
-                {mcreator.Create(path[i], path[i + 1]); }
+                { mcreator.Create(path[i], path[i + 1]); }
             }, "ShowSolution");
         }
 
