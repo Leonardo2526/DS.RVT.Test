@@ -19,6 +19,7 @@ using DS.RevitLib.Utils.Solids.Models;
 using DS.RevitLib.Utils.Various;
 using DS.RevitLib.Utils.Various.Selections;
 using DS.RevitLib.Utils.Visualisators;
+using Serilog;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -49,6 +50,11 @@ namespace DS.RevitApp.Test
             _uiDoc = uidoc;
             _doc = _uiDoc.Document;
             _trb = new ContextTransactionFactory(_doc);
+
+            Log.Logger = new LoggerConfiguration()
+                  .WriteTo.Debug()
+                  .CreateLogger();
+
             var path = Run();
 
             if (path != null && path.Count != 0)
@@ -90,7 +96,7 @@ namespace DS.RevitApp.Test
             //{
             //    var visualizator = new BoundingBoxVisualisator(bb, _doc);
             //    visualizator.Show();
-            //}, "show BoundingBox");
+            //}, "show BoundingBox");          
 
             var (docElements, linkElementsDict) = new ElementsExtractor(_doc, _exludedCathegories, outline).GetAll();
             var objectsToExclude = new List<Element>() { startConnectionPoint.Element };
@@ -101,7 +107,7 @@ namespace DS.RevitApp.Test
             var endMEPCurve = endConnectionPoint.Element as MEPCurve;
 
             var pathFindFactory = new xYZPathFinder(_uiDoc, basisStrategy, traceSettings, docElements, linkElementsDict);
-            pathFindFactory.Build(startMEPCurve, endMEPCurve, objectsToExclude, outline, false, planes);
+            pathFindFactory.Build(startMEPCurve, endMEPCurve, objectsToExclude, outline, true, planes);
 
             return pathFindFactory.FindPath(startConnectionPoint.Point, endConnectionPoint.Point);
         }
@@ -115,9 +121,11 @@ namespace DS.RevitApp.Test
             ConnectionPoint connectionPoint1 = new ConnectionPoint(element, selector.Point);
             if (connectionPoint1.IsValid)
             {
+                connectionPoint1.Point.Show(_doc, 200.MMToFeet());
                 element = selector.Pick($"Укажите точку присоединения 2 на элементе.");
                 if (element == null) return (null, null);
                 ConnectionPoint connectionPoint2 = new ConnectionPoint(element, selector.Point);
+                connectionPoint2.Point.Show(_doc, 200.MMToFeet());
                 return (connectionPoint1, connectionPoint2);
             }
 
@@ -139,8 +147,8 @@ namespace DS.RevitApp.Test
         {
             ITraceSettings traceSettings = new TraceSettings()
             {
-                B = 20.MMToFeet(),
-                AList = new List<int>() {90}
+                B = 50.MMToFeet(),
+                AList = new List<int>() {30}
             };
             var solidModel = new SolidModel(mEPCurve.Solid());
             var mEPCurveModel = new MEPCurveModel(mEPCurve, solidModel);
@@ -175,7 +183,7 @@ namespace DS.RevitApp.Test
             if(startPoint == null)
             {
                 p1 = _uiDoc.Selection.PickPoint("Укажите первую точку зоны поиска.");
-                p1.Show(_doc);
+                p1.Show(_doc, 200.MMToFeet());
                 _uiDoc.RefreshActiveView();
             }
             else
@@ -185,7 +193,7 @@ namespace DS.RevitApp.Test
             if (startPoint == null)
             {
                 p2 = _uiDoc.Selection.PickPoint("Укажите вторую точку зоны поиска.");
-                p2.Show(_doc);
+                p2.Show(_doc, 200.MMToFeet());
                 _uiDoc.RefreshActiveView();
             }
             else
