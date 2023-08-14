@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.Exceptions;
 using Autodesk.Revit.UI;
 using DS.ClassLib.VarUtils;
 using DS.ClassLib.VarUtils.Points;
@@ -6,23 +7,31 @@ using DS.RevitLib.Utils;
 using DS.RevitLib.Utils.Bases;
 using DS.RevitLib.Utils.Collisions;
 using DS.RevitLib.Utils.Connections.PointModels;
+using DS.RevitLib.Utils.Connections.PointModels.PointModels;
 using DS.RevitLib.Utils.Creation.Transactions;
 using DS.RevitLib.Utils.Elements;
 using DS.RevitLib.Utils.Elements.MEPElements;
 using DS.RevitLib.Utils.Extensions;
+using DS.RevitLib.Utils.Geometry.Points;
 using DS.RevitLib.Utils.MEP;
 using DS.RevitLib.Utils.MEP.Creator;
 using DS.RevitLib.Utils.MEP.Models;
+using DS.RevitLib.Utils.MEP.SystemTree;
 using DS.RevitLib.Utils.ModelCurveUtils;
 using DS.RevitLib.Utils.PathCreators;
 using DS.RevitLib.Utils.Solids.Models;
 using DS.RevitLib.Utils.Various;
+using DS.RevitLib.Utils.Various.Bases;
 using DS.RevitLib.Utils.Various.Selections;
 using DS.RevitLib.Utils.Visualisators;
 using Serilog;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Reflection;
+using System.Runtime.InteropServices.ComTypes;
+using DS.RevitLib.Utils.Various.Bases;
 
 namespace DS.RevitApp.Test
 {
@@ -67,13 +76,17 @@ namespace DS.RevitApp.Test
 
         private List<XYZ> Run()
         {
-            var (startConnectionPoint, endConnectionPoint) = GetEdgePoints();
+            var startConnectionPoint =GetPoint(1);
+            var endConnectionPoint = GetPoint(2);
+            //var (startConnectionPoint, endConnectionPoint) = GetEdgePoints();
             //var (startConnectionPoint, endConnectionPoint) = GetPointsByConnectors();
             if (startConnectionPoint is null || endConnectionPoint is null) { return null; }
 
-            _baseMEPCurve = startConnectionPoint.Element as MEPCurve;
+            //_baseMEPCurve = startConnectionPoint.GetMEPCurve();
 
             var basisStrategy = new TwoMEPCurvesBasisStrategy(_uiDoc);
+            basisStrategy.GetBasis();
+            _baseMEPCurve = basisStrategy.MEPCurve1;
             var traceSettings = GetTraceSettings(_baseMEPCurve);
             var planes = new List<PlaneType>()
             {
@@ -82,7 +95,7 @@ namespace DS.RevitApp.Test
                 //PlaneType.YZ,
             };
 
-            var outline = GetOutline(startConnectionPoint.Point, endConnectionPoint.Point);
+            //var outline = GetOutline(startConnectionPoint.Point, endConnectionPoint.Point);
             //var outline = GetOutline();
             //outline.MinimumPoint.Show(_doc);
             //_uiDoc.RefreshActiveView();
@@ -98,18 +111,54 @@ namespace DS.RevitApp.Test
             //    visualizator.Show();
             //}, "show BoundingBox");          
 
-            var (docElements, linkElementsDict) = new ElementsExtractor(_doc, _exludedCathegories, outline).GetAll();
-            var objectsToExclude = new List<Element>() { startConnectionPoint.Element };
-            if (startConnectionPoint.Element.Id != endConnectionPoint.Element.Id)
-            { objectsToExclude.Add(endConnectionPoint.Element); }
+            var mEPSystem = new SimpleMEPSystemBuilder(_baseMEPCurve).Build();
+            var span = mEPSystem.Root.GetElements(startConnectionPoint.Element, endConnectionPoint.Element, true);
+            var objectsToExclude = new List<Element>();
+            objectsToExclude.AddRange(span);
 
-            var startMEPCurve = startConnectionPoint.Element as MEPCurve;
-            var endMEPCurve = endConnectionPoint.Element as MEPCurve;
+            //var objectsToExclude = new List<Element>() { startConnectionPoint.Element };
+            //if (startConnectionPoint.Element.Id != endConnectionPoint.Element.Id)
+            //{ objectsToExclude.Add(endConnectionPoint.Element); }
 
-            var pathFindFactory = new xYZPathFinder(_uiDoc, basisStrategy, traceSettings, docElements, linkElementsDict);
-            pathFindFactory.Build(startMEPCurve, endMEPCurve, objectsToExclude, outline, true, planes);
+            var pathFindFactory = new xYZPathFinder(_uiDoc, basisStrategy, traceSettings, _exludedCathegories);
+            pathFindFactory.Build(_baseMEPCurve, objectsToExclude, true, planes, basisStrategy.MEPCurve1, basisStrategy.MEPCurve2);
 
-            return pathFindFactory.FindPath(startConnectionPoint.Point, endConnectionPoint.Point);
+            return pathFindFactory.FindPath(startConnectionPoint, endConnectionPoint);
+        }
+
+        public ConnectionPoint GetPoint(int pointId)
+        {
+            XYZ point = null;
+            Element element = null;
+
+            try
+            {
+                (element, point) = CenterPoint(pointId);
+            }
+            catch (OperationCanceledException)
+            { (element, point) = PickPoint(pointId); }
+
+            return new ConnectionPoint(element, point);
+        }
+
+        public (Element element, XYZ point) CenterPoint(int pointId)
+        {
+            var selector = new ElementSelector(_uiDoc) { AllowLink = false };
+            var element = selector.Pick($"Укажите элемент для получения точки присоединения {pointId}. " +
+                "Или нажмите 'ESC', чтобы выбрать точку на элементе.");
+            var centerPoint = ElementUtils.GetLocationPoint(element);
+            //centerPoint.Show(_doc);
+            Debug.WriteLine($"Selected element is: {element.Id}.");
+            return (element, centerPoint);
+        }
+
+        public (Element element, XYZ point) PickPoint(int pointId)
+        {
+            var selector = new PointSelector(_uiDoc) { AllowLink = false };
+            var element = selector.Pick($"Укажите точку присоединения {pointId} на элементе.");
+            //selector.Point.Show(_doc);
+            Debug.WriteLine($"Selected element is: {element.Id}.");
+            return (element, selector.Point);
         }
 
         private (ConnectionPoint startPoint, ConnectionPoint endPoint) GetEdgePoints()
