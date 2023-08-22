@@ -32,6 +32,7 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices.ComTypes;
 using DS.RevitLib.Utils.Various.Bases;
+using System.Threading;
 
 namespace DS.RevitApp.Test
 {
@@ -84,8 +85,8 @@ namespace DS.RevitApp.Test
 
             //_baseMEPCurve = startConnectionPoint.GetMEPCurve();
 
-            var basisStrategy = new TwoMEPCurvesBasisStrategy(_uiDoc);
-            basisStrategy.GetBasis();
+            var basisStrategy = new TwoMEPCurvesBasisStrategy();
+            basisStrategy.Build(_uiDoc).GetBasis();
             _baseMEPCurve = basisStrategy.MEPCurve1;
             var traceSettings = GetTraceSettings(_baseMEPCurve);
             var planes = new List<PlaneType>()
@@ -120,9 +121,9 @@ namespace DS.RevitApp.Test
             //if (startConnectionPoint.Element.Id != endConnectionPoint.Element.Id)
             //{ objectsToExclude.Add(endConnectionPoint.Element); }
 
-            var pathFindFactory = new xYZPathFinder(_uiDoc, basisStrategy, traceSettings, _exludedCathegories);
-            pathFindFactory.Build(_baseMEPCurve, objectsToExclude, true, planes, basisStrategy.MEPCurve1, basisStrategy.MEPCurve2);
-
+            var pathFindFactory = new xYZPathFinder(basisStrategy, traceSettings).AddDoc(_uiDoc);
+            pathFindFactory.Build(_baseMEPCurve, objectsToExclude, _exludedCathegories, true, planes, basisStrategy.MEPCurve1, basisStrategy.MEPCurve2);
+            pathFindFactory.TokenSource = new CancellationTokenSource();
             return pathFindFactory.FindPath(startConnectionPoint, endConnectionPoint);
         }
 
@@ -196,8 +197,9 @@ namespace DS.RevitApp.Test
         {
             ITraceSettings traceSettings = new TraceSettings()
             {
+                A = 30,
                 B = 50.MMToFeet(),
-                AList = new List<int>() {30}
+                //AList = new List<int>() {30}
             };
             var solidModel = new SolidModel(mEPCurve.Solid());
             var mEPCurveModel = new MEPCurveModel(mEPCurve, solidModel);
