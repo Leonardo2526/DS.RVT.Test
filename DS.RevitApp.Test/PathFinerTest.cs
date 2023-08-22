@@ -10,16 +10,10 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
-using DS.ClassLib.VarUtils;
 using DS.RevitLib.Utils;
-using DS.RevitLib.Utils.Collisions.Models;
 using DS.RevitLib.Utils.Extensions;
 using DS.RevitLib.Utils.MEP;
-using DS.RevitLib.Utils.MEP.Models;
-using DS.RevitLib.Utils.MEP.SystemTree;
 using DS.RevitLib.Utils.ModelCurveUtils;
-using DS.RevitLib.Utils.PathCreators;
-using DS.RevitLib.Utils.Solids.Models;
 using PathFinderLib;
 
 namespace DS.RevitApp.Test
@@ -28,61 +22,46 @@ namespace DS.RevitApp.Test
     {
         private readonly Document _doc;
         private readonly UIDocument _uIDoc;
-        private readonly TransactionBuilder _trb;
 
         public PathFinerTest(Document doc, UIDocument uIDoc = null)
         {
             _doc = doc;
             _uIDoc = uIDoc;
-            _trb = new TransactionBuilder(_doc);
         }
 
         public void Run()
         {
             XYZ startPoint;
             XYZ endPoint;
-
             ObjectSnapTypes snapTypes = ObjectSnapTypes.Endpoints | ObjectSnapTypes.Intersections;
+            startPoint = _uIDoc.Selection.PickPoint(snapTypes, "Select startPoint");
+            endPoint = _uIDoc.Selection.PickPoint(snapTypes, "Select endPoint");
 
-            var ref1 = _uIDoc.Selection.PickObject(ObjectType.PointOnElement, "Select startPoint");
-            MEPCurve mEPCurve1 = _doc.GetElement(ref1) as MEPCurve;
-            var ref2 = _uIDoc.Selection.PickObject(ObjectType.PointOnElement, "Select endPoint");
-            MEPCurve mEPCurve2 = _doc.GetElement(ref2) as MEPCurve;
-            _uIDoc.Selection.SetElementIds(new List<ElementId> { mEPCurve1.Id });
+            Reference reference = _uIDoc.Selection.PickObject(ObjectType.Element, "Select MEPCurve1");
+            MEPCurve mEPCurve = _doc.GetElement(reference) as MEPCurve;
+            (double width, double heigth) = MEPCurveUtils.GetWidthHeight(mEPCurve);
+            ElementUtils.GetPoints(mEPCurve, out XYZ p11, out XYZ p12, out XYZ c1);
+
+
+            //reference = _uIDoc.Selection.PickObject(ObjectType.Element, "Select MEPCurve2");
+            //mEPCurve = _doc.GetElement(reference) as MEPCurve;
+            //ElementUtils.GetPoints(mEPCurve, out XYZ p21, out XYZ p22, out XYZ c2);
+            //startPoint = p11;
+            //endPoint = p12;
+
+            startPoint.Show(_doc);
+            endPoint.Show(_doc);
             _uIDoc.RefreshActiveView();
 
-            startPoint = ref1.GlobalPoint;
-            endPoint = ref2.GlobalPoint;
-            //startPoint = _uIDoc.Selection.PickPoint(snapTypes, "Select startPoint");
-            //endPoint = _uIDoc.Selection.PickPoint(snapTypes, "Select endPoint");
-
-            //Reference reference = _uIDoc.Selection.PickObject(ObjectType.Element, "Select MEPCurve1");
-            //MEPCurve mEPCurve = _doc.GetElement(reference) as MEPCurve;
-            (double width, double heigth) = MEPCurveUtils.GetWidthHeight(mEPCurve1);
-            ElementUtils.GetPoints(mEPCurve1, out XYZ p11, out XYZ p12, out XYZ c1);
-
-            startPoint.Show(_doc, 1, _trb);
-            endPoint.Show(_doc, 1, _trb);
-            _uIDoc.RefreshActiveView();
-
-
-            List<XYZ> path = IvanovPathFinderTest(mEPCurve1, mEPCurve2, startPoint, endPoint);
-            //List<XYZ> path = FindPath1(mEPCurve1, mEPCurve2, startPoint, endPoint, width, heigth);
-
-            _trb.Build(() => ShowPath(path), "show path");
-        }
-
-        private List<XYZ> FindPath1(MEPCurve mEPCurve1, MEPCurve mEPCurve2, XYZ startPoint, XYZ endPoint, double width, double heigth)
-        {
             //создаем опции поиска
             //параметр в конструкторе это Ширина отвода от оси до грани
             //исходя из этого параметра будет подбираться минимальный шаг поиска так, что
-            //минимальная длина прямого участка 50 мм + 2 * Ширина отвода
-            var exceptions = new List<int> { mEPCurve1.Id.IntegerValue, mEPCurve2.Id.IntegerValue };
-            var options = new FinderOptions(exceptions);
+            //минимальная длина прямого участка 50 мм + 2* Ширина отвода
+            var options = new FinderOptions(new List<int>());
 
             //класс анализирует геометрию
-            var geometryDocuments = GeometryDocuments.Create(_doc, options);
+            GeometryDocuments geometryDocuments = null;
+            //var geometryDocuments = new GeometryDocuments(_doc, options, null);
 
             //класс для поиска пути
             var finder = new PathFinderToOnePoint(startPoint, endPoint,
@@ -90,7 +69,7 @@ namespace DS.RevitApp.Test
 
             //ищем путь
             List<XYZ> path = new List<XYZ>();
-            Task<List<XYZ>> task = finder.FindPath(new CancellationTokenSource().Token);
+            Task<List<XYZ>> task = finder.FindPath(new CancellationTokenSource().Token);        
             task.Wait();
             path = task.Result;
 
@@ -100,28 +79,11 @@ namespace DS.RevitApp.Test
             }
 
             //объединяем прямые последовательные участки пути в один сегмент
-            return Optimizer.MergeStraightSections(path, options);
+            path = Optimizer.MergeStraightSections(path, options);
+
+            var trb = new TransactionBuilder(_doc);
+            trb.Build(() => ShowPath(path), "show path");
         }
-
-        private List<XYZ> IvanovPathFinderTest(MEPCurve mEPCurve1, MEPCurve mEPCurve2, XYZ startPoint, XYZ endPoint)
-        {
-            var mEPSystemBuilder = new SimpleMEPSystemBuilder(mEPCurve1);
-            var sourceMEPModel = mEPSystemBuilder.Build();
-            var mEPCurveModel = new MEPCurveModel(mEPCurve1, new SolidModel(ElementUtils.GetSolid(mEPCurve1)));
-
-                var elbowRadius = new ElbowRadiusCalc(mEPCurveModel, _trb).
-                GetRadius(90.DegToRad());
-           
-            var pathFinder = new PathFindCreator().Create(
-                _doc, elbowRadius, sourceMEPModel, new CancellationTokenSource().Token);
-
-            var elementsToDelete = new List<Element>() { mEPCurve1, mEPCurve2 };
-            pathFinder.ExceptionElements = elementsToDelete.Select(obj => obj.Id).ToList();
-
-
-            return pathFinder.Create(startPoint, endPoint);
-        }
-
         private void ShowPath(List<XYZ> path)
         {
             var mcreator = new ModelCurveCreator(_doc);

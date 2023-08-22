@@ -1,12 +1,12 @@
-﻿using DS.PathSearch;
-using DS.PathSearch.GridMap;
+﻿using DS.ClassLib.VarUtils.GridMap;
+using System.Windows.Media.Media3D;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
     class MapCreator : IMap
     {
-        public Location Start { get; set; }
-        public Location Goal { get; set; }
+        public Point3D MinPoint { get; set; }
+        public Point3D MaxPoint { get; set; }
         public int[,,] Matrix { get; set; }
     }
 }

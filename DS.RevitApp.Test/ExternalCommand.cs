@@ -1,7 +1,9 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using System.Diagnostics;
+//using ClassLibrary1;
+using ConsoleApp2;
+using System.Net.Http;
 
 namespace DS.RevitApp.Test
 {
@@ -17,12 +19,14 @@ namespace DS.RevitApp.Test
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
-            TaskDialog.Show("message","Hello");
+            new WallsTest(uidoc);
 
-            //var path = new PathCreatorClient(uidoc).GetPath();
-            //Debug.WriteLine(path?.Count);
+            //PersonClient.Test5(new HttpClient(), "addj");
 
-            //new TestClass().SomeTest();
+
+            //new MongoTest();
+
+            //new SerilogTest(uidoc);
 
             //var test = new PathFinerTest(doc, uidoc);
             //test.Run();

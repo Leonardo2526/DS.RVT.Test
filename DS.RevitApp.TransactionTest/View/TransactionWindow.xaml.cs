@@ -1,13 +1,9 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
-using DS.RevitApp.TransactionTest.Model;
 using DS.RevitApp.TransactionTest.ViewModel;
 using System;
-using System.Threading.Tasks;
-using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace DS.RevitApp.TransactionTest.View
 {
@@ -28,7 +24,7 @@ namespace DS.RevitApp.TransactionTest.View
             _uiapp = uiapp;
 
             InitializeComponent();
-            DataContext = new TransactioinTestViewModel(doc, uiDoc, this);
+            DataContext = new TransactioinTestViewModel(doc, uiDoc);
         }
 
         private void OnIdling(object sender, IdlingEventArgs e)

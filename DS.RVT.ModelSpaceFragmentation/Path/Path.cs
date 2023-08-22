@@ -1,4 +1,6 @@
 ﻿using Autodesk.Revit.DB;
+using DS.ClassLib.VarUtils.Points;
+using DS.RevitLib.Utils.Various;
 using DS.RVT.ModelSpaceFragmentation.Lines;
 using FrancoGustavo;
 using System;
@@ -6,46 +8,65 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Media3D;
+using Transform = Rhino.Geometry.Transform;
 
 namespace DS.RVT.ModelSpaceFragmentation
 {
     static class Path
     {
-        public static List<XYZ> PathRefinement(List<PathFinderNode> path)
+        public static List<Point3D> Refine(List<PointPathFinderNode> path)
         {
+            List<Point3D> points = new List<Point3D>();
+            if (path == null || path.Count == 0)
+            { return points; }
 
-            //Convert path to revit coordinates                
-            List<XYZ> pathCoords = new List<XYZ>();
-            pathCoords.Add(ElementInfo.StartElemPoint);
+            var firstNode = path[0];
+            Point3D basePoint = firstNode.Point;
+            Vector3D baseDir = firstNode.Dir;
 
-            foreach (PathFinderNode item in path)
+            for (int i = 1; i < path.Count; i++)
             {
-                XYZ point = new XYZ(item.ANX, item.ANY, item.ANZ);
-                XYZ pathpoint = ConvertToModel(point);
+                var currentNode = path[i];
+                var currentPoint = currentNode.Point;
+                var currentDir = path[i].Dir;
+                if (currentDir.Length != 0)
+                { currentDir.Normalize(); }
 
-                double xx = Math.Abs(pathCoords[pathCoords.Count - 1].X - pathpoint.X);
-                double xy = Math.Abs(pathCoords[pathCoords.Count - 1].Y - pathpoint.Y);
-                double xz = Math.Abs(pathCoords[pathCoords.Count - 1].Z - pathpoint.Z);
-
-                if (xx > 0.01 || xy > 0.01 || xz > 0.01)
-                    pathCoords.Add(pathpoint);
-
+                if(baseDir.Length == 0 || !currentDir.IsAlmostEqualTo(baseDir))
+                {
+                    points.Add(basePoint);
+                    baseDir = currentDir;
+                }
+                basePoint = currentPoint; 
             }
 
-            //check min distance
-            double minDist = 1.5 * ElementSize.ElemDiameterF;
-            if (Math.Abs(pathCoords[pathCoords.Count - 2].X - pathCoords[pathCoords.Count - 1].X) <= minDist &&
-                Math.Abs(pathCoords[pathCoords.Count - 2].Y - pathCoords[pathCoords.Count - 1].Y) <= minDist &&
-                Math.Abs(pathCoords[pathCoords.Count - 2].Z - pathCoords[pathCoords.Count - 1].Z) <= minDist)
-                pathCoords.RemoveAt(pathCoords.Count - 2);
+            points.Add(basePoint);
+
+            return points;
+        }
+
+        public static List<XYZ> Convert(List<Point3D> path, IPoint3dConverter pointConverter)
+        {
+            //Convert path to revit coordinates                
+            List<XYZ> pathCoords = new List<XYZ>();
+            //pathCoords.Add(ElementInfo.StartElemPoint);
+
+            foreach (var point in path)
+            {
+                //Point3D ucs1Point = point;
+                var ucs1Point3d = point.Convert();
+                ucs1Point3d = pointConverter.ConvertToUCS1(ucs1Point3d);
+                var xYZ = new XYZ(ucs1Point3d.X, ucs1Point3d.Y, ucs1Point3d.Z);
+                pathCoords.Add(xYZ);
+            }
 
             return pathCoords;
-
         }
 
         public static void ShowPath(List<XYZ> pathCoords)
         {
-            pathCoords.Add(ElementInfo.EndElemPoint);
+            //pathCoords.Add(ElementInfo.EndElemPoint);
 
             //Show path with lines
             LineCreator lineCreator = new LineCreator();
@@ -54,9 +75,6 @@ namespace DS.RVT.ModelSpaceFragmentation
             //MEP system changing
             //RevitUtils.MEP.PypeSystem pypeSystem = new RevitUtils.MEP.PypeSystem(Main.Uiapp, Main.Uidoc, Main.Doc, Main.CurrentElement);
             //pypeSystem.CreatePipeSystem(pathCoords);
-
-            RevitUtils.MEP.ElementEraser elementEraser = new RevitUtils.MEP.ElementEraser(Main.Doc);
-            elementEraser.DeleteElement(Main.CurrentElement);
         }
 
 

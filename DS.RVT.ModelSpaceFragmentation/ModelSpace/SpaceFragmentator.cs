@@ -27,8 +27,8 @@ namespace DS.RVT.ModelSpaceFragmentation
         public void FragmentSpace(Element element)
         {
 
-            ElementInfo pointsInfo = new ElementInfo();
-            pointsInfo.GetPoints(element);
+            ElementInfo pointsInfo = null;
+            pointsInfo.GetPoints();
 
             ModelSpacePointsGenerator modelSpacePointsGenerator =
             new ModelSpacePointsGenerator(ElementInfo.MinBoundPoint, ElementInfo.MaxBoundPoint);
@@ -79,7 +79,7 @@ namespace DS.RVT.ModelSpaceFragmentation
             UnpassablePoints = pointsSeparator.UnpassablePoints;
             PassablePoints = pointsSeparator.PassablePoints;
 
-            Visualize(pointsSeparator);
+            //Visualize(pointsSeparator);
         }
 
         private void Visualize(PointsSeparator pointsSeparator)
