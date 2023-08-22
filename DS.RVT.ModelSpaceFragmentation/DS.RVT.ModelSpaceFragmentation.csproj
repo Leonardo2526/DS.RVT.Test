@@ -1,8 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Rhino3dm.7.15.0\build\net45\Rhino3dm.props" Condition="Exists('..\packages\Rhino3dm.7.15.0\build\net45\Rhino3dm.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -36,18 +39,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DS.PathSearch, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
-    <Reference Include="DS.RevitLib.Utils, Version=2.0.0.4, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\DS.RevitLib.Utils\DS.RevitLib.Utils\bin\Debug\DS.RevitLib.Utils.dll</HintPath>
+    <Reference Include="DS.PathFinder">
+      <HintPath>..\..\DS.CommonLib.Utils\PathFinders\DS.PathFinder\bin\Debug\DS.PathFinder.dll</HintPath>
     </Reference>
     <Reference Include="DS.RevitUtils.MEP, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\DS.RevitUtils.MEP.dll</HintPath>
-    </Reference>
-    <Reference Include="FrancoGustavo, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\DS.WindowsApp.Programs\PathSearchAlgorythms\FrancoGustavo\bin\Debug\FrancoGustavo.dll</HintPath>
     </Reference>
     <Reference Include="iUtils">
       <HintPath>..\..\VAR.RevitLib.Utils\iUtils\bin\Debug\iUtils.dll</HintPath>
@@ -61,7 +58,11 @@
       <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Rhino3dm, Version=7.15.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rhino3dm.7.15.0\lib\net45\Rhino3dm.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -82,11 +83,10 @@
     <Compile Include="MapCreator.cs" />
     <Compile Include="BoundingBox\BoundigBoxVizualizator.cs" />
     <Compile Include="ParallelSort.cs" />
-    <Compile Include="Path\BestPathRequirement.cs" />
     <Compile Include="Path\Path.cs" />
-    <Compile Include="Path\PathRequiment.cs" />
     <Compile Include="Path\Priority.cs" />
     <Compile Include="BoundingBox\BoundingBoxCreator.cs" />
+    <Compile Include="PointCreator.cs" />
     <Compile Include="Points\Convertor\PointsConvertor.cs" />
     <Compile Include="ModelSpace\SpaceZone.cs" />
     <Compile Include="Points\PointsSeparator.cs" />
@@ -96,7 +96,6 @@
     <Compile Include="Points\StepsPriority.cs" />
     <Compile Include="Points\Convertor\PointConvertor.cs" />
     <Compile Include="Element\ElementInfo.cs" />
-    <Compile Include="Element\ElementUtils.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="Interfaces\Interfaces.cs" />
     <Compile Include="Main.cs" />
@@ -122,11 +121,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="DS.RVT.ModelSpaceFragmentation.addin" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\DS.CommonLib.Utils\DS.ClassLib.VarUtils\DS.ClassLib.VarUtils.csproj">
       <Project>{97D2548B-BA7F-4C31-8F52-6BF929E0C37B}</Project>
       <Name>DS.ClassLib.VarUtils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\DS.RevitLib.Utils\DS.RevitLib.Utils\DS.RevitLib.Utils.csproj">
+      <Project>{9873f185-f630-4bb2-94a4-d9665f32b802}</Project>
+      <Name>DS.RevitLib.Utils</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -135,4 +139,10 @@
 Copy "$(ProjectDir)$(TargetName).addin" "C:\ProgramData\Autodesk\Revit\Addins\2020"
 </PostBuildEvent>
   </PropertyGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Rhino3dm.7.15.0\build\net45\Rhino3dm.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Rhino3dm.7.15.0\build\net45\Rhino3dm.props'))" />
+  </Target>
 </Project>

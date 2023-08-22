@@ -104,6 +104,9 @@
     <Reference Include="Serilog.Settings.Configuration, Version=3.4.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.Settings.Configuration.3.4.0\lib\net461\Serilog.Settings.Configuration.dll</HintPath>
     </Reference>
+    <Reference Include="Serilog.Sinks.Console, Version=4.1.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.Sinks.Console.4.1.0\lib\net45\Serilog.Sinks.Console.dll</HintPath>
+    </Reference>
     <Reference Include="Serilog.Sinks.Debug, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.Sinks.Debug.2.0.0\lib\net46\Serilog.Sinks.Debug.dll</HintPath>
     </Reference>
@@ -179,6 +182,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AStarAlgorithmCDFTest.cs" />
     <Compile Include="SerilogTests\AccountDoc.cs" />
     <Compile Include="CmdFailureGatherer.cs" />
     <Compile Include="SerilogTests\CustomHttpClient.cs" />
@@ -195,6 +199,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SymbolPlacer\SymbolPlacerClient.cs" />
     <Compile Include="TransactionTests\MEPCurveTransaction.cs" />
+    <Compile Include="WallsTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -205,6 +210,12 @@
     <Content Include="Core\Compression\Snappy\lib\win\snappy32.dll" />
     <Content Include="Core\Compression\Snappy\lib\win\snappy64.dll" />
     <Content Include="Core\Compression\Zstandard\lib\win\libzstd.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\DS.CommonLib.Utils\PathFinders\DS.PathFinder\DS.PathFinder.csproj">
+      <Project>{F42C671B-41AF-4CD6-8DA8-C75EAE032D73}</Project>
+      <Name>DS.PathFinder</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

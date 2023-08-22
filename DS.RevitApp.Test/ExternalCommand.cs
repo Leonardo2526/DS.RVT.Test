@@ -19,12 +19,14 @@ namespace DS.RevitApp.Test
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
 
+            new WallsTest(uidoc);
+
             //PersonClient.Test5(new HttpClient(), "addj");
 
 
             //new MongoTest();
 
-            new SerilogTest(uidoc);
+            //new SerilogTest(uidoc);
 
             //var test = new PathFinerTest(doc, uidoc);
             //test.Run();
