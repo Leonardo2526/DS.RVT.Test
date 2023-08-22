@@ -31,9 +31,12 @@ namespace DS.RevitApp.Test
             var selector = new ElementSelector(_uiDoc) { AllowLink = false };
             var element = selector.Pick($"Укажите элемент");
 
-            var oLPNoIntersection = element.GetParameters("OLP_БезПересечений").FirstOrDefault();
+            var paramName = "OLP_БезПересечений";
+            var oLPNoIntersection = element.GetParameters(paramName).FirstOrDefault();
+            Debug.WriteLine(element.Id);
             Debug.WriteLine(oLPNoIntersection.Definition.Name);
             Debug.WriteLine(oLPNoIntersection.AsInteger());
+            Debug.WriteLine(oLPNoIntersection.AsValueString());
 
             var line = element.GetCenterLine();
             Debug.WriteLine(line.Direction);

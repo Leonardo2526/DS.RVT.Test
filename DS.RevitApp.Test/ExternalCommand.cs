@@ -3,7 +3,11 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 //using ClassLibrary1;
 using ConsoleApp2;
+using DS.RevitLib.Utils.Elements;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using DS.RevitLib.Utils.Extensions;
 
 namespace DS.RevitApp.Test
 {
@@ -17,9 +21,10 @@ namespace DS.RevitApp.Test
             Autodesk.Revit.ApplicationServices.Application application = uiapp.Application;
 
             UIDocument uidoc = uiapp.ActiveUIDocument;
-            Document doc = uiapp.ActiveUIDocument.Document;
+            Document doc = uiapp.ActiveUIDocument.Document;         
 
-            new WallsTest(uidoc);
+            //new WallsTest(uidoc);
+            new AStarAlgorithmCDFTest(uidoc);
 
             //PersonClient.Test5(new HttpClient(), "addj");
 

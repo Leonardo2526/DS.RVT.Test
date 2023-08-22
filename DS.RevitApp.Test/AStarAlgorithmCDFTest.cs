@@ -117,6 +117,12 @@ namespace DS.RevitApp.Test
             var objectsToExclude = new List<Element>();
             objectsToExclude.AddRange(span);
 
+            if(!objectsToExclude.Contains(startConnectionPoint.Element))
+            { objectsToExclude.Add(startConnectionPoint.Element); }
+
+            if (!objectsToExclude.Contains(endConnectionPoint.Element))
+            { objectsToExclude.Add(endConnectionPoint.Element); }
+
             //var objectsToExclude = new List<Element>() { startConnectionPoint.Element };
             //if (startConnectionPoint.Element.Id != endConnectionPoint.Element.Id)
             //{ objectsToExclude.Add(endConnectionPoint.Element); }
@@ -197,8 +203,9 @@ namespace DS.RevitApp.Test
         {
             ITraceSettings traceSettings = new TraceSettings()
             {
-                A = 30,
-                B = 50.MMToFeet(),
+                A = 90,
+                B = 20.MMToFeet(),
+                Step = 500.MMToFeet()
                 //AList = new List<int>() {30}
             };
             var solidModel = new SolidModel(mEPCurve.Solid());
