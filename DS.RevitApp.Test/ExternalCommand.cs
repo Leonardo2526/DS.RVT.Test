@@ -23,8 +23,9 @@ namespace DS.RevitApp.Test
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;         
 
+            new AddSharedTest(uidoc);
             //new WallsTest(uidoc);
-            new AStarAlgorithmCDFTest(uidoc);
+            //new AStarAlgorithmCDFTest(uidoc);
 
             //PersonClient.Test5(new HttpClient(), "addj");
 
