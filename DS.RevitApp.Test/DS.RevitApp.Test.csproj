@@ -48,9 +48,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\DS.CommonLib.Utils\DS.ClassLib.VarUtils\bin\Debug\DS.ClassLib.VarUtils.dll</HintPath>
     </Reference>
-    <Reference Include="DS.RevitLib.Utils">
-      <HintPath>..\..\DS.RevitLib.Utils\DS.RevitLib.Utils\bin\Debug\DS.RevitLib.Utils.dll</HintPath>
-    </Reference>
     <Reference Include="iUtils, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\VAR.RevitLib.Utils\iUtils\bin\Debug\iUtils.dll</HintPath>
@@ -81,6 +78,9 @@
     </Reference>
     <Reference Include="MongoDB.Libmongocrypt, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MongoDB.Libmongocrypt.1.0.0\lib\net452\MongoDB.Libmongocrypt.dll</HintPath>
+    </Reference>
+    <Reference Include="MoreLinq, Version=4.1.0.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
+      <HintPath>..\packages\morelinq.4.1.0\lib\netstandard2.0\MoreLinq.dll</HintPath>
     </Reference>
     <Reference Include="Nito.Collections.Deque, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Nito.Collections.Deque.1.1.1\lib\net461\Nito.Collections.Deque.dll</HintPath>
@@ -187,6 +187,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddSharedTest.cs" />
+    <Compile Include="GetOpeningsSolidTest.cs" />
+    <Compile Include="WallOpeningsTest.cs" />
+    <Compile Include="GetAnalyticalModelTest.cs" />
+    <Compile Include="OpeningsUtilsTest.cs" />
     <Compile Include="ParameterChecker.cs" />
     <Compile Include="SerilogTests\AccountDoc.cs" />
     <Compile Include="CmdFailureGatherer.cs" />
@@ -221,6 +225,10 @@
     <ProjectReference Include="..\..\DS.CommonLib.Utils\PathFinders\DS.PathFinder\DS.PathFinder.csproj">
       <Project>{F42C671B-41AF-4CD6-8DA8-C75EAE032D73}</Project>
       <Name>DS.PathFinder</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\OLMP.RevitAPI\OLMP.RevitAPI.Tools\OLMP.RevitAPI.Tools.csproj">
+      <Project>{698a89cb-1b8a-46f5-9e67-8820c37c1ed5}</Project>
+      <Name>OLMP.RevitAPI.Tools</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -3,11 +3,12 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 //using ClassLibrary1;
 using ConsoleApp2;
-using DS.RevitLib.Utils.Elements;
+using OLMP.RevitAPI.Tools.Elements;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using DS.RevitLib.Utils.Extensions;
+using OLMP.RevitAPI.Tools.Extensions;
+using Serilog;
 
 namespace DS.RevitApp.Test
 {
@@ -21,24 +22,20 @@ namespace DS.RevitApp.Test
             Autodesk.Revit.ApplicationServices.Application application = uiapp.Application;
 
             UIDocument uidoc = uiapp.ActiveUIDocument;
-            Document doc = uiapp.ActiveUIDocument.Document;         
+            Document doc = uiapp.ActiveUIDocument.Document;
 
-            new AddSharedTest(uidoc);
-            //new WallsTest(uidoc);
-            //new AStarAlgorithmCDFTest(uidoc);
+           var logger = new LoggerConfiguration()
+            .MinimumLevel.Information()
+            .WriteTo.Debug()
+            .CreateLogger();
 
-            //PersonClient.Test5(new HttpClient(), "addj");
+            var test = new GetOpeningsSolidTest(uidoc)
+            { Logger = logger };
+            test.GetWallSolid();
 
-
-            //new MongoTest();
-
-            //new SerilogTest(uidoc);
-
-            //var test = new PathFinerTest(doc, uidoc);
-            //test.Run();
-
-            //var test = new DirectShapeTest(doc, uidoc);
-            //test.CreateSphereDirectShape();
+            //var test = new OpeningsUtilsTest(uidoc)
+            //{ Logger = logger };
+            //test.GetOpeningsSolids();
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }
