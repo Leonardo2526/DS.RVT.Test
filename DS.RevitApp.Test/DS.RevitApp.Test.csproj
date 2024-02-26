@@ -188,6 +188,7 @@
   <ItemGroup>
     <Compile Include="AddSharedTest.cs" />
     <Compile Include="GetOpeningsSolidTest.cs" />
+    <Compile Include="GetSpacesTest.cs" />
     <Compile Include="WallOpeningsTest.cs" />
     <Compile Include="GetAnalyticalModelTest.cs" />
     <Compile Include="OpeningsUtilsTest.cs" />

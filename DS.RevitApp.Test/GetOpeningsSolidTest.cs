@@ -2,15 +2,19 @@
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using DS.ClassLib.VarUtils;
+using DS.ClassLib.VarUtils.Basis;
 using DS.ClassLib.VarUtils.Points;
 using MoreLinq;
 using OLMP.RevitAPI.Tools;
 using OLMP.RevitAPI.Tools.Creation.Transactions;
 using OLMP.RevitAPI.Tools.Extensions;
 using OLMP.RevitAPI.Tools.Geometry;
+using OLMP.RevitAPI.Tools.Geometry.Points;
+using Rhino;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace DS.RevitApp.Test
@@ -23,6 +27,8 @@ namespace DS.RevitApp.Test
         private readonly List<Document> _allFilteredDocs;
         private readonly DocumentFilter _globalFilter;
         private readonly ContextTransactionFactory _trb;
+        private readonly XYZVisualizator _xyzVisualizator;
+
         //create global filter
         private readonly List<BuiltInCategory> _excludedCategories = new List<BuiltInCategory>()
         {
@@ -33,7 +39,7 @@ namespace DS.RevitApp.Test
         };
         private static double _feetsToMeters = Rhino.RhinoMath.UnitScale(Rhino.UnitSystem.Feet, Rhino.UnitSystem.Meters);
         private static double _squareFeetsToMeters = Math.Pow(_feetsToMeters, 2);
-
+        private static double _at = RhinoMath.ToRadians(1);
 
         public GetOpeningsSolidTest(UIDocument uiDoc)
         {
@@ -49,6 +55,8 @@ namespace DS.RevitApp.Test
                 (new ElementIsElementTypeFilter(true), null),
             ];
             _trb = new ContextTransactionFactory(_doc);
+
+            _xyzVisualizator = new XYZVisualizator(uiDoc, 0, _trb);
         }
 
         public ILogger Logger { get; set; }
@@ -61,6 +69,19 @@ namespace DS.RevitApp.Test
 
             if (element is not Wall wall)
             { return; }
+            var solid = wall.Solid(_allLoadedLinks);
+
+            //var mainFaces = GetMainFaces(wall).ToList();
+            //mainFaces.ForEach(face =>
+            //{
+            //    Logger?.Information($"face area is {face.Area}");
+            //    var evPoint = TryComputeCenter(face, solid);
+            //    evPoint.Show(_doc, 0, _trb);
+            //    var loop = face.GetOuterLoop();
+            //    ShowLoop(loop);
+            //});
+            //Logger?.Information($"Total faces count is {mainFaces.Count}");
+            //return;
 
             var wallInseretsIds = wall.FindInserts(true, false, false, false) ?? new List<ElementId>();
             var inserts = wallInseretsIds.Select(i => _doc.GetElement(i)).ToList();
@@ -74,7 +95,15 @@ namespace DS.RevitApp.Test
             }
         }
 
-        private Solid GetSolid(Opening opening, Wall wall)
+        private Rhino.Geometry.PolylineCurve GetTangents(Wall wall)
+        {
+            var wallLocCurve = wall.Location as LocationCurve;
+            var wallCurve = wallLocCurve.Curve;
+            var points = wallCurve.Tessellate().Select(p => p.ToPoint3d());
+            return new Rhino.Geometry.PolylineCurve(points);
+        }
+
+        public Solid GetSolid(Opening opening, Wall wall)
         {
             var wallLocCurve = wall.Location as LocationCurve;
             var wallCurve = wallLocCurve.Curve;
@@ -108,7 +137,6 @@ namespace DS.RevitApp.Test
             var startParam = wallCurve.GetEndParameter(0);
             //var solid = GeometryCreationUtilities.CreateExtrusionGeometry(profileLoops, XYZ.BasisY, 1);
             var solid = GeometryCreationUtilities.CreateSweptGeometry(sweepPath, 0, startParam, profileLoops);
-
             return solid;
         }
 
@@ -144,21 +172,59 @@ namespace DS.RevitApp.Test
         }
 
 
+        private void ShowLoop(CurveLoop loop)
+        => _trb.CreateAsync(() => loop.ForEach(c => c.Show(_doc)), "ShowLoop");
 
         private IEnumerable<Face> GetMainFaces(Wall wall)
         {
             var faces = new List<Face>();
 
-
             var solid = wall.Solid(_allLoadedLinks);
-            foreach (Face item in solid.Faces)
+            var wallLocCurve = wall.Location as LocationCurve;
+            var wallCurve = wallLocCurve.Curve;
+            var p1 = wallCurve.GetEndPoint(0);
+            var p2 = wallCurve.GetEndPoint(1);
+
+            foreach (Face face in solid.Faces)
             {
-                faces.Add(item);
+                var normal = face.ComputeNormal(new UV()).ToVector3d();
+                if (Rhino.Geometry.Vector3d.ZAxis.IsParallelTo(normal, _at) != 0)
+                { continue; }
+
+                var curveLoop = face.GetOuterLoop();
+                if(!HasIntersection(wallCurve, curveLoop))
+                { faces.Add(face); }
             }
 
-            faces = faces.OrderByDescending(f => f.Area).ToList();
+            faces = faces.OrderByDescending(f => f.GetOuterLoop().GetExactLength()).ToList();
 
             return new List<Face>() { faces[0], faces[1] };
+
+            static bool HasIntersection(Curve wallCurve, CurveLoop curveLoop)
+            {
+                foreach (var curve in curveLoop)
+                {
+                    var intersection = curve.Intersect(wallCurve, out var result);
+                    if(result !=null && result.Size > 0) { return true; }
+                   
+                }
+
+                return false;
+            }
+        }
+
+        private XYZ TryComputeCenter(Face face, Solid solid)
+        {
+            var outerLoop = face.GetOuterLoop();
+
+            var loopPoints = new List<XYZ>();
+            outerLoop.ForEach(c => loopPoints.AddRange(c.Tessellate()));
+
+            _trb.CreateAsync(() => outerLoop.ForEach(c => c.Show(_doc)), "ShowCurve");         
+
+            var center = solid.ComputeCentroid();
+            //var center =  XYZUtils.GetAverage(loopPoints);          
+            return face.Project(center, true) ?? center;
         }
     }
 }

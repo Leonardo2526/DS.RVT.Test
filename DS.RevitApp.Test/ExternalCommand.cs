@@ -29,13 +29,13 @@ namespace DS.RevitApp.Test
             .WriteTo.Debug()
             .CreateLogger();
 
-            var test = new GetOpeningsSolidTest(uidoc)
-            { Logger = logger };
-            test.GetWallSolid();
-
-            //var test = new OpeningsUtilsTest(uidoc)
+            //var test = new GetOpeningsSolidTest(uidoc)
             //{ Logger = logger };
-            //test.GetOpeningsSolids();
+            //test.GetWallSolid();
+
+            var test = new GetSpacesTest(uidoc)
+            { Logger = logger };
+            test.Run();
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }

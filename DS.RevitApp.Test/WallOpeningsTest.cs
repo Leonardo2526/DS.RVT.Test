@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.Xml.Linq;
 using OLMP.RevitAPI.Tools.Solids;
 using Autodesk.Revit.UI.Selection;
+using static MongoDB.Driver.WriteConcern;
 
 namespace DS.RevitApp.Test
 {
@@ -74,8 +75,18 @@ namespace DS.RevitApp.Test
                 rooms.ForEach(r => Logger.Information(r.Name, r.Id));
             }
             return rooms;
-        }     
+        }
 
+        public void ShowShape()
+        {
+            Reference reference = _uiDoc.Selection.PickObject(ObjectType.Element, "Select element");
+            var element = _doc.GetElement(reference);
+
+            if (element is not Wall wall)
+            { return; }
+            var solid = wall.Solid(_allLoadedLinks);
+            _trb.CreateAsync(() => solid.ShowShape(_doc), "ShowSurfaceSolid");
+        }
 
         public void Run()
         {
@@ -86,29 +97,62 @@ namespace DS.RevitApp.Test
             var existSpaces = spaceDocFilter.ApplyToAllDocs()
                 .SelectMany(kv => kv.Value.ToElements(kv.Key)).OfType<EnergyAnalysisSpace>();
 
-            var room1 = rooms.FirstOrDefault();
-            var model = room1.GetAnalyticalModel();
+            var settings = EnergyDataSettings.GetFromDocument(_doc);
+            _trb.CreateAsync(() =>
+            {
+                settings.AnalysisType = AnalysisMode.BuildingElements;
+                settings.EnergyModel = true;
+                settings.DividePerimeter = false;
+                settings.CoreOffset = 100; 
+                settings.SetCreateAnalyticalModel(false);
+
+            }, 
+            "SetSettings").Wait();
+
+            var p1Name = "Analytical Space Resolution";
+            var p1 = settings.GetParameters(p1Name).First();
+            var p2Name = "Analytical Surface Resolution";
+            var p2 = settings.GetParameters(p2Name).First();
+            _trb.CreateAsync(() =>
+            {
+                p1.Set(0.5);
+                p2.Set(0.5);
+
+            },
+             "SetSettings").Wait();
+
+            //var room1 = rooms.FirstOrDefault();
+            //var model = room1.GetAnalyticalModel();
             var opt = new EnergyAnalysisDetailModelOptions()
             {
-                //ExportMullions = true,
-                //IncludeShadingSurfaces = true,
-                //Tier = EnergyAnalysisDetailModelTier.Final
+                ExportMullions = true,
+                IncludeShadingSurfaces = true,
+                Tier = EnergyAnalysisDetailModelTier.Final,
+                SimplifyCurtainSystems = false
             };
+
             //var m = EnergyAnalysisDetailModel.GetMainEnergyAnalysisDetailModel(_doc);           
             var eModel = _trb.CreateAsync(() => EnergyAnalysisDetailModel.Create(_doc, opt), "CreateModel").Result;
             var spaces = eModel.GetAnalyticalSpaces();
             var modelOpenings = eModel.GetAnalyticalOpenings();
             var modelSurfaces = eModel.GetAnalyticalSurfaces();
 
+
+            var s = GetStringValues(settings.Parameters);
+            Logger?.Information(s);
+            //return;
+
+
             var exludeTypes = new List<EnergyAnalysisSurfaceType>()
             {
-                EnergyAnalysisSurfaceType.Air,
-                 EnergyAnalysisSurfaceType.Shading,
-                  EnergyAnalysisSurfaceType.Underground
+                //EnergyAnalysisSurfaceType.Air,
+                // EnergyAnalysisSurfaceType.Shading,
+                //  EnergyAnalysisSurfaceType.Underground
             };
             double extrusionValue = 0.001;
             foreach (var space in spaces)
             {
+                ShowSpace(space);
                 var surfaces = space.GetAnalyticalSurfaces()
                     .Where(surface => !exludeTypes.Contains(surface.SurfaceType));
                 foreach (var surface in surfaces)
@@ -124,9 +168,9 @@ namespace DS.RevitApp.Test
                     dedutibleSolids.AddRange(windowsAndDoorsSolids);
 
                     var resultSolid = Substract(surfaceSolid, dedutibleSolids);
-                    _trb.CreateAsync(() => resultSolid.ShowShape(_doc), "ShowSurfaceSolid");
-                    var mainFace = GetMainFace(resultSolid);
-                    Logger?.Information($"Main face area is: {mainFace.Area}");
+                    _trb.CreateAsync(() => surfaceSolid.ShowShape(_doc), "ShowSurfaceSolid");
+                    //var mainFace = GetMainFace(surfaceSolid);
+                    //Logger?.Information($"Main face area is: {mainFace.Area}");
                 }
             }
         }
@@ -157,6 +201,8 @@ namespace DS.RevitApp.Test
             var inseretsIds = new List<ElementId>();
             if (TryGetOriginateElement(surface) is not Wall wall) { return oSolids; }
 
+
+            var solidExtractor = new GetOpeningsSolidTest(_uiDoc);
             var wallInseretsIds = wall.FindInserts(true, false, false, false) ?? new List<ElementId>();
             inseretsIds.AddRange(wallInseretsIds);
 
@@ -164,8 +210,9 @@ namespace DS.RevitApp.Test
             var openings = inserts.OfType<Opening>();
             foreach (var opening in openings)
             {
-                var geom = opening.get_Geometry(new Options());
-                var oSolid = opening.TryGetSolid(_doc, _allLoadedLinks);
+                var oSolid = solidExtractor.GetSolid(opening, wall);
+                //var geom = opening.get_Geometry(new Options());
+                //var oSolid = opening.TryGetSolid(_doc, _allLoadedLinks);
                 oSolids.Add(oSolid);
             }
 
@@ -268,5 +315,43 @@ namespace DS.RevitApp.Test
             //    face.ComputeNormal()
             //}
         }
+
+
+        private string GetStringValues(ParameterSet parameters)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine();
+            int i = 0;
+            foreach (Parameter parameter in parameters)
+            {
+                i++;
+                string value = null;
+                switch (parameter.StorageType)
+                {
+                    case StorageType.None:
+                        break;
+                    case StorageType.Integer:
+                        value = parameter.AsInteger().ToString();
+                        break;
+                    case StorageType.Double:
+                        value = parameter.AsDouble().ToString();
+                        break;
+                    case StorageType.String:
+                        value = parameter.AsValueString();
+                        break;
+                    case StorageType.ElementId:
+                        break;
+                    default:
+                        break;
+                }
+                sb.AppendLine($"Parameter {i} '{parameter.Definition.Name}': {value}.");
+            }
+
+            return sb.ToString();
+        }
+
+               
+        private void ShowSpace(EnergyAnalysisSpace space) => 
+            _trb.CreateAsync(() => ShowPolyLoop(space.GetBoundary().First(), 26.316), "ShowSpaces");
     }
 }
