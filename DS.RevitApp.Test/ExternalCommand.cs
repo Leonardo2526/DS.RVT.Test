@@ -33,6 +33,9 @@ namespace DS.RevitApp.Test
             //{ Logger = logger };
             //test.GetWallSolid();
 
+            //var test = new DirectShapeTest(doc, uidoc);
+            //test.SelectWall();
+
             var test = new GetSpacesTest(uidoc)
             { Logger = logger };
             test.Run();

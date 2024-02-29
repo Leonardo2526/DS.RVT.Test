@@ -48,6 +48,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\DS.CommonLib.Utils\DS.ClassLib.VarUtils\bin\Debug\DS.ClassLib.VarUtils.dll</HintPath>
     </Reference>
+    <Reference Include="DS.GraphUtils.Entities, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\DS.GraphUtils\DS.GraphUtils.Entities\DS.GraphUtils.Entities\bin\Debug\DS.GraphUtils.Entities.dll</HintPath>
+    </Reference>
     <Reference Include="iUtils, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\VAR.RevitLib.Utils\iUtils\bin\Debug\iUtils.dll</HintPath>
@@ -87,6 +91,18 @@
     </Reference>
     <Reference Include="PathFinderLib">
       <HintPath>bin\Debug\PathFinderLib.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph, Version=3.6.61114.0, Culture=neutral, PublicKeyToken=f3fb40175eec2af3, processorArchitecture=MSIL">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph.Data, Version=3.6.61114.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph.Graphviz, Version=3.6.61114.0, Culture=neutral, PublicKeyToken=f3fb40175eec2af3, processorArchitecture=MSIL">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Graphviz.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph.Serialization, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Serialization.dll</HintPath>
     </Reference>
     <Reference Include="RevitAPI">
       <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
@@ -187,8 +203,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddSharedTest.cs" />
+    <Compile Include="CreateSurfaceTest.cs" />
+    <Compile Include="Energy\AdjacenciesFuncBuilder.cs" />
+    <Compile Include="Energy\EnergyEdge.cs" />
+    <Compile Include="Energy\EnergyGraphFactory.cs" />
+    <Compile Include="Energy\EnergyModelBuilder.cs" />
+    <Compile Include="Energy\EnergyModel.cs" />
+    <Compile Include="Energy\EnergySpace.cs" />
+    <Compile Include="Energy\EnergySurface.cs" />
+    <Compile Include="Energy\EnergySurfaceBooleanOperations.cs" />
+    <Compile Include="Energy\ISpaceFactory.cs" />
+    <Compile Include="Energy\NewExtensions.cs" />
+    <Compile Include="Energy\SpaceFactory.cs" />
     <Compile Include="GetOpeningsSolidTest.cs" />
     <Compile Include="GetSpacesTest.cs" />
+    <Compile Include="IEnergyModelFactory.cs" />
     <Compile Include="WallOpeningsTest.cs" />
     <Compile Include="GetAnalyticalModelTest.cs" />
     <Compile Include="OpeningsUtilsTest.cs" />
