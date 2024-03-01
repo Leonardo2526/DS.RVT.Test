@@ -5,6 +5,8 @@ using DS.GraphUtils.Entities;
 using MoreLinq;
 using OLMP.RevitAPI.Tools.Extensions;
 using QuickGraph;
+using QuickGraph.Algorithms;
+using Rhino;
 using Rhino.Geometry;
 using Serilog;
 using System;
@@ -13,15 +15,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms.VisualStyles;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TreeView;
 
 namespace DS.RevitApp.Test.Energy
 {
     internal class EnergyGraphFactory :
-        IGraphFactory<EnergyVertex>, ISerilogged
+        //IGraphFactory<EnergyVertex>, 
+        ISerilogged
     {
-        private readonly static double _minIntersectionVolume =
-           UnitConvertionExtenstions.MMToFeet(1, 3);
+        private readonly static double _minIntersectionVolume = 1.CMToFeet(3);
 
+        private static readonly double _at = RhinoMath.ToRadians(1);
+        private static readonly EnergyVertex _nullVertex = new(0, null);
         private readonly Document _activeDoc;
         private readonly IEnumerable<RevitLinkInstance> _links;
         private readonly IEnumerable<Space> _spaces;
@@ -41,18 +46,19 @@ namespace DS.RevitApp.Test.Energy
             _spaces = spaces;
             spaces.ForEach(_openSpaces.Push);
             _energyModelFactory = energyModelFactory;
+            Graph.AddVertex(_nullVertex);
         }
 
 
         public Func<Space, IEnumerable<Space>> GetBoxAdjacencies { get; set; }
 
-        public BidirectionalGraph<EnergyVertex, Edge<EnergyVertex>> Graph { get; } = new();
+        public BidirectionalGraph<EnergyVertex, TaggedEdge<EnergyVertex, EnergySurface>> Graph { get; } = new();
 
         public ILogger Logger { get; set; }
 
 
 
-        public IVertexAndEdgeListGraph<EnergyVertex, Edge<EnergyVertex>> CreateGraph()
+        public BidirectionalGraph<EnergyVertex, TaggedEdge<EnergyVertex, EnergySurface>> CreateGraph()
         {
 
             while (_openSpaces.Count > 0)
@@ -62,42 +68,49 @@ namespace DS.RevitApp.Test.Energy
 
                 var currentSpaceModel = _energyModelFactory.Create(currentSpace);
                 _openModels.Push(currentSpaceModel);
+                var currentVertex = new EnergyVertex(Graph.VertexCount, currentSpaceModel.EnergySpace);
+                Graph.AddVertex(currentVertex);
 
                 while (_openModels.Count > 0)
                 {
                     var current = _openModels.Pop();
+                    var sourceVertex = Graph.Sinks()
+                       .FirstOrDefault(v => v.Tag !=null && v.Tag.Space.Equals(current.EnergySpace.Space));
+                    Logger?.Verbose($"Current room is '{current.EnergySpace.Space.Room.Name}'.");
                     _close.Add(current.EnergySpace.Space.Room.Id);
-                    var currentVertex = new EnergyVertex(Graph.VertexCount, current.EnergySpace);
 
                     List<EnergyModel> ajBoxModels = GetBoxAdjacencies is null ?
                         _spaces.Where(s => !_close.Contains(s.Room.Id))
                         .Select(s => _energyModelFactory.Create(s)).ToList() :
                         GetAdjacencyModels(current, _energyModelFactory, GetBoxAdjacencies, _close);
                     ajBoxModels.ForEach(_openModels.Push);
+                    Logger?.Verbose($"{ajBoxModels.Count} box adjacencies spaces was found.");
 
                     var interiorEdges = GetInteriorEdges(
-                        currentVertex,
+                        sourceVertex,
                         currentSpaceModel,
                         ajBoxModels,
                         out var interiorSurfaces);
 
+                    Logger?.Verbose($"{interiorEdges.Count()} interiorEdges was found.");
                     if (interiorEdges.Count() > 0)
                     {
                         ajBoxModels.ForEach(m =>
                         m.EnergySurfaces = EnergySurfaceBooleanOperations
-                        .Differences(m.EnergySurfaces, interiorSurfaces, _minIntersectionVolume));
-                        interiorEdges.ForEach(e => Graph.AddEdge(e));
+                        .Differences(m.EnergySurfaces, interiorSurfaces, ParallelCondition, MinVolumeCondition));
+                        interiorEdges.ForEach(e => Graph.AddVerticesAndEdge(e));
 
                         current.EnergySurfaces = EnergySurfaceBooleanOperations
-                        .Differences(current.EnergySurfaces, interiorSurfaces, _minIntersectionVolume);
+                        .Differences(current.EnergySurfaces, interiorSurfaces, ParallelCondition, MinVolumeCondition);
                     }
 
-                    var exteriorEdges = GetExteriorEdges(currentVertex, current.EnergySurfaces);
-                    exteriorEdges.ForEach(e => Graph.AddEdge(e));
+                    var exteriorEdges = GetExteriorEdges(sourceVertex, current.EnergySurfaces);                    
+                    Logger?.Verbose($"{exteriorEdges.Count()} exteriorEdges.");
+                    exteriorEdges.ForEach(e => Graph.AddVerticesAndEdge(e));
                 }
             }
 
-
+            Logger?.Information($"Graph was created with {Graph.VertexCount} vertices and {Graph.EdgeCount} edges.");
             return Graph;
         }
 
@@ -107,18 +120,22 @@ namespace DS.RevitApp.Test.Energy
             IEnumerable<EnergyModel> ajBoxModels,
             out IEnumerable<EnergySurface> intersectionSurfaces)
         {
+
             var edges = new List<TaggedEdge<EnergyVertex, EnergySurface>>();
             intersectionSurfaces = new List<EnergySurface>();
 
             //get interior edges
             foreach (var model in ajBoxModels)
             {
-                _openModels.Push(model);
                 var target = new EnergyVertex(Graph.VertexCount, model.EnergySpace);
                 intersectionSurfaces =
                     EnergySurfaceBooleanOperations
-                    .Intersections(parentModel.EnergySurfaces, model.EnergySurfaces, _minIntersectionVolume);
-
+                    .Intersections(parentModel.EnergySurfaces,
+                    model.EnergySurfaces,
+                    ParallelCondition,
+                    MinVolumeCondition);
+                intersectionSurfaces.ForEach(s => s.SurfaceType = 
+                Autodesk.Revit.DB.Analysis.EnergyAnalysisSurfaceType.InteriorWall);
                 foreach (var surface in intersectionSurfaces)
                 {
                     var edge = new TaggedEdge<EnergyVertex, EnergySurface>(
@@ -129,7 +146,28 @@ namespace DS.RevitApp.Test.Energy
 
             return edges;
 
+        }
+          private  static bool ParallelCondition(EnergySurface s1, EnergySurface s2)
+            {
+                var point = s1.Solid.ComputeCentroid();
 
+                var intersectionResult1 = s1.Face.Project(point);
+                if (intersectionResult1 == null)
+                { return false; }
+                var n1 = s1.Face.ComputeNormal(intersectionResult1.UVPoint).ToVector3d();
+
+                var intersectionResult2 = s2.Face.Project(point);
+                if (intersectionResult2 == null)
+                { return false; }
+                var n2 = s2.Face.ComputeNormal(intersectionResult2.UVPoint).ToVector3d();
+
+                return n1.IsParallelTo(n2, _at) != 0;
+            }
+
+        private static bool MinVolumeCondition(Solid solid)
+        {
+            double minIntersectionVolume = 1.CMToFeet(3);
+            return solid != null && Math.Abs(solid.Volume) > minIntersectionVolume;
         }
 
         private IEnumerable<TaggedEdge<EnergyVertex, EnergySurface>> GetExteriorEdges(
@@ -141,7 +179,7 @@ namespace DS.RevitApp.Test.Energy
             foreach (var surface in exteriorSurfaces)
             {
                 var edge = new TaggedEdge<EnergyVertex, EnergySurface>(
-                        parentVertex, null, surface);
+                        parentVertex, _nullVertex, surface);
                 edges.Add(edge);
             }
 

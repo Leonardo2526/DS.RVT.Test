@@ -11,19 +11,24 @@ namespace DS.RevitApp.Test.Energy
         public static EnergySurface Intersection(
             EnergySurface surface1,
             EnergySurface surface2,
-            double minIntersectionVolume = 0)
+            Func<EnergySurface, EnergySurface, bool> surfaceCondition = null,
+            Func<Solid, bool> solidCondition = null)
         {
+            if (surfaceCondition != null && !surfaceCondition(surface1, surface2))
+            { return null; }
+
             var solidResult = BooleanOperationsUtils
-                  .ExecuteBooleanOperation(surface1.Solid, surface2.Solid, BooleanOperationsType.Intersect);
-            return solidResult != null && Math.Abs(solidResult.Volume) > minIntersectionVolume ?
-              surface1.Clone(solidResult) : null;
+              .ExecuteBooleanOperation(surface1.Solid, surface2.Solid, BooleanOperationsType.Intersect);
+            return solidCondition == null || solidCondition(solidResult) ?
+               surface1.Clone(solidResult) : null;
         }
 
 
         public static IEnumerable<EnergySurface> Intersections(
             IEnumerable<EnergySurface> surfaces1,
             IEnumerable<EnergySurface> surfaces2,
-            double minIntersectionVolume = 0)
+            Func<EnergySurface, EnergySurface, bool> surfaceCondition,
+             Func<Solid, bool> solidCondition = null)
         {
             var results = new List<EnergySurface>();
 
@@ -31,8 +36,9 @@ namespace DS.RevitApp.Test.Energy
             {
                 foreach (var surface2 in surfaces2)
                 {
-                    var result = Intersection(surface1, surface2, minIntersectionVolume);
-                    if (result != null) results.Add(result);
+                    var result = Intersection(surface1, surface2, surfaceCondition, solidCondition);
+                    if (result != null)
+                    { results.Add(result); }
                 }
             }
 
@@ -42,18 +48,21 @@ namespace DS.RevitApp.Test.Energy
         public static EnergySurface Difference(
            EnergySurface surface1,
            EnergySurface surface2,
-           double minIntersectionVolume = 0)
+           Func<EnergySurface, EnergySurface, bool> condition = null,
+           Func<Solid, bool> solidCondition = null)
         {
+            if (condition != null && !condition(surface1, surface2)) { return surface1; }
             var solidResult = BooleanOperationsUtils
                   .ExecuteBooleanOperation(surface1.Solid, surface2.Solid, BooleanOperationsType.Difference);
-            return solidResult != null && Math.Abs(solidResult.Volume) > minIntersectionVolume ?
+            return solidCondition == null || solidCondition(solidResult) ?
               surface1.Clone(solidResult) : null;
         }
 
         public static IEnumerable<EnergySurface> Differences(
           IEnumerable<EnergySurface> surfaces1,
           IEnumerable<EnergySurface> surfaces2,
-          double minIntersectionVolume = 0)
+          Func<EnergySurface, EnergySurface, bool> condition = null,
+          Func<Solid, bool> solidCondition = null)
         {
             var results = new List<EnergySurface>();
 
@@ -62,15 +71,24 @@ namespace DS.RevitApp.Test.Energy
                 var intersectionSolids = new List<Solid>();
                 foreach (var surface2 in surfaces2)
                 {
-                    var intersectionSolid = 
-                        GetIntersetionSolid(surface1.Solid, surface2.Solid, minIntersectionVolume);
-                    if (intersectionSolid != null) intersectionSolids.Add(intersectionSolid);
+                    if (condition != null && !condition(surface1, surface2))
+                    { continue; }
+                    var intersectionSolid = BooleanOperationsUtils
+                        .ExecuteBooleanOperation(surface1.Solid, surface2.Solid,
+                        BooleanOperationsType.Intersect);
+                    if (solidCondition == null || solidCondition(intersectionSolid))
+                    { intersectionSolids.Add(intersectionSolid); }
                 }
 
                 var resultSolid = Autodesk.Revit.DB.SolidUtils.Clone(surface1.Solid);
                 foreach (var solid in intersectionSolids)
-                { resultSolid = GetDifferenceSolid(resultSolid, solid, minIntersectionVolume); }
-                results.Add(surface1.Clone(resultSolid));
+                {
+                    resultSolid = BooleanOperationsUtils
+                        .ExecuteBooleanOperation(resultSolid, solid,
+                        BooleanOperationsType.Difference);
+                }
+                if (solidCondition == null || solidCondition(resultSolid))
+                { results.Add(surface1.Clone(resultSolid)); }
             }
 
             return results;
@@ -80,16 +98,16 @@ namespace DS.RevitApp.Test.Energy
         public static (EnergySurface result1, EnergySurface result2) SymmetricDifference(
           EnergySurface surface1,
           EnergySurface surface2,
-          double minIntersectionVolume = 0)
+          Func<Solid, bool> solidCondition = null)
         {
             var solidResult1 = BooleanOperationsUtils
                   .ExecuteBooleanOperation(surface1.Solid, surface2.Solid, BooleanOperationsType.Difference);
-            var result1 = solidResult1 != null && Math.Abs(solidResult1.Volume) > minIntersectionVolume ?
+            var result1 = solidCondition == null || solidCondition(solidResult1) ?
                 surface1.Clone(solidResult1) : null;
 
             var solidResult2 = BooleanOperationsUtils
                   .ExecuteBooleanOperation(surface2.Solid, surface1.Solid, BooleanOperationsType.Difference);
-            var result2 = solidResult2 != null && Math.Abs(solidResult2.Volume) > minIntersectionVolume ?
+            var result2 = solidCondition == null || solidCondition(solidResult1) ?
                 surface1.Clone(solidResult2) : null;
 
             return (result1, result2);
@@ -98,34 +116,12 @@ namespace DS.RevitApp.Test.Energy
         public static EnergySurface Union(
           EnergySurface surface1,
           EnergySurface surface2,
-          double minIntersectionVolume = 0)
+           Func<Solid, bool> solidCondition = null)
         {
             var solidResult = BooleanOperationsUtils
                   .ExecuteBooleanOperation(surface1.Solid, surface2.Solid, BooleanOperationsType.Union);
-            return solidResult != null && Math.Abs(solidResult.Volume) > minIntersectionVolume ?
+            return solidCondition == null || solidCondition(solidResult) ?
               surface1.Clone(solidResult) : null;
-        }
-
-       private static Solid GetDifferenceSolid(
-           Solid solid1,
-           Solid solid2,
-           double minIntersectionVolume)
-        {
-            var solidResult = BooleanOperationsUtils
-                 .ExecuteBooleanOperation(solid1, solid2, BooleanOperationsType.Difference);
-            return solidResult != null && Math.Abs(solidResult.Volume) > minIntersectionVolume ?
-              solidResult : null;
-        }
-
-        private static Solid GetIntersetionSolid(
-           Solid solid1,
-           Solid solid2,
-            double minIntersectionVolume)
-        {
-            var solidResult = BooleanOperationsUtils
-                 .ExecuteBooleanOperation(solid1, solid2, BooleanOperationsType.Intersect);
-            return solidResult != null && Math.Abs(solidResult.Volume) > minIntersectionVolume ?
-              solidResult : null;
         }
     }
 }

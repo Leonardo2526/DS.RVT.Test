@@ -207,11 +207,13 @@
     <Compile Include="Energy\AdjacenciesFuncBuilder.cs" />
     <Compile Include="Energy\EnergyEdge.cs" />
     <Compile Include="Energy\EnergyGraphFactory.cs" />
-    <Compile Include="Energy\EnergyModelBuilder.cs" />
+    <Compile Include="Energy\EnergyModelProcessor.cs" />
     <Compile Include="Energy\EnergyModel.cs" />
+    <Compile Include="Energy\EnergyModelFactory.cs" />
     <Compile Include="Energy\EnergySpace.cs" />
     <Compile Include="Energy\EnergySurface.cs" />
     <Compile Include="Energy\EnergySurfaceBooleanOperations.cs" />
+    <Compile Include="Energy\EnergyModelBuilderTest.cs" />
     <Compile Include="Energy\ISpaceFactory.cs" />
     <Compile Include="Energy\NewExtensions.cs" />
     <Compile Include="Energy\SpaceFactory.cs" />

@@ -23,9 +23,9 @@ namespace DS.RevitApp.Test
 
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
-
+         
            var logger = new LoggerConfiguration()
-            .MinimumLevel.Information()
+            .MinimumLevel.Verbose()
             .WriteTo.Debug()
             .CreateLogger();
 
@@ -36,9 +36,10 @@ namespace DS.RevitApp.Test
             //var test = new DirectShapeTest(doc, uidoc);
             //test.SelectWall();
 
-            var test = new GetSpacesTest(uidoc)
+            var test = new EnergyModelBuilderTest(uidoc)
             { Logger = logger };
-            test.Run();
+            //test.GetModels();
+            test.CreateGraph();
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }
