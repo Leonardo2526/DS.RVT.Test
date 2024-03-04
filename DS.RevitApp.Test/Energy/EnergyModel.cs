@@ -3,6 +3,7 @@ using Autodesk.Revit.DB;
 using OLMP.RevitAPI.Tools.Creation.Transactions;
 using System.Collections.Generic;
 using MoreLinq;
+using System.Linq;
 
 namespace DS.RevitApp.Test.Energy
 {
@@ -11,13 +12,13 @@ namespace DS.RevitApp.Test.Energy
         public EnergyModel(EnergySpace space, IEnumerable<EnergySurface> energySurfaces)
         {
             EnergySpace = space;
-            EnergySurfaces = energySurfaces;
+            EnergySurfaces = energySurfaces.ToList();
         }
 
 
         public EnergySpace EnergySpace { get; }
 
-        public IEnumerable<EnergySurface> EnergySurfaces { get; set; }
+        public List<EnergySurface> EnergySurfaces { get; set; }
 
         public void Show(Document activeDoc)
         {

@@ -91,19 +91,19 @@ namespace DS.RevitApp.Test
             var rooms = GetRooms();
 
             var spaceFactory = new SpaceFactory(_doc);
-            var spaces = _trf.Create(() => CreateSpaces(rooms), "CreateSpaces");
-            Logger?.Information($"Spaces created: {spaces.Count()}");
-            spaces.ForEach(s => Show(_doc, s));
+            //var spaces = _trf.Create(() => CreateSpaces(rooms), "CreateSpaces");
+            //Logger?.Information($"Spaces created: {spaces.Count()}");
+            //spaces.ForEach(s => Show(_doc, s));
             //_uiDoc.RefreshActiveView();
             //return;
 
             var energyModelFactory = new EnergyModelFactory(_doc, _allLoadedLinks);
-            //var modelProcessor = new EnergyModelProcessor(_doc, _allLoadedLinks, _trf, spaceFactory, energyModelFactory)
-            //{ Logger = Logger };
-            //var eModels = modelProcessor.Create(rooms);
+            var modelProcessor = new EnergyModelProcessor(_doc, _allLoadedLinks, _trf, spaceFactory, energyModelFactory)
+            { Logger = Logger };
+            var eModels = modelProcessor.Create(rooms);
             //Logger?.Information($"Energy models created: {eModels.Count()}");
 
-            var graphFactory = new EnergyGraphFactory(_doc, _allLoadedLinks, spaces, energyModelFactory)
+            var graphFactory = new EnergyGraphFactory(_doc, _allLoadedLinks, eModels, energyModelFactory)
             { Logger = Logger };
             var graph = graphFactory.CreateGraph();
 

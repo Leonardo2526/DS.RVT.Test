@@ -52,7 +52,7 @@ namespace DS.RevitApp.Test.Energy
             var segments = space.GetBoundarySegments(options);
 
             var boundaryCurves = segments.SelectMany(sl => sl.Select(s => s.GetCurve()));
-            TransactionFactory?.Create(() => boundaryCurves.ForEach(c => c.Show(_doc)), "showCurve");
+            //TransactionFactory?.Create(() => boundaryCurves.ForEach(c => c.Show(_doc)), "showCurve");
             //return eSurfaces;
 
             var analyticalBoundary = GetAnalyticalBoundary(segments);
