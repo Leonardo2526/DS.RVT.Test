@@ -36,6 +36,14 @@ namespace DS.RevitApp.Test
             //var test = new DirectShapeTest(doc, uidoc);
             //test.SelectWall();
 
+            var wallTest = new WallsTest(uidoc);
+            wallTest
+                .SelectWall()?
+                .GetSortedFaces();
+            //new WallsTest(uidoc).GetWallOpenings();
+            return Autodesk.Revit.UI.Result.Succeeded;
+
+
             var test = new EnergyModelBuilderTest(uidoc)
             { Logger = logger };
             //test.GetModels();
