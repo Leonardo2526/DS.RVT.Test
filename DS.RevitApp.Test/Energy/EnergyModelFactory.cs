@@ -9,6 +9,7 @@ using System.Runtime.Remoting.Services;
 using System.Text;
 using System.Threading.Tasks;
 using OLMP.RevitAPI.Tools;
+using OLMP.RevitAPI.Tools.Extensions;
 
 namespace DS.RevitApp.Test.Energy
 {
@@ -194,7 +195,7 @@ namespace DS.RevitApp.Test.Energy
             {
                 var id = segment.ElementId;
                 Wall wall = id.IntegerValue > 0 ? _doc.GetElement(id) as Wall : null;
-                var heigth = wall.get_Parameter(BuiltInParameter.WALL_USER_HEIGHT_PARAM).AsDouble();
+                var heigth = wall.GetHeigth();
                 return GeometryCreationUtilities
                     .CreateExtrusionGeometry(new List<CurveLoop> { loop }, XYZ.BasisZ, heigth);
             }

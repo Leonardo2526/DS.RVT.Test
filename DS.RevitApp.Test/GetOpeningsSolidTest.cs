@@ -4,6 +4,8 @@ using Autodesk.Revit.UI.Selection;
 using DS.ClassLib.VarUtils;
 using DS.ClassLib.VarUtils.Basis;
 using DS.ClassLib.VarUtils.Points;
+using DS.RevitApp.Test.OpeningSolidExtractors;
+using DS.RevitApp.Test.WallUtilsTests;
 using MoreLinq;
 using OLMP.RevitAPI.Tools;
 using OLMP.RevitAPI.Tools.Creation.Transactions;
@@ -192,7 +194,7 @@ namespace DS.RevitApp.Test
                 { continue; }
 
                 var curveLoop = face.GetOuterLoop();
-                if(!HasIntersection(wallCurve, curveLoop))
+                if (!HasIntersection(wallCurve, curveLoop))
                 { faces.Add(face); }
             }
 
@@ -205,8 +207,8 @@ namespace DS.RevitApp.Test
                 foreach (var curve in curveLoop)
                 {
                     var intersection = curve.Intersect(wallCurve, out var result);
-                    if(result !=null && result.Size > 0) { return true; }
-                   
+                    if (result != null && result.Size > 0) { return true; }
+
                 }
 
                 return false;
@@ -220,11 +222,65 @@ namespace DS.RevitApp.Test
             var loopPoints = new List<XYZ>();
             outerLoop.ForEach(c => loopPoints.AddRange(c.Tessellate()));
 
-            _trb.CreateAsync(() => outerLoop.ForEach(c => c.Show(_doc)), "ShowCurve");         
+            _trb.CreateAsync(() => outerLoop.ForEach(c => c.Show(_doc)), "ShowCurve");
 
             var center = solid.ComputeCentroid();
             //var center =  XYZUtils.GetAverage(loopPoints);          
             return face.Project(center, true) ?? center;
         }
+
+
+        public void TestGetBestOpeningSolid()
+        {
+            Reference reference = _uiDoc.Selection.PickObject(ObjectType.Element, "Select element");
+            var element = _doc.GetElement(reference);
+
+            var openings = new List<Opening>();
+            switch (element)
+            {
+                case Wall wall:
+                    {
+                        openings = GetOpenings(wall).ToList();
+                        break;
+                    }
+                case Floor floor:
+                    {
+                        openings = GetOpenings(floor).ToList();
+                        break;
+                    }
+                default:
+                    break;
+            }
+
+            if(openings.Count == 0) { return ; }
+
+            var solids = new List<Solid>();
+            foreach (var op in openings)
+            {
+                var solid = op.TryGetBestSolid(_doc, _allLoadedLinks);
+                solids.Add(solid);
+            }
+            ShowSolids(solids);
+        }
+
+        private IEnumerable<Opening> GetOpenings(Wall wall)
+        {
+            var wallInseretsIds = wall.FindInserts(true, false, false, false) ?? new List<ElementId>();
+            var inserts = wallInseretsIds.Select(i => _doc.GetElement(i)).ToList();
+            return inserts.OfType<Opening>();
+        }
+
+        private IEnumerable<Opening> GetOpenings(Floor floor)
+        {
+            var wallInseretsIds = floor.FindInserts(true, false, false, false) ?? new List<ElementId>();
+            var inserts = wallInseretsIds.Select(i => _doc.GetElement(i)).ToList();
+            return inserts.OfType<Opening>();
+        }
+
+        private void ShowSolids(IEnumerable<Solid> solids)
+            => _trb.Create(() =>
+            {
+                solids.ForEach(s => s.ShowShape(_doc));
+            }, "ShowOpenings");
     }
 }

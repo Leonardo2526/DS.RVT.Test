@@ -216,10 +216,14 @@
     <Compile Include="Energy\EnergyModelBuilderTest.cs" />
     <Compile Include="Energy\ISpaceFactory.cs" />
     <Compile Include="Energy\NewExtensions.cs" />
+    <Compile Include="Energy\InsertsSolidModelBase.cs" />
+    <Compile Include="OpeningSolidExtractors\OpeningSolidExtractorBase.cs" />
     <Compile Include="Energy\SpaceFactory.cs" />
     <Compile Include="GetOpeningsSolidTest.cs" />
     <Compile Include="GetSpacesTest.cs" />
     <Compile Include="IEnergyModelFactory.cs" />
+    <Compile Include="OpeningSolidExtractors\FloorOpeningSolidExtractor.cs" />
+    <Compile Include="OpeningSolidExtractors\WallOpeningSolidExtractor.cs" />
     <Compile Include="WallOpeningsTest.cs" />
     <Compile Include="GetAnalyticalModelTest.cs" />
     <Compile Include="OpeningsUtilsTest.cs" />
@@ -242,6 +246,8 @@
     <Compile Include="TransactionTests\MEPCurveTransaction.cs" />
     <Compile Include="FloorsTest.cs" />
     <Compile Include="WallsTest.cs" />
+    <Compile Include="WallUtilsTests\FaceExtensionsTest.cs" />
+    <Compile Include="WallUtilsTests\OpeningExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

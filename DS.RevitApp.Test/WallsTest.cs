@@ -102,7 +102,7 @@ namespace DS.RevitApp.Test
             Show(parameter);
             //return;
 
-            var basis = WallExtensionsTest.GetBasis(_wall, parameter, _allLoadedLinks);
+            var basis = _wall.GetBasis(parameter, _allLoadedLinks);
             _viz.Show(basis);
             return basis;
 
@@ -127,14 +127,19 @@ namespace DS.RevitApp.Test
             //var center = GetCenter(wallCurve);
             //center.Show(_doc, 0, _trb);
             //return;
+             var mYfaces =  _wall.GetMainYFaces(_allLoadedLinks);
+            if (mYfaces.Item1 != null && mYfaces.Item2 != null)
+            { ShowFaces(new List<Face>() { mYfaces.Item1, mYfaces.Item2 }); }
+            return;
 
-            var faces = GeometryElementsUtils.GetFaces(_wall, _doc, _allLoadedLinks).ToList();
-            var xFaces = faces.FindAll(FaceFilterTest.XNormal(_wall, _allLoadedLinks)).ToList();
+            var faces = GeometryElementsUtils.GetFaces(_wall, _allLoadedLinks).ToList();
+            var xFaces = faces.FindAll(FaceFilter.XNormal(_wall, _allLoadedLinks)).ToList();
             //ShowFaces(xFaces);
-            var yFaces = faces.FindAll(FaceFilterTest.YNormal(_wall, _allLoadedLinks)).ToList();
-            ShowFaces(yFaces);
-            var zFaces = faces.FindAll(FaceFilterTest.ZNormal()).ToList();
+            var yFaces = faces.FindAll(FaceFilter.YNormal(_wall, _allLoadedLinks)).ToList();
+            //ShowFaces(yFaces);
+            var zFaces = faces.FindAll(FaceFilter.ZNormal()).ToList();
             //ShowFaces(zFaces);
+
 
             //_trb.Create(() => 
             //xFaces.ForEach(f => FaceExtensionsTest.GetSolid(f).ShowShape(_doc)), 

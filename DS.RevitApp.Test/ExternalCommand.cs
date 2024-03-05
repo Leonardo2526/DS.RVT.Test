@@ -29,17 +29,21 @@ namespace DS.RevitApp.Test
             .WriteTo.Debug()
             .CreateLogger();
 
-            //var test = new GetOpeningsSolidTest(uidoc)
-            //{ Logger = logger };
-            //test.GetWallSolid();
+            var openingTest = new GetOpeningsSolidTest(uidoc)
+            { Logger = logger };
+            openingTest.TestGetBestOpeningSolid();
+            //openingTest.GetWallSolid();
+            return Autodesk.Revit.UI.Result.Succeeded;
+
 
             //var test = new DirectShapeTest(doc, uidoc);
             //test.SelectWall();
 
-            var wallTest = new WallsTest(uidoc);
-            wallTest
-                .SelectWall()?
-                .GetSortedFaces();
+            //var wallTest = new WallsTest(uidoc);
+            //wallTest
+            //    .SelectWall()?
+            //    .GetSortedFaces();
+            //.GetSortedFaces();
             //new WallsTest(uidoc).GetWallOpenings();
             return Autodesk.Revit.UI.Result.Succeeded;
 
