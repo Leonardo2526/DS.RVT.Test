@@ -16,14 +16,13 @@ namespace DS.RevitApp.Test.Energy
 {
     public class EnergySurface
     {
-        private readonly IEnumerable<EnergySurface> _inserts;
         private Face _face;
 
         public EnergySurface(Solid analitycalSolid, Element hostElement, IEnumerable<EnergySurface> inserts = null)
         {
             Solid = analitycalSolid;
             Host = hostElement;
-            _inserts = inserts ?? new List<EnergySurface>();
+            Inserts = inserts ?? new List<EnergySurface>();
         }
 
         public Solid Solid { get; private set; }
@@ -42,10 +41,12 @@ namespace DS.RevitApp.Test.Energy
         /// </summary>
         public double H { get; set; }
 
+        public IEnumerable<EnergySurface> Inserts { get; }
+
         public EnergySurface Clone()
         {
             var solid = Autodesk.Revit.DB.SolidUtils.Clone(Solid);
-            return new(solid, Host, _inserts)
+            return new(solid, Host, Inserts)
             {
                 H = H,
                 SurfaceType = SurfaceType
@@ -68,7 +69,7 @@ namespace DS.RevitApp.Test.Energy
         private IEnumerable<EnergySurface> GetInsertes(Solid hostSolid)
         {
             var inserts = new List<EnergySurface>();
-            foreach (var insert in _inserts)
+            foreach (var insert in Inserts)
             {
                 var solidResult = BooleanOperationsUtils
                     .ExecuteBooleanOperation(hostSolid, insert.Solid, BooleanOperationsType.Intersect);

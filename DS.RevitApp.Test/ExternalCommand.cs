@@ -29,11 +29,11 @@ namespace DS.RevitApp.Test
             .WriteTo.Debug()
             .CreateLogger();
 
-            var openingTest = new GetOpeningsSolidTest(uidoc)
-            { Logger = logger };
-            openingTest.TestGetBestOpeningSolid();
-            //openingTest.GetWallSolid();
-            return Autodesk.Revit.UI.Result.Succeeded;
+            //var openingTest = new GetOpeningsSolidTest(uidoc)
+            //{ Logger = logger };
+            //openingTest.TestGetBestOpeningSolid();
+            ////openingTest.GetWallSolid();
+            //return Autodesk.Revit.UI.Result.Succeeded;
 
 
             //var test = new DirectShapeTest(doc, uidoc);
@@ -45,13 +45,13 @@ namespace DS.RevitApp.Test
             //    .GetSortedFaces();
             //.GetSortedFaces();
             //new WallsTest(uidoc).GetWallOpenings();
-            return Autodesk.Revit.UI.Result.Succeeded;
+            //return Autodesk.Revit.UI.Result.Succeeded;
 
 
             var test = new EnergyModelBuilderTest(uidoc)
             { Logger = logger };
-            //test.GetModels();
-            test.CreateGraph();
+            test.GetModels();
+            //test.CreateGraph();
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }

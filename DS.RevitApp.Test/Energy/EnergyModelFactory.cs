@@ -17,11 +17,16 @@ namespace DS.RevitApp.Test.Energy
     {
         private readonly Document _doc;
         private readonly IEnumerable<RevitLinkInstance> _links;
+        private readonly IEnergySurfaceFactory _energySurfaceFactory;
 
-        public EnergyModelFactory(Document activeDoc, IEnumerable<RevitLinkInstance> links)
+        public EnergyModelFactory(
+            Document activeDoc, 
+            IEnumerable<RevitLinkInstance> links, 
+            IEnergySurfaceFactory energySurfaceFactory)
         {
             _doc = activeDoc;
             _links = links;
+            _energySurfaceFactory = energySurfaceFactory;
         }
 
 
@@ -60,7 +65,8 @@ namespace DS.RevitApp.Test.Energy
             TransactionFactory?.Create(() => analyticalBoundary.ForEach(c => c.Item2.Show(_doc)), "showCurve");
             foreach (var boundary in analyticalBoundary)
             {
-                var eSurface = ToEnergySurface(boundary);
+                var eSurface = _energySurfaceFactory.CreateEnergySurface(boundary.Item1, boundary.Item2);
+                //var eSurface = ToEnergySurface(boundary);
                 if (eSurface == null) 
                 { throw new Exception("Failed to get Energy surface!"); }
                 else
@@ -164,41 +170,53 @@ namespace DS.RevitApp.Test.Energy
             }
         }
 
-        private EnergySurface ToEnergySurface((BoundarySegment, Curve) boundary)
-        {
-            var loop = CreateLoop(boundary.Item2, 0.01, XYZ.BasisZ);
-            var isClosed = !loop.IsOpen();
-            if (!isClosed) { throw new Exception("Loop is not closed!"); }
+        //private EnergySurface ToEnergySurface((BoundarySegment, Curve) boundary)
+        //{
+        //    var loop = CreateLoop(boundary.Item2, 0.01, XYZ.BasisZ);
+        //    var isClosed = !loop.IsOpen();
+        //    if (!isClosed) { throw new Exception("Loop is not closed!"); }
 
-            var solid = GetSolid(boundary.Item1, loop);
-            return solid is null ?
-                null :
-                new EnergySurface(solid, _doc.GetElement(boundary.Item1.ElementId))
-                { SurfaceType = Autodesk.Revit.DB.Analysis.EnergyAnalysisSurfaceType.ExteriorWall };
+        //    var id = boundary.Item1.ElementId;
+        //    Wall wall = id.IntegerValue > 0 ? _doc.GetElement(id) as Wall : null;
+        //    if(wall is null) { return null; }
+        //    var wModel = new WallInsertSolidModel(wall, _doc, _links);
+        //    var bSolid = GetBoundarySolid(wall, loop, wModel);
+        //    var insertsSurfaces = GetInsertsSurfaces();
+        //    return bSolid is null ?
+        //        null :
+        //        new EnergySurface(bSolid, _doc.GetElement(boundary.Item1.ElementId))
+        //        { SurfaceType = Autodesk.Revit.DB.Analysis.EnergyAnalysisSurfaceType.ExteriorWall };
 
-            CurveLoop CreateLoop(Curve curve, double loopWidth, XYZ referenceVector)
-            {
-                var offsetCurve1 = curve.CreateOffset(loopWidth, -referenceVector);
-                var offsetCurve2 = curve.CreateOffset(loopWidth, referenceVector).CreateReversed();
+        //    CurveLoop CreateLoop(Curve curve, double loopWidth, XYZ referenceVector)
+        //    {
+        //        var offsetCurve1 = curve.CreateOffset(loopWidth, -referenceVector);
+        //        var offsetCurve2 = curve.CreateOffset(loopWidth, referenceVector).CreateReversed();
 
-                var p1 = offsetCurve1.GetEndPoint(0);
-                var p2 = offsetCurve1.GetEndPoint(1);
-                var p3 = offsetCurve2.GetEndPoint(0);
-                var p4 = offsetCurve2.GetEndPoint(1);
+        //        var p1 = offsetCurve1.GetEndPoint(0);
+        //        var p2 = offsetCurve1.GetEndPoint(1);
+        //        var p3 = offsetCurve2.GetEndPoint(0);
+        //        var p4 = offsetCurve2.GetEndPoint(1);
 
-                var line1 = Line.CreateBound(p2, p3);
-                var line2 = Line.CreateBound(p4, p1);
-                return CurveLoop.Create(new List<Curve>() { offsetCurve1, line1, offsetCurve2, line2 });
-            }
+        //        var line1 = Line.CreateBound(p2, p3);
+        //        var line2 = Line.CreateBound(p4, p1);
+        //        return CurveLoop.Create(new List<Curve>() { offsetCurve1, line1, offsetCurve2, line2 });
+        //    }
 
-            Solid GetSolid(BoundarySegment segment, CurveLoop loop)
-            {
-                var id = segment.ElementId;
-                Wall wall = id.IntegerValue > 0 ? _doc.GetElement(id) as Wall : null;
-                var heigth = wall.GetHeigth();
-                return GeometryCreationUtilities
-                    .CreateExtrusionGeometry(new List<CurveLoop> { loop }, XYZ.BasisZ, heigth);
-            }
-        }
+        //    Solid GetBoundarySolid(Wall wall, CurveLoop loop, InsertsSolidModelBase<Wall> insertsModel)
+        //    {
+        //        var heigth = wall.GetHeigth();
+        //        var bSolid = GeometryCreationUtilities
+        //            .CreateExtrusionGeometry(new List<CurveLoop> { loop }, XYZ.BasisZ, heigth);
+
+        //        var insertsSolids = insertsModel.GetAllInsertsSolidModels()
+        //            .Select(m => m.solid);
+
+        //        insertsSolids.ForEach(insSolid => bSolid = BooleanOperationsUtils
+        //                   .ExecuteBooleanOperation(bSolid, insSolid,
+        //                               BooleanOperationsType.Difference));
+
+        //        return bSolid;
+        //    }
+        //}
     }
 }

@@ -153,23 +153,28 @@ namespace DS.RevitApp.Test.WallUtilsTests
         public static Solid TryGetBestSolid(this Opening opening, Document activeDoc, IEnumerable<RevitLinkInstance> links)
         {
             Solid solid = null;
-            switch (opening.Host)
+            try
             {
-                case Wall wall:
-                    {
-                        solid = new WallOpeningSolidExtractor(wall, activeDoc, links)
-                            .GetSolid(opening);
+                switch (opening.Host)
+                {
+                    case Wall wall:
+                        {
+                            solid = new WallOpeningSolidExtractor(wall, activeDoc, links)
+                                .GetSolid(opening);
+                            break;
+                        }
+                    case Floor floor:
+                        {
+                            solid = new FloorOpeningSolidExtractor(floor, activeDoc, links)
+                                .GetSolid(opening);
+                            break;
+                        }
+                    default:
                         break;
-                    }
-                case Floor floor:
-                    {
-                        solid = new FloorOpeningSolidExtractor(floor, activeDoc, links)
-                            .GetSolid(opening);
-                        break;
-                    }
-                default:
-                    break;
+                }
             }
+            catch (System.Exception)
+            {}
 
             return solid;
         }

@@ -214,9 +214,12 @@
     <Compile Include="Energy\EnergySurface.cs" />
     <Compile Include="Energy\EnergySurfaceBooleanOperations.cs" />
     <Compile Include="Energy\EnergyModelBuilderTest.cs" />
+    <Compile Include="Energy\EnergySurfaceFactory.cs" />
+    <Compile Include="Energy\IEnergySurfaceFactory.cs" />
     <Compile Include="Energy\ISpaceFactory.cs" />
     <Compile Include="Energy\NewExtensions.cs" />
-    <Compile Include="Energy\InsertsSolidModelBase.cs" />
+    <Compile Include="InsertsSolidModels\InsertsSolidModelBase.cs" />
+    <Compile Include="InsertsSolidModels\WallInsertSolidModel.cs" />
     <Compile Include="OpeningSolidExtractors\OpeningSolidExtractorBase.cs" />
     <Compile Include="Energy\SpaceFactory.cs" />
     <Compile Include="GetOpeningsSolidTest.cs" />
@@ -269,6 +272,7 @@
       <Name>OLMP.RevitAPI.Tools</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y  "$(TargetDir)*.*" "C:\ProgramData\Autodesk\Revit\Addins\2020\$(TargetName)\" 

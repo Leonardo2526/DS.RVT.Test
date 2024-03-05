@@ -74,17 +74,32 @@ namespace DS.RevitApp.Test
             var rooms = GetRooms();
 
             var spaceFactory = new SpaceFactory(_doc);
-            var energyModelFactory = new EnergyModelFactory(_doc, _allLoadedLinks)
+            EnergySurfaceFactory energySurfaceFactory = new(_doc, _allLoadedLinks);
+            var energyModelFactory = new EnergyModelFactory(_doc, _allLoadedLinks, energySurfaceFactory)
             { TransactionFactory = _trf };
             var modelProcessor = new EnergyModelProcessor(_doc, _allLoadedLinks, _trf, spaceFactory, energyModelFactory)
             { Logger = Logger };
             var eModels = modelProcessor.Create(rooms);
             //return;
 
-            _trf.Create(() => eModels.ForEach(model => model.Show(_doc)), "ShowSpace");
+            var surfaces = eModels.SelectMany(m => m.EnergySurfaces);
+            _trf.Create(() => surfaces.ForEach(s => s.Show(_doc)), "ShowSpace");
+            ShowInsertSurfaces(eModels);
+            //_trf.Create(() => eModels.ForEach(model => model.Show(_doc)), "ShowSpace");
             return;
-        }
 
+            void ShowInsertSurfaces(IEnumerable<EnergyModel> energyModels)
+            {
+                var insertSurfaces = new List<EnergySurface>();
+                foreach (var model in energyModels)
+                {
+                    var modelInsertSurfaces = model.EnergySurfaces.SelectMany(s => s.Inserts);
+                    insertSurfaces.AddRange(modelInsertSurfaces);
+                }
+
+                _trf.Create(() => insertSurfaces.ForEach(s => s.Show(_doc)), "ShowSpace");
+            }
+        }
 
         public void CreateGraph()
         {
@@ -96,8 +111,8 @@ namespace DS.RevitApp.Test
             //spaces.ForEach(s => Show(_doc, s));
             //_uiDoc.RefreshActiveView();
             //return;
-
-            var energyModelFactory = new EnergyModelFactory(_doc, _allLoadedLinks);
+            EnergySurfaceFactory energySurfaceFactory = new(_doc, _allLoadedLinks);
+            var energyModelFactory = new EnergyModelFactory(_doc, _allLoadedLinks, energySurfaceFactory);
             var modelProcessor = new EnergyModelProcessor(_doc, _allLoadedLinks, _trf, spaceFactory, energyModelFactory)
             { Logger = Logger };
             var eModels = modelProcessor.Create(rooms);
