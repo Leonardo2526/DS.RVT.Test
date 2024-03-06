@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OLMP.RevitAPI.Tools;
 using OLMP.RevitAPI.Tools.Extensions;
+using Autodesk.Revit.UI;
 
 namespace DS.RevitApp.Test.Energy
 {
@@ -20,8 +21,8 @@ namespace DS.RevitApp.Test.Energy
         private readonly IEnergySurfaceFactory _energySurfaceFactory;
 
         public EnergyModelFactory(
-            Document activeDoc, 
-            IEnumerable<RevitLinkInstance> links, 
+            Document activeDoc,
+            IEnumerable<RevitLinkInstance> links,
             IEnergySurfaceFactory energySurfaceFactory)
         {
             _doc = activeDoc;
@@ -53,12 +54,12 @@ namespace DS.RevitApp.Test.Energy
             var eSurfaces = new List<EnergySurface>();
 
             var options = new SpatialElementBoundaryOptions();
-            
+
 
             var segments = space.GetBoundarySegments(options);
 
             var boundaryCurves = segments.SelectMany(sl => sl.Select(s => s.GetCurve()));
-            //TransactionFactory?.Create(() => boundaryCurves.ForEach(c => c.Show(_doc)), "showCurve");
+            ShowBoundaries(boundaryCurves);
             //return eSurfaces;
 
             var analyticalBoundary = GetAnalyticalBoundary(segments);
@@ -67,13 +68,16 @@ namespace DS.RevitApp.Test.Energy
             {
                 var eSurface = _energySurfaceFactory.CreateEnergySurface(boundary.Item1, boundary.Item2);
                 //var eSurface = ToEnergySurface(boundary);
-                if (eSurface == null) 
+                if (eSurface == null)
                 { throw new Exception("Failed to get Energy surface!"); }
                 else
                 { eSurfaces.Add(eSurface); }
             }
 
             return eSurfaces;
+
+            void ShowBoundaries(IEnumerable<Curve> curves)
+                => TransactionFactory?.Create(() => curves.ForEach(c => c.Show(_doc)), "showCurve");
         }
 
         private IEnumerable<EnergySurface> GetFloorEnergySurfaces(Space space)
@@ -147,17 +151,46 @@ namespace DS.RevitApp.Test.Energy
                 var intersection = cloned1.Intersect(cloned2, out var resultArray);
                 if (intersection == SetComparisonResult.Overlap)
                 {
-                    var interectionResult = resultArray.get_Item(0);
+                    if (resultArray.Size > 1)
+                    { }
+
+                    var cp11 = curve1.GetEndPoint(0);
+                    var cp12 = curve1.GetEndPoint(1);
+                    var cp21 = curve2.GetEndPoint(0);
+                    var cp22 = curve2.GetEndPoint(1);
+
+                    var basePoint = fromStart ? curve1.GetEndPoint(0) : curve1.GetEndPoint(1);
+                    var intersectionResults = new List<IntersectionResult>();
+                    foreach (IntersectionResult intersectionResult in resultArray)
+                    { intersectionResults.Add(intersectionResult); }
+                    intersectionResults = intersectionResults
+                        .OrderByDescending(r => basePoint.DistanceTo(r.XYZPoint)).ToList();
+                    var interectionResult = intersectionResults.Last();
                     var interectionPoint = interectionResult.XYZPoint;
 
+                    cloned1 = cloned1.CreateReversed();
                     var result = cloned1.Project(interectionPoint);
+                    var clonedP1 = cloned1.Project(cp11);
+                    var clonedP2 = cloned1.Project(cp12);
 
                     var p1 = curve1.GetEndParameter(0);
                     var p2 = curve1.GetEndParameter(1);
 
-                    var param11 = fromStart ? result.Parameter : p1;
-                    var param12 = fromStart ? p2 : result.Parameter;
-                    if (param11 > param12) { return curve1; }
+                    //var param11 = Math.Min(result.Parameter, p1);
+                    //var param12 = Math.Max(result.Parameter, p2);
+                    var parameter = result.Parameter;
+                    //var rParameter = curve1.ComputeRawParameter(result.Parameter);
+
+                    var param11 = fromStart ? Math.Min(parameter, p1) : p1;
+                    var param12 = fromStart ? p2 : Math.Max(parameter, p2);
+
+                    var param110 = fromStart ? parameter : p1;
+                    var param120 = fromStart ? p2 : parameter;
+
+                    if (param110 > param120)
+                    {
+                        //return curve1; 
+                    }
                     cloned1.MakeBound(param11, param12);
                     return cloned1;
                 }

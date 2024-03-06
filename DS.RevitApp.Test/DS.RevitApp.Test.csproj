@@ -205,8 +205,10 @@
     <Compile Include="AddSharedTest.cs" />
     <Compile Include="CreateSurfaceTest.cs" />
     <Compile Include="Energy\AdjacenciesFuncBuilder.cs" />
+    <Compile Include="Energy\EndCurveConnector.cs" />
     <Compile Include="Energy\EnergyEdge.cs" />
     <Compile Include="Energy\EnergyGraphFactory.cs" />
+    <Compile Include="CurveConnectorTest.cs" />
     <Compile Include="Energy\EnergyModelProcessor.cs" />
     <Compile Include="Energy\EnergyModel.cs" />
     <Compile Include="Energy\EnergyModelFactory.cs" />
@@ -215,6 +217,7 @@
     <Compile Include="Energy\EnergySurfaceBooleanOperations.cs" />
     <Compile Include="Energy\EnergyModelBuilderTest.cs" />
     <Compile Include="Energy\EnergySurfaceFactory.cs" />
+    <Compile Include="Energy\ICurveConnector.cs" />
     <Compile Include="Energy\IEnergySurfaceFactory.cs" />
     <Compile Include="Energy\ISpaceFactory.cs" />
     <Compile Include="Energy\NewExtensions.cs" />

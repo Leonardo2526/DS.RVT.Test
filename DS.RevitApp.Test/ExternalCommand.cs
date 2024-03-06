@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net.Http;
 using OLMP.RevitAPI.Tools.Extensions;
 using Serilog;
+using OLMP.RevitAPI.Tools.Creation.Transactions;
 
 namespace DS.RevitApp.Test
 {
@@ -23,11 +24,17 @@ namespace DS.RevitApp.Test
 
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
-         
-           var logger = new LoggerConfiguration()
-            .MinimumLevel.Verbose()
-            .WriteTo.Debug()
-            .CreateLogger();
+
+            var logger = new LoggerConfiguration()
+             .MinimumLevel.Verbose()
+             .WriteTo.Debug()
+             .CreateLogger();
+            var trf = new ContextTransactionFactory(doc);
+
+            var connectorTest = new CurveConnectorTest(uidoc)
+            { Logger = logger, TransactionFactory = trf };
+            var walls = connectorTest.SelectWalls();
+            connectorTest.ConnectWallCurves(walls.Item1, walls.Item2);
 
             //var openingTest = new GetOpeningsSolidTest(uidoc)
             //{ Logger = logger };
@@ -48,9 +55,9 @@ namespace DS.RevitApp.Test
             //return Autodesk.Revit.UI.Result.Succeeded;
 
 
-            var test = new EnergyModelBuilderTest(uidoc)
-            { Logger = logger };
-            test.GetModels();
+            //var test = new EnergyModelBuilderTest(uidoc)
+            //{ Logger = logger };
+            //test.GetModels();
             //test.CreateGraph();
 
             return Autodesk.Revit.UI.Result.Succeeded;
