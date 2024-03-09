@@ -33,7 +33,7 @@ namespace DS.RevitApp.Test
         public ITransactionFactory TransactionFactory { get; set; }
         public ILogger Logger { get; set; }
 
-        public (Wall, Wall) SelectWalls()
+        public (Wall, Wall) SelectTWoWalls()
         {
             Reference reference1 = _uiDoc.Selection
                 .PickObject(ObjectType.Element, "Select wall1");
@@ -45,7 +45,7 @@ namespace DS.RevitApp.Test
         }
 
 
-        public void ConnectWallCurves(Wall wall1, Wall wall2)
+        public void ConnectTwoWallCurves(Wall wall1, Wall wall2)
         {
             var curve1 = wall1.GetLocationCurve(_allLoadedLinks);
             //ShowCurve(curve1);
@@ -53,14 +53,17 @@ namespace DS.RevitApp.Test
             //ShowCurve(curve2);
             //_uiDoc.RefreshActiveView();
 
-            //curve1 = curve1.CreateReversed();
-            var curveConnector = new EndCurveConnector()
-            { IsVirtualEnable = true, Logger = Logger };
-            var connectedCurve = curveConnector.TryConnect(curve1, curve2);
-            if (connectedCurve != null)
+            curve1 = curve1.CreateReversed();
+            CurveExtensionsTest.TransactionFactory = TransactionFactory;
+            var resulstCurves = curve1.Extend(curve2, true);
+            //var resulstCurves = curve1.Trim(curve2, true);
+            //var resultCurve = resulstCurves.LastOrDefault();
+            var resultCurve = resulstCurves.FirstOrDefault();
+            if (resultCurve != null)
             {
-                ShowCurve(connectedCurve);
-                ShowPoint(curveConnector.ConnectionPoint);
+                ShowCurve(resultCurve);
+                var resultPoint = resultCurve.GetEndPoint(1);
+                ShowPoint(resultPoint);
             }
         }
 
