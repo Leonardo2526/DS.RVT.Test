@@ -33,8 +33,8 @@ namespace DS.RevitApp.Test
 
             var connectorTest = new CurveConnectorTest(uidoc)
             { Logger = logger, TransactionFactory = trf };
-            var walls = connectorTest.SelectWalls();
-            connectorTest.ConnectWallCurves(walls.Item1, walls.Item2);
+            var curves = connectorTest.SelectTWoCurves();
+            connectorTest.ConnectTwoCurves(curves.Item1, curves.Item2);
 
             //var openingTest = new GetOpeningsSolidTest(uidoc)
             //{ Logger = logger };

@@ -96,7 +96,7 @@ namespace DS.RevitApp.Test.Energy
 
         private IEnumerable<(BoundarySegment, Curve)> GetAnalyticalBoundary(IList<IList<BoundarySegment>> segmentLists)
         {
-            var offsetted = new List<(BoundarySegment, Curve)>();
+            var boundaryCurves = new List<(BoundarySegment segment, Curve curve)>();
             foreach (var sl in segmentLists)
             {
                 foreach (var segment in sl)
@@ -107,12 +107,22 @@ namespace DS.RevitApp.Test.Energy
                         var distanseToOffset = wall.Width / 2;
                         curve = curve.CreateOffset(distanseToOffset, XYZ.BasisZ);
                         if (curve != null)
-                        { offsetted.Add((segment, curve)); }
+                        { boundaryCurves.Add((segment, curve)); }
                     }
                 }
             }
 
-            return Connect(offsetted);
+            var curveLoop = CurveLoop.Create(boundaryCurves.Select(x => x.curve).ToList());
+            var closedLoop = curveLoop.TryMakeClosed() ?? throw new Exception();
+            var result = new List<(BoundarySegment, Curve)>();
+            for (int i = 0; i < boundaryCurves.Count; i++)
+            {
+                var connectedCurve = closedLoop.ElementAt(i);
+                var (segment, curve) = boundaryCurves[i];
+                result.Add((segment, connectedCurve));
+            }
+            return result;
+            //return Connect(offsetted);
         }
 
 

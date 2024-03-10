@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using OLMP.RevitAPI.Tools.Creation.Transactions;
 using OLMP.RevitAPI.Tools.Extensions;
 using Rhino;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace DS.RevitApp.Test
 {
@@ -14,23 +16,32 @@ namespace DS.RevitApp.Test
         public static ITransactionFactory TransactionFactory { get; set; }
         private static Document _activeDoc => TransactionFactory.Doc;
 
+        public static bool IsCircle(this Curve curve)
+        {
+            var p1 = curve.GetEndParameter(0);
+            var p2 = curve.GetEndParameter(1);
+            var deltaP = p2 - p1;
+
+            return Math.Abs(deltaP - Math.PI * 2) < RhinoMath.ZeroTolerance;
+        }
+
+
         public static IEnumerable<Curve> Trim(
             this Curve sourceCurve,
             Curve targetCurve,
-            bool isVirtualEnable = false)
+            bool isVirtualEnable = false,
+            int staticIndex = 0)
         {
+            if (staticIndex != 0 && staticIndex != 1)
+            { throw new ArgumentException("index can be only 0 or 1."); }
+
             var resultCurves = new List<Curve>();
 
-            var staticIndex = 0;
+            var moveIndex = Math.Abs(1 - staticIndex);
             var staticPoint = sourceCurve.GetEndPoint(staticIndex);
             var staticParamter = sourceCurve.GetEndParameter(staticIndex);
             staticPoint.Show(_activeDoc, 200.MMToFeet(), TransactionFactory);
-            var movePoint = sourceCurve.GetEndPoint(1);
-
-            Debug.WriteLine($"Static points is {staticPoint}");
-            Debug.WriteLine($"pointToConnect is {movePoint}");
-            Debug.WriteLine($"trying to connect point {movePoint} " +
-                  $"of {sourceCurve.GetType().Name} to {targetCurve.GetType().Name}.");
+            var movePoint = sourceCurve.GetEndPoint(moveIndex);
 
             Curve targetOperationCurve;
             if (isVirtualEnable)
@@ -42,13 +53,18 @@ namespace DS.RevitApp.Test
             var intersection = sourceCurve
                 .Intersect(targetOperationCurve, out var resultArray);
 
+            Curve getIntersectionCurve(IntersectionResult result) =>
+            GetResultIntersectionCurves(result, sourceCurve, staticParamter).FirstOrDefault();
+
             switch (intersection)
             {
                 case SetComparisonResult.Overlap:
-                    var intersecionCurves =
-                        GetIntersectionCurves(sourceCurve, staticParamter, resultArray);
-                    if (intersecionCurves != null)
-                    { resultCurves.AddRange(intersecionCurves); }
+                    var results = resultArray.AsEnumerable<IntersectionResult>();
+                    var intersecionCurves = results
+                        .Select(getIntersectionCurve)
+                        .Where(c => c != null)
+                        .OrderBy(c => c.ApproximateLength);
+                    resultCurves.AddRange(intersecionCurves);
                     break;
                 case SetComparisonResult.Equal:
                     { resultCurves.Add(sourceCurve); }
@@ -59,48 +75,24 @@ namespace DS.RevitApp.Test
 
             Debug.WriteLine($"{resultCurves.Count} intersection curves were found.");
             return resultCurves;
-
-            static IEnumerable<Curve> GetIntersectionCurves(
-                Curve sourceCurve,
-                double sourceStaticParameter,
-                IntersectionResultArray resultArray)
-            {
-                var intersectionCurves = new List<Curve>();
-
-                foreach (IntersectionResult intersectionResult in resultArray)
-                {
-                    var intersectionCurve = sourceCurve.Clone();
-                    var projection = intersectionCurve
-                                   .Project(intersectionResult.XYZPoint);
-                    var intersectionParameter = projection.Parameter;
-                    intersectionCurve.MakeBound(sourceStaticParameter, intersectionParameter);
-                    intersectionCurves.Add(intersectionCurve);
-                }
-
-                intersectionCurves =
-                    intersectionCurves.OrderBy(c => c.ApproximateLength).ToList();
-
-                return intersectionCurves;
-            }
         }
 
         public static IEnumerable<Curve> Extend(
             this Curve sourceCurve,
             Curve targetCurve,
-            bool isVirtualEnable = false)
+            bool isVirtualEnable = false,
+             int staticIndex = 0)
         {
+            if (staticIndex != 0 && staticIndex != 1)
+            { throw new ArgumentException("index can be only 0 or 1."); }
+
             var resultCurves = new List<Curve>();
 
-            var staticIndex = 0;
+            var moveIndex = Math.Abs(1 - staticIndex);
             var staticPoint = sourceCurve.GetEndPoint(staticIndex);
             var staticParamter = sourceCurve.GetEndParameter(staticIndex);
             staticPoint.Show(_activeDoc, 200.MMToFeet(), TransactionFactory);
-            var movePoint = sourceCurve.GetEndPoint(1);
-
-            Debug.WriteLine($"Static points is {staticPoint}");
-            Debug.WriteLine($"pointToConnect is {movePoint}");
-            Debug.WriteLine($"trying to connect point {movePoint} " +
-                  $"of {sourceCurve.GetType().Name} to {targetCurve.GetType().Name}.");
+            var movePoint = sourceCurve.GetEndPoint(moveIndex);
 
             var sourceOperationCurve = sourceCurve.Clone();
             sourceOperationCurve.MakeUnbound();
@@ -116,15 +108,23 @@ namespace DS.RevitApp.Test
             var intersection = sourceOperationCurve
                 .Intersect(targetOperationCurve, out var resultArray);
 
+            Curve getIntersectionCurve(IntersectionResult result) =>
+                GetResultIntersectionCurves(result, sourceOperationCurve, staticOperationParamter)
+                .FirstOrDefault(c =>
+                    (c.Project(movePoint).Distance < 0.001 &&
+                        sourceCurve.Project(result.XYZPoint).Distance > 0.001)
+                    || IsCircle(c)
+                );
+
             switch (intersection)
             {
                 case SetComparisonResult.Overlap:
-                    var intersecionCurves =
-                        GetIntersectionCurves(sourceCurve, 
-                        sourceOperationCurve,
-                        staticOperationParamter, movePoint, resultArray);
-                    if (intersecionCurves != null)
-                    { resultCurves.AddRange(intersecionCurves); }
+                    var results = resultArray.AsEnumerable<IntersectionResult>();
+                    var intersecionCurves = results
+                       .Select(getIntersectionCurve)
+                       .Where(c => c != null)
+                       .OrderBy(c => c.ApproximateLength);
+                    resultCurves.AddRange(intersecionCurves);
                     break;
                 case SetComparisonResult.Equal:
                     { resultCurves.Add(sourceCurve); }
@@ -135,67 +135,64 @@ namespace DS.RevitApp.Test
 
             Debug.WriteLine($"{resultCurves.Count} intersection curves were found.");
             return resultCurves;
+        }
 
-            IEnumerable<Curve> GetIntersectionCurves(
-                Curve sourceCurve,
-               Curve sourceOperationCurve,
-               double sourceStaticParameter,
-               XYZ movePoint,
-               IntersectionResultArray resultArray)
+        public static IEnumerable<Curve> Connect(
+           this Curve sourceCurve,
+           Curve targetCurve,
+           bool isVirtualEnable = false,
+            int staticIndex = 0)
+        {
+            var result = sourceCurve.Trim(targetCurve, false, staticIndex);
+            result = result == null || result.Count() == 0 ? 
+                sourceCurve.Extend(targetCurve, isVirtualEnable, staticIndex) : 
+                result;
+
+            return result;  
+        }
+
+        public static IEnumerable<Curve> ConnectAnyPoint(
+          this Curve sourceCurve,
+          Curve targetCurve,
+          bool isVirtualEnable = false)
+        {
+            var result = Connect(sourceCurve, targetCurve, isVirtualEnable, 0);
+            result = result == null || result.Count() == 0 ? 
+                Connect(sourceCurve, targetCurve, isVirtualEnable, 1) :
+                result;
+            return result;
+        }
+
+        public static IEnumerable<Curve> GetResultIntersectionCurves(
+            IntersectionResult intersectionResult,
+            Curve baseCurve,
+            double baseStaticParameter)
+        {
+            var intersectionCurves = new List<Curve>();
+
+            var projection = baseCurve.Project(intersectionResult.XYZPoint);
+            var targetParameter = projection.Parameter;
+
+            var p11 = Math.Min(baseStaticParameter, targetParameter);
+            var p12 = Math.Max(baseStaticParameter, targetParameter);
+            var p121 = Math.Abs(p12 - p11) < RhinoMath.ZeroTolerance ? p12 + baseCurve.Period : p12;
+            var curve1 = baseCurve.Clone();
+            curve1.MakeBound(p11, p121);
+            intersectionCurves.Add(curve1);
+
+            if (baseCurve.IsCyclic && !IsCircle(curve1))
             {
-                var intersectionCurves = new List<Curve>();
-
-                foreach (IntersectionResult intersectionResult in resultArray)
-                {
-                    var currentResultCurves = GetIntersectionCurves(intersectionResult, sourceOperationCurve, sourceStaticParameter);
-                    var intersectionCurve = currentResultCurves
-                        .FirstOrDefault(c => c.Project(movePoint).Distance < 0.001 
-                        && sourceCurve.Project(intersectionResult.XYZPoint).Distance >0.001);
-
-                    foreach (var item in currentResultCurves)
-                    {
-                        var r= item.Project(movePoint);
-                    }
-
-                    if (intersectionCurve != null)
-                    { intersectionCurves.Add(intersectionCurve); }
-                }
-
-                intersectionCurves =
-                    intersectionCurves.OrderBy(c => c.ApproximateLength).ToList();
-
-                return intersectionCurves;
-
-                static IEnumerable<Curve> GetIntersectionCurves(IntersectionResult intersectionResult, Curve baseCurve, double sourceParameter)
-                {
-                    var intersectionCurves = new List<Curve>();
-
-                    var projection = baseCurve.Project(intersectionResult.XYZPoint);
-                    var targetParameter = projection.Parameter;
-
-                    var p11 = Math.Min(sourceParameter, targetParameter);
-                    var p12 = Math.Max(sourceParameter, targetParameter);
-                    var curve1 = baseCurve.Clone();
-                    curve1.MakeBound(p11, p12);
-                    intersectionCurves.Add(curve1);
-
-                    if (baseCurve.IsCyclic)
-                    {
-                        var p21 = p12;
-                        var p22 = baseCurve.Period + p11;
-                        var curve2 = baseCurve.Clone();
-                        curve2.MakeBound(p21, p22);
-                        intersectionCurves.Add(curve2);
-                    }
-
-                    return intersectionCurves;
-                }
+                var p21 = p12;
+                var p22 = baseCurve.Period + p11;
+                var curve2 = baseCurve.Clone();
+                curve2.MakeBound(p21, p22);
+                intersectionCurves.Add(curve2);
             }
+
+            return intersectionCurves;
         }
 
 
     }
-
-
 }
 

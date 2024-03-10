@@ -33,29 +33,27 @@ namespace DS.RevitApp.Test
         public ITransactionFactory TransactionFactory { get; set; }
         public ILogger Logger { get; set; }
 
-        public (Wall, Wall) SelectTWoWalls()
+        public (ModelCurve, ModelCurve) SelectTWoCurves()
         {
             Reference reference1 = _uiDoc.Selection
-                .PickObject(ObjectType.Element, "Select wall1");
-            var w1 = _doc.GetElement(reference1) as Wall;
+                .PickObject(ObjectType.Element, "Select curve1");
+            var w1 = _doc.GetElement(reference1) as ModelCurve;
             Reference reference2 = _uiDoc.Selection
-                .PickObject(ObjectType.Element, "Select wall2");
-            var w2 = _doc.GetElement(reference2) as Wall;
+                .PickObject(ObjectType.Element, "Select curve2");
+            var w2 = _doc.GetElement(reference2) as ModelCurve;
             return (w1, w2);
         }
 
-
-        public void ConnectTwoWallCurves(Wall wall1, Wall wall2)
+        public void ConnectTwoCurves(ModelCurve mCurve1, ModelCurve mCurve2)
         {
-            var curve1 = wall1.GetLocationCurve(_allLoadedLinks);
-            //ShowCurve(curve1);
-            var curve2 = wall2.GetLocationCurve(_allLoadedLinks);
-            //ShowCurve(curve2);
-            //_uiDoc.RefreshActiveView();
+            var curve1 = mCurve1.GeometryCurve; var curve2 = mCurve2.GeometryCurve;
 
-            curve1 = curve1.CreateReversed();
+            //curve1 = curve1.CreateReversed();
             CurveExtensionsTest.TransactionFactory = TransactionFactory;
-            var resulstCurves = curve1.Extend(curve2, true);
+            //var resulstCurves = curve1.Trim(curve2, true);
+            //var resulstCurves = curve1.Extend(curve2, true, 0);
+            //var resulstCurves = curve1.Connect(curve2, true, 0);
+            var resulstCurves = curve1.ConnectAnyPoint(curve2, true);
             //var resulstCurves = curve1.Trim(curve2, true);
             //var resultCurve = resulstCurves.LastOrDefault();
             var resultCurve = resulstCurves.FirstOrDefault();
@@ -64,8 +62,12 @@ namespace DS.RevitApp.Test
                 ShowCurve(resultCurve);
                 var resultPoint = resultCurve.GetEndPoint(1);
                 ShowPoint(resultPoint);
+                DeleteCurve(mCurve1);
             }
         }
+
+        private void DeleteCurve(ModelCurve mCurve)
+            => TransactionFactory.Create(() => _doc.Delete(mCurve.Id), "ShowCurve");
 
         private void ShowCurve(Curve curve)
         => TransactionFactory.Create(() => curve.Show(_doc), "ShowCurve");

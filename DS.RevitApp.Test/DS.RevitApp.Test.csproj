@@ -204,8 +204,9 @@
   <ItemGroup>
     <Compile Include="AddSharedTest.cs" />
     <Compile Include="CreateSurfaceTest.cs" />
+    <Compile Include="CurveExtensionsTest.cs" />
+    <Compile Include="CurveLoopExtensionsTest.cs" />
     <Compile Include="Energy\AdjacenciesFuncBuilder.cs" />
-    <Compile Include="Energy\EndCurveConnector.cs" />
     <Compile Include="Energy\EnergyEdge.cs" />
     <Compile Include="Energy\EnergyGraphFactory.cs" />
     <Compile Include="CurveConnectorTest.cs" />
@@ -220,7 +221,7 @@
     <Compile Include="Energy\ICurveConnector.cs" />
     <Compile Include="Energy\IEnergySurfaceFactory.cs" />
     <Compile Include="Energy\ISpaceFactory.cs" />
-    <Compile Include="Energy\NewExtensions.cs" />
+    <Compile Include="NewExtensions.cs" />
     <Compile Include="InsertsSolidModels\InsertsSolidModelBase.cs" />
     <Compile Include="InsertsSolidModels\WallInsertSolidModel.cs" />
     <Compile Include="OpeningSolidExtractors\OpeningSolidExtractorBase.cs" />
