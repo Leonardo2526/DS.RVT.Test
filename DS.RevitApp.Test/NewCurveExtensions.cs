@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 
 namespace DS.RevitApp.Test
 {
-    public static class CurveExtensionsTest
+    public static class NewCurveExtensions
     {
         public static ITransactionFactory TransactionFactory { get; set; }
         private static Document _activeDoc => TransactionFactory.Doc;
@@ -40,7 +40,7 @@ namespace DS.RevitApp.Test
             var moveIndex = Math.Abs(1 - staticIndex);
             var staticPoint = sourceCurve.GetEndPoint(staticIndex);
             var staticParamter = sourceCurve.GetEndParameter(staticIndex);
-            staticPoint.Show(_activeDoc, 200.MMToFeet(), TransactionFactory);
+            //staticPoint.Show(_activeDoc, 200.MMToFeet(), TransactionFactory);
             var movePoint = sourceCurve.GetEndPoint(moveIndex);
 
             Curve targetOperationCurve;
@@ -73,7 +73,7 @@ namespace DS.RevitApp.Test
                     break;
             }
 
-            Debug.WriteLine($"{resultCurves.Count} intersection curves were found.");
+            //Debug.WriteLine($"{resultCurves.Count} intersection curves were found.");
             return resultCurves;
         }
 
@@ -91,7 +91,7 @@ namespace DS.RevitApp.Test
             var moveIndex = Math.Abs(1 - staticIndex);
             var staticPoint = sourceCurve.GetEndPoint(staticIndex);
             var staticParamter = sourceCurve.GetEndParameter(staticIndex);
-            staticPoint.Show(_activeDoc, 200.MMToFeet(), TransactionFactory);
+            //staticPoint.Show(_activeDoc, 200.MMToFeet(), TransactionFactory);
             var movePoint = sourceCurve.GetEndPoint(moveIndex);
 
             var sourceOperationCurve = sourceCurve.Clone();
@@ -133,32 +133,36 @@ namespace DS.RevitApp.Test
                     break;
             }
 
-            Debug.WriteLine($"{resultCurves.Count} intersection curves were found.");
+            //Debug.WriteLine($"{resultCurves.Count} intersection curves were found.");
             return resultCurves;
         }
 
-        public static IEnumerable<Curve> Connect(
+        public static IEnumerable<Curve> TrimOrExtend(
            this Curve sourceCurve,
            Curve targetCurve,
-           bool isVirtualEnable = false,
+           bool isVirtualTrimEnable = false,
+           bool isVirtualExtendEnable = false,
             int staticIndex = 0)
         {
-            var result = sourceCurve.Trim(targetCurve, false, staticIndex);
+            var result = sourceCurve.Trim(targetCurve, isVirtualTrimEnable, staticIndex);
             result = result == null || result.Count() == 0 ? 
-                sourceCurve.Extend(targetCurve, isVirtualEnable, staticIndex) : 
+                sourceCurve.Extend(targetCurve, isVirtualExtendEnable, staticIndex) : 
                 result;
 
             return result;  
         }
 
-        public static IEnumerable<Curve> ConnectAnyPoint(
+        public static IEnumerable<Curve> TrimOrExtendAnyPoint(
           this Curve sourceCurve,
           Curve targetCurve,
-          bool isVirtualEnable = false)
+           bool isVirtualTrimEnable = false,
+           bool isVirtualExtendEnable = false)
         {
-            var result = Connect(sourceCurve, targetCurve, isVirtualEnable, 0);
+            var result = TrimOrExtend(sourceCurve, targetCurve, 
+                isVirtualTrimEnable, isVirtualExtendEnable, 0);
             result = result == null || result.Count() == 0 ? 
-                Connect(sourceCurve, targetCurve, isVirtualEnable, 1) :
+                TrimOrExtend(sourceCurve, targetCurve, 
+                isVirtualTrimEnable, isVirtualExtendEnable, 1) :
                 result;
             return result;
         }

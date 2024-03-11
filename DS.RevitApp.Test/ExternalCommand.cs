@@ -31,10 +31,16 @@ namespace DS.RevitApp.Test
              .CreateLogger();
             var trf = new ContextTransactionFactory(doc);
 
-            var connectorTest = new CurveConnectorTest(uidoc)
+
+            var test = new TryMakeClosedLoopTest(uidoc)
             { Logger = logger, TransactionFactory = trf };
-            var curves = connectorTest.SelectTWoCurves();
-            connectorTest.ConnectTwoCurves(curves.Item1, curves.Item2);
+            var loop =  test.SelectCurves();
+            test.TryMakeLoopClosed(loop);
+
+            //var connectorTest = new CurveConnectorTest(uidoc)
+            //{ Logger = logger, TransactionFactory = trf };
+            //var curves = connectorTest.SelectTWoCurves();
+            //connectorTest.ConnectTwoCurves(curves.Item1, curves.Item2);
 
             //var openingTest = new GetOpeningsSolidTest(uidoc)
             //{ Logger = logger };

@@ -49,11 +49,11 @@ namespace DS.RevitApp.Test
             var curve1 = mCurve1.GeometryCurve; var curve2 = mCurve2.GeometryCurve;
 
             //curve1 = curve1.CreateReversed();
-            CurveExtensionsTest.TransactionFactory = TransactionFactory;
+            NewCurveExtensions.TransactionFactory = TransactionFactory;
             //var resulstCurves = curve1.Trim(curve2, true);
             //var resulstCurves = curve1.Extend(curve2, true, 0);
             //var resulstCurves = curve1.Connect(curve2, true, 0);
-            var resulstCurves = curve1.ConnectAnyPoint(curve2, true);
+            var resulstCurves = curve1.TrimOrExtendAnyPoint(curve2, true);
             //var resulstCurves = curve1.Trim(curve2, true);
             //var resultCurve = resulstCurves.LastOrDefault();
             var resultCurve = resulstCurves.FirstOrDefault();
