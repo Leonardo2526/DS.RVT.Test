@@ -10,6 +10,7 @@ using OLMP.RevitAPI.Tools.Extensions;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace DS.RevitApp.Test
@@ -63,10 +64,12 @@ namespace DS.RevitApp.Test
         public void TryMakeLoopClosed(IEnumerable<ModelCurve> modelCurves)
         {
             var curves = modelCurves.Select(m => m.GeometryCurve);
-
-            var closedLoop = CurveUtils.TryConnect(curves, getConnectedCurveAtAnyPoint);
+            curves = CurveUtils.FitEndToStart(curves);
+            PrintCurvePoints(curves);
+            //return;
+            var closedLoop = CurveUtils.TryConnect(curves, getConnectedCurve);
             //var closedLoop = CurveLoopUtils.TryCreateLoop(curves);
-            if (closedLoop == null)
+            if (closedLoop == null || closedLoop.Count() == 0)
             {
                 Logger?.Error("Failed to make loop closed!");
                 return;
@@ -80,18 +83,50 @@ namespace DS.RevitApp.Test
 
             static Curve getConnectedCurve(Curve current, Curve previous, Curve next)
             {
-                var result = current.TrimOrExtend(previous, false, true, 1)
+                //var p1 = current.GetEndPoint(0);
+                //var p2 = current.GetEndPoint(1);
+
+                var result = current.TrimOrExtend(previous, true, true, 1)
                   .FirstOrDefault();
-                return result.TrimOrExtend(next, false, true, 0)
+
+                //var r1 = result.GetEndPoint(0);
+                //var r2 = result.GetEndPoint(1);
+
+                return result?.TrimOrExtend(next, true, true, 0)
                     .FirstOrDefault();
             }
 
             static Curve getConnectedCurveAtAnyPoint(Curve current, Curve previous, Curve next)
             {
-                var result = current.TrimOrExtendAnyPoint(previous, false, true)
+                var result = current.TrimOrExtendAnyPoint(previous, true, true)
                      .FirstOrDefault();
-                return result.TrimOrExtendAnyPoint(next, false, true)
+                return result?.TrimOrExtendAnyPoint(next, true, true)
                     .FirstOrDefault();
+            }
+
+            static Curve getConnectedCurveAtClosest(Curve current, Curve previous, Curve next)
+            {
+                var result = current.TrimOrExtendAtClosestPoints(previous, false, true)
+                     .FirstOrDefault();
+                return result?.TrimOrExtendAtClosestPoints(next, false, true)
+                    .FirstOrDefault();
+            }
+        }
+
+        private void PrintCurvePoints(IEnumerable<Curve> curves)
+        {
+            int i = 0;
+            foreach (var curve in curves)
+            {
+                i++;
+                Debug.WriteLine($"Curve + {i}");
+                var p1 = curve.GetEndPoint(0);
+                //ShowPoint(p1);
+                var p2 = curve.GetEndPoint(1);
+                var dir = (p2 - p1).RoundVector().Normalize();
+                Debug.WriteLine(p1);
+                Debug.WriteLine(p2);
+                Debug.WriteLine(dir);
             }
         }
 

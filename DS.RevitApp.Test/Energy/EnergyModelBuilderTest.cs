@@ -83,7 +83,7 @@ namespace DS.RevitApp.Test
             //return;
 
             var surfaces = eModels.SelectMany(m => m.EnergySurfaces);
-            return;
+            //return;
             _trf.Create(() => surfaces.ForEach(s => s.Show(_doc)), "ShowSpace");
             //ShowInsertSurfaces(eModels);
             //_trf.Create(() => eModels.ForEach(model => model.Show(_doc)), "ShowSpace");

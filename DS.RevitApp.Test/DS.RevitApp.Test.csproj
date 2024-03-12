@@ -204,8 +204,9 @@
   <ItemGroup>
     <Compile Include="AddSharedTest.cs" />
     <Compile Include="CreateSurfaceTest.cs" />
-    <Compile Include="CurveExtensionsTest.cs" />
-    <Compile Include="CurveLoopExtensionsTest.cs" />
+    <Compile Include="TryMakeClosedLoopTest.cs" />
+    <Compile Include="NewCurveExtensions.cs" />
+    <Compile Include="CurveUtils.cs" />
     <Compile Include="Energy\AdjacenciesFuncBuilder.cs" />
     <Compile Include="Energy\EnergyEdge.cs" />
     <Compile Include="Energy\EnergyGraphFactory.cs" />

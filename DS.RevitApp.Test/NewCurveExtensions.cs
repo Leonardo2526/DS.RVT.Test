@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using OLMP.RevitAPI.Tools;
 using OLMP.RevitAPI.Tools.Creation.Transactions;
 using OLMP.RevitAPI.Tools.Extensions;
 using Rhino;
@@ -43,6 +44,10 @@ namespace DS.RevitApp.Test
             //staticPoint.Show(_activeDoc, 200.MMToFeet(), TransactionFactory);
             var movePoint = sourceCurve.GetEndPoint(moveIndex);
 
+
+            //Debug.WriteLine($"Trying to trim point {movePoint} of " +
+                //$"{sourceCurve.GetType().Name} with {targetCurve.GetType().Name}");
+
             Curve targetOperationCurve;
             if (isVirtualEnable)
             {
@@ -63,8 +68,11 @@ namespace DS.RevitApp.Test
                     var intersecionCurves = results
                         .Select(getIntersectionCurve)
                         .Where(c => c != null)
-                        .OrderBy(c => c.ApproximateLength);
-                    resultCurves.AddRange(intersecionCurves);
+                        .OrderByDescending(c => c.ApproximateLength);
+                    var count = intersecionCurves.Count();                 
+                    Debug.WriteLine($"{count} " +
+                        $"curves were trimmed.");
+                    resultCurves.AddRange(intersecionCurves);               
                     break;
                 case SetComparisonResult.Equal:
                     { resultCurves.Add(sourceCurve); }
@@ -83,6 +91,7 @@ namespace DS.RevitApp.Test
             bool isVirtualEnable = false,
              int staticIndex = 0)
         {
+
             if (staticIndex != 0 && staticIndex != 1)
             { throw new ArgumentException("index can be only 0 or 1."); }
 
@@ -93,6 +102,9 @@ namespace DS.RevitApp.Test
             var staticParamter = sourceCurve.GetEndParameter(staticIndex);
             //staticPoint.Show(_activeDoc, 200.MMToFeet(), TransactionFactory);
             var movePoint = sourceCurve.GetEndPoint(moveIndex);
+
+            //Debug.WriteLine($"Trying to extend point {movePoint} of " +
+                //$"{sourceCurve.GetType().Name} to {targetCurve.GetType().Name}");
 
             var sourceOperationCurve = sourceCurve.Clone();
             sourceOperationCurve.MakeUnbound();
@@ -124,6 +136,9 @@ namespace DS.RevitApp.Test
                        .Select(getIntersectionCurve)
                        .Where(c => c != null)
                        .OrderBy(c => c.ApproximateLength);
+                    var count = intersecionCurves.Count();
+                    Debug.WriteLine($"{count} " +
+                        $"curves were extent.");
                     resultCurves.AddRange(intersecionCurves);
                     break;
                 case SetComparisonResult.Equal:
@@ -133,11 +148,30 @@ namespace DS.RevitApp.Test
                     break;
             }
 
-            //Debug.WriteLine($"{resultCurves.Count} intersection curves were found.");
             return resultCurves;
         }
 
+
         public static IEnumerable<Curve> TrimOrExtend(
+          this Curve sourceCurve,
+          Curve targetCurve,
+          bool isVirtualTrimEnable = false,
+          bool isVirtualExtendEnable = false,
+           int staticIndex = 0)
+        {
+            var resultCurves = new List<Curve>();   
+            var trimResult = sourceCurve.Trim(targetCurve, isVirtualTrimEnable, staticIndex);
+            resultCurves.AddRange(trimResult);
+            var extendResults = sourceCurve.Extend(targetCurve, isVirtualExtendEnable, staticIndex);
+            resultCurves.AddRange(extendResults);
+
+            resultCurves = resultCurves
+                .OrderBy(c => Math.Abs(sourceCurve.ApproximateLength - c.ApproximateLength)).ToList();
+
+            return resultCurves;
+        }
+
+        public static IEnumerable<Curve> TrimOrExtendOld(
            this Curve sourceCurve,
            Curve targetCurve,
            bool isVirtualTrimEnable = false,
@@ -145,11 +179,11 @@ namespace DS.RevitApp.Test
             int staticIndex = 0)
         {
             var result = sourceCurve.Trim(targetCurve, isVirtualTrimEnable, staticIndex);
-            result = result == null || result.Count() == 0 ? 
-                sourceCurve.Extend(targetCurve, isVirtualExtendEnable, staticIndex) : 
+            result = result == null || result.Count() == 0 ?
+                sourceCurve.Extend(targetCurve, isVirtualExtendEnable, staticIndex) :
                 result;
 
-            return result;  
+            return result;
         }
 
         public static IEnumerable<Curve> TrimOrExtendAnyPoint(
@@ -158,13 +192,33 @@ namespace DS.RevitApp.Test
            bool isVirtualTrimEnable = false,
            bool isVirtualExtendEnable = false)
         {
-            var result = TrimOrExtend(sourceCurve, targetCurve, 
+            var result = TrimOrExtend(sourceCurve, targetCurve,
                 isVirtualTrimEnable, isVirtualExtendEnable, 0);
-            result = result == null || result.Count() == 0 ? 
-                TrimOrExtend(sourceCurve, targetCurve, 
+            result = result == null || result.Count() == 0 ?
+                TrimOrExtend(sourceCurve, targetCurve,
                 isVirtualTrimEnable, isVirtualExtendEnable, 1) :
                 result;
             return result;
+        }
+
+        public static IEnumerable<Curve> TrimOrExtendAtClosestPoints(
+         this Curve sourceCurve,
+         Curve targetCurve,
+          bool isVirtualTrimEnable = false,
+          bool isVirtualExtendEnable = false)
+        {
+            var sp1 = sourceCurve.GetEndPoint(0);
+            var sp2 = sourceCurve.GetEndPoint(1);
+
+            var tp1 = targetCurve.GetEndPoint(0);
+            var tp2 = targetCurve.GetEndPoint(1);
+
+            var d1 = Math.Min(sp1.DistanceTo(tp1), sp1.DistanceTo(tp2));
+            var d2 = Math.Min(sp2.DistanceTo(tp1), sp2.DistanceTo(tp2));
+            int staticIndex = d1 < d2 ? 1 : 0;
+
+            return TrimOrExtend(sourceCurve, targetCurve,
+                isVirtualTrimEnable, isVirtualExtendEnable, staticIndex);
         }
 
         public static IEnumerable<Curve> GetResultIntersectionCurves(
@@ -176,6 +230,8 @@ namespace DS.RevitApp.Test
 
             var projection = baseCurve.Project(intersectionResult.XYZPoint);
             var targetParameter = projection.Parameter;
+            if(Math.Abs(baseStaticParameter - targetParameter) < RhinoMath.ZeroTolerance)
+            { return intersectionCurves; }
 
             var p11 = Math.Min(baseStaticParameter, targetParameter);
             var p12 = Math.Max(baseStaticParameter, targetParameter);

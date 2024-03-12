@@ -48,21 +48,41 @@ namespace DS.RevitApp.Test
         {
             var curve1 = mCurve1.GeometryCurve; var curve2 = mCurve2.GeometryCurve;
 
+            var p1 = curve1.GetEndPoint(0);
+            //ShowPoint(p1);
+            var p2 = curve1.GetEndPoint(1);
+
             //curve1 = curve1.CreateReversed();
             NewCurveExtensions.TransactionFactory = TransactionFactory;
+            curve1 = CurveUtils.IsBaseEndFitted(curve1, curve2) ?
+               curve1 :
+               curve1.CreateReversed();
+
+            var fp1 = curve1.GetEndPoint(0);
+            //ShowPoint(fp1);
+            var fp2 = curve1.GetEndPoint(1);
+
+            var p21 = curve2.GetEndPoint(0);
+            //ShowPoint(p21);
+
             //var resulstCurves = curve1.Trim(curve2, true);
             //var resulstCurves = curve1.Extend(curve2, true, 0);
             //var resulstCurves = curve1.Connect(curve2, true, 0);
-            var resulstCurves = curve1.TrimOrExtendAnyPoint(curve2, true);
+            //var resulstCurves = curve1.TrimOrExtend(curve2, true, true);
+            var resulstCurves = curve1.TrimOrExtend(curve2, true, true, 0);
             //var resulstCurves = curve1.Trim(curve2, true);
             //var resultCurve = resulstCurves.LastOrDefault();
             var resultCurve = resulstCurves.FirstOrDefault();
+            //resultCurve = resultCurve.TrimOrExtend(curve2, true, true, 1).FirstOrDefault();
             if (resultCurve != null)
             {
                 ShowCurve(resultCurve);
-                var resultPoint = resultCurve.GetEndPoint(1);
-                ShowPoint(resultPoint);
+                var resultPoint = resultCurve.GetEndPoint(0);
+                //ShowPoint(resultPoint);
                 DeleteCurve(mCurve1);
+
+                var r1 = resultCurve.GetEndPoint(0);
+                var r2 = resultCurve.GetEndPoint(1);
             }
         }
 
