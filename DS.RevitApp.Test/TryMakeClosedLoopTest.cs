@@ -83,29 +83,6 @@ namespace DS.RevitApp.Test
 
             static Curve getConnectedCurve(Curve current, Curve previous, Curve next)
             => current.TrimOrExtend(previous, next, true, true);
-
-            static Curve getConnectedCurveOld(Curve current, Curve previous, Curve next)
-            {
-                //var p1 = current.GetEndPoint(0);
-                //var p2 = current.GetEndPoint(1);
-
-                var result = current.TrimOrExtend(previous, true, true, 1)
-                  .FirstOrDefault();
-
-                //var r1 = result.GetEndPoint(0);
-                //var r2 = result.GetEndPoint(1);
-
-                return result?.TrimOrExtend(next, true, true, 0)
-                    .FirstOrDefault();
-            }
-
-            static Curve getConnectedCurveAtClosest(Curve current, Curve previous, Curve next)
-            {
-                var result = current.TrimOrExtendAtClosestPoints(previous, false, true)
-                     .FirstOrDefault();
-                return result?.TrimOrExtendAtClosestPoints(next, false, true)
-                    .FirstOrDefault();
-            }
         }
 
         private void PrintCurvePoints(IEnumerable<Curve> curves)

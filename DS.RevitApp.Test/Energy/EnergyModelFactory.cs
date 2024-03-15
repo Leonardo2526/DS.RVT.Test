@@ -15,6 +15,7 @@ using System.Diagnostics;
 using Autodesk.Revit.DB.Architecture;
 using Rhino.UI;
 using DS.ClassLib.VarUtils;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DS.RevitApp.Test.Energy
 {
@@ -65,8 +66,8 @@ namespace DS.RevitApp.Test.Energy
             //var boundarySegments =  GetExternalBoundaries(space);
             //var boundaryCurves = boundarySegments.Select(s => s.GetCurve());
             //ShowBoundariesOneByOne(boundaryCurves);
-            ShowBoundaries(boundaryCurves);
-            return eSurfaces;
+            //ShowBoundaries(boundaryCurves);
+            //return eSurfaces;
 
             var analyticalBoundary = GetAnalyticalBoundary(boundarySegments);
             TransactionFactory?.Create(() => analyticalBoundary.ForEach(c => c.Item1.Show(_doc)), "showCurve");
@@ -75,8 +76,8 @@ namespace DS.RevitApp.Test.Energy
                 var eSurface = _energySurfaceFactory.CreateEnergySurface(boundary.Item2, boundary.Item1);
                 //var eSurface = ToEnergySurface(boundary);
                 if (eSurface == null)
-                { 
-                    Debug.WriteLine("Failed to get Energy surface!"); 
+                {
+                    Debug.WriteLine("Failed to get Energy surface!");
                     continue;
                 }
                 else
@@ -119,12 +120,12 @@ namespace DS.RevitApp.Test.Energy
             var boundaryCurves = new List<(Curve curve, BoundarySegment segment)>();
             foreach (var segment in segmentLists)
             {
-                    var curve = segment.GetCurve();
-                    var distanseToOffset = _doc.GetElement(segment.ElementId) is Wall wall ?
-                        wall.Width / 2 : 0;
-                    curve = curve.CreateOffset(distanseToOffset, XYZ.BasisZ);
-                    if (curve != null)
-                    { boundaryCurves.Add((curve, segment)); }
+                var curve = segment.GetCurve();
+                var distanseToOffset = _doc.GetElement(segment.ElementId) is Wall wall ?
+                    wall.Width / 2 : 0;
+                curve = curve.CreateOffset(distanseToOffset, XYZ.BasisZ);
+                if (curve != null)
+                { boundaryCurves.Add((curve, segment)); }
             }
             //return boundaryCurves;
             var connectedBoundaryCurves = CurveUtils
@@ -148,7 +149,7 @@ namespace DS.RevitApp.Test.Energy
                 foreach (var segment in sl)
                 {
                     var curve = segment.GetCurve();
-                    var distanseToOffset = _doc.GetElement(segment.ElementId) is Wall wall ? 
+                    var distanseToOffset = _doc.GetElement(segment.ElementId) is Wall wall ?
                         wall.Width / 2 : 0;
                     curve = curve.CreateOffset(distanseToOffset, XYZ.BasisZ);
                     if (curve != null)
@@ -157,16 +158,11 @@ namespace DS.RevitApp.Test.Energy
             }
             //return boundaryCurves;
             var connectedBoundaryCurves = CurveUtils
-                .TryConnect<BoundarySegment>(boundaryCurves, getConnectedCurve);           
+                .TryConnect<BoundarySegment>(boundaryCurves, getConnectedCurve);
             return connectedBoundaryCurves;
 
             static Curve getConnectedCurve(Curve current, Curve previous, Curve next)
-            {
-                var result = current.TrimOrExtend(previous, true, true, 1)
-                  .FirstOrDefault();
-                return result?.TrimOrExtend(next, true, true, 0)
-                    .FirstOrDefault();
-            }
+            => current.TrimOrExtend(previous, next, true, true);
         }
 
         private void ShowCurve(Curve curve)
@@ -201,10 +197,10 @@ namespace DS.RevitApp.Test.Energy
                     if (_doc.GetElement(segment.ElementId) is Wall wall)
                     {
                         var joints = wall.GetJoints(true);
-                        if(joints.Count() == 2)
+                        if (joints.Count() == 2)
                         { boundaryCurves.Add(segment); }
                     }
-                   
+
                 }
             }
 

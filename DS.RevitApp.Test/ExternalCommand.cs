@@ -32,8 +32,8 @@ namespace DS.RevitApp.Test
             var trf = new ContextTransactionFactory(doc);
 
 
-            var test = new MakeBoundTest(uidoc)
-            { Logger = logger, TransactionFactory = trf };
+            //var test = new MakeBoundTest(uidoc)
+            //{ Logger = logger, TransactionFactory = trf };
 
 
             //var curve = test
@@ -41,19 +41,19 @@ namespace DS.RevitApp.Test
             //    .SelectFirstPoint()?
             //    .SelectSecondPoint()?
             //    .CreateNewCurve();
-
             //var test = new TryMakeClosedLoopTest(uidoc)
             //{ Logger = logger, TransactionFactory = trf };
             //var loop = test.SelectCurves();
             //test.TryMakeLoopClosed(loop);
             //return Autodesk.Revit.UI.Result.Succeeded;
 
-            var connectorTest = new CurveConnectorTest(uidoc)
-            { Logger = logger, TransactionFactory = trf };
-            var curves = connectorTest.SelectTWoCurves();
-            connectorTest.ConnectTwoCurves(curves.Item1, curves.Item2);
-            //connectorTest.GetBases(curves.Item1, curves.Item2);
-            return Autodesk.Revit.UI.Result.Succeeded;
+
+            //var connectorTest = new CurveConnectorTest(uidoc)
+            //{ Logger = logger, TransactionFactory = trf };
+            //var curves = connectorTest.SelectTWoCurves();
+            //connectorTest.ConnectTwoCurves(curves.Item1, curves.Item2);
+            ////connectorTest.GetBases(curves.Item1, curves.Item2);
+            //return Autodesk.Revit.UI.Result.Succeeded;
 
             //var openingTest = new GetOpeningsSolidTest(uidoc)
             //{ Logger = logger };
@@ -74,9 +74,9 @@ namespace DS.RevitApp.Test
             //return Autodesk.Revit.UI.Result.Succeeded;
 
 
-            //var test = new EnergyModelBuilderTest(uidoc)
-            //{ Logger = logger };
-            //test.GetModels();
+            var test = new EnergyModelBuilderTest(uidoc)
+            { Logger = logger };
+            test.GetModels();
             //test.CreateGraph();
 
             return Autodesk.Revit.UI.Result.Succeeded;

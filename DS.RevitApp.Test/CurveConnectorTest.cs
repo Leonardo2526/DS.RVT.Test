@@ -98,23 +98,25 @@ namespace DS.RevitApp.Test
             var p2 = curve1.GetEndPoint(1);
             //curve1 = curve1.CreateReversed();
             NewCurveExtensions.TransactionFactory = TransactionFactory;
-            curve1 = CurveUtils.IsBaseEndFitted(curve1, curve2) ?
-               curve1 :
-               curve1.CreateReversed();
+            //curve1 = CurveUtils.IsBaseEndFitted(curve1, curve2) ?
+            //   curve1 :
+            //   curve1.CreateReversed();
 
             var fp1 = curve1.GetEndPoint(0);
-            ShowPoint(fp1);
+            //ShowPoint(fp1);
             var fp2 = curve1.GetEndPoint(1);
 
             //var p21 = curve2.GetEndPoint(0);
             //var p22 = curve2.GetEndPoint(1);
             //ShowPoint(p21);
 
-            var resultCurve = curve1.BestTrim(curve2, true);
+            //var resultCurve = curve1.BestTrim(curve2, true);
+            //var resultCurve = curve1.BestExtend(curve2, true,0);
             //var resulstCurves = curve1.Extend(curve2, true, 0);
             //var resulstCurves = curve1.Connect(curve2, true, 0);
-           //var resulstCurves = curve1.TrimOrExtend(curve2, true, true);
-           //var resultCurve = curve1.TrimOrExtend(curve2, curve2, true, true);
+            var resultCurve = curve1.TrimOrExtend(curve2, true, true).FirstOrDefault();
+            //var resultCurve = curve1.BestTrimOrExtendAny(curve2, true, true);
+            //var resultCurve = curve1.BestTrimOrExtend(curve2, curve2, true, true);
             //var resulstCurves = curve1.TrimOrExtend(curve2, true, true, 0);
             //var resulstCurves = curve1.Trim(curve2, true);
             //var resultCurve = resulstCurves.LastOrDefault();
