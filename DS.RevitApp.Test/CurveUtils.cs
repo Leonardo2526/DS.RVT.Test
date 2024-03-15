@@ -62,19 +62,45 @@ namespace DS.RevitApp.Test
             return resultCurves;
         }
 
+        public static IEnumerable<(Curve curve, TTag tag)> TryConnect<TTag>(
+            IEnumerable<(Curve curve, TTag tag)> curves,
+            Func<Curve, Curve, Curve, Curve> getConnectedCurve)
+        {
+            var resultCurves = new List<(Curve curve, TTag tag)>();
+
+            var linkedCurves = new LinkedList<(Curve curve, TTag tag)>(curves);
+            var currentNode = linkedCurves.First;
+            var previous = linkedCurves.Last;
+            while (currentNode != null)
+            {
+                var connectedCurve = getConnectedCurve(
+                    currentNode.Value.curve,
+                    previous.Value.curve,
+                    (currentNode.Next ?? linkedCurves.First).Value.curve);
+                if (connectedCurve != null)
+                { resultCurves.Add((connectedCurve, currentNode.Value.tag)); }
+                else { break; }
+                //break;
+                previous = currentNode;
+                currentNode = currentNode.Next;
+            }
+
+            return resultCurves;
+        }
+
         public static bool IsBaseEndFitted(
             Curve baseCurve,
-            Curve curveToFit)
+            Curve curveToFit, double minFitDistance = 0)
         {
+            if(!baseCurve.IsBound) { return true; }
+
             var sp1 = baseCurve.GetEndPoint(0);
             var sp2 = baseCurve.GetEndPoint(1);
 
-            var tp1 = curveToFit.GetEndPoint(0);
-            var tp2 = curveToFit.GetEndPoint(1);
+            var d1 = curveToFit.Distance(sp1);
+            var d2 = curveToFit.Distance(sp2);
 
-            var d1 = Math.Min(sp1.DistanceTo(tp1), sp1.DistanceTo(tp2));
-            var d2 = Math.Min(sp2.DistanceTo(tp1), sp2.DistanceTo(tp2));
-            return d2 < d1;
+            return d2 >= minFitDistance && d2 < d1;
         }
 
 

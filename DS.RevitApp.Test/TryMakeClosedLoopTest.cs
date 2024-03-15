@@ -82,6 +82,9 @@ namespace DS.RevitApp.Test
             { ShowCurve(curve); }
 
             static Curve getConnectedCurve(Curve current, Curve previous, Curve next)
+            => current.TrimOrExtend(previous, next, true, true);
+
+            static Curve getConnectedCurveOld(Curve current, Curve previous, Curve next)
             {
                 //var p1 = current.GetEndPoint(0);
                 //var p2 = current.GetEndPoint(1);
@@ -93,14 +96,6 @@ namespace DS.RevitApp.Test
                 //var r2 = result.GetEndPoint(1);
 
                 return result?.TrimOrExtend(next, true, true, 0)
-                    .FirstOrDefault();
-            }
-
-            static Curve getConnectedCurveAtAnyPoint(Curve current, Curve previous, Curve next)
-            {
-                var result = current.TrimOrExtendAnyPoint(previous, true, true)
-                     .FirstOrDefault();
-                return result?.TrimOrExtendAnyPoint(next, true, true)
                     .FirstOrDefault();
             }
 

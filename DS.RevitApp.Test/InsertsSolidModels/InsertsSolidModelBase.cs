@@ -6,6 +6,7 @@ using OLMP.RevitAPI.Tools.Extensions;
 using OLMP.RevitAPI.Tools.Extensions.RhinoExtensions;
 using Rhino.Geometry;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -45,10 +46,10 @@ namespace DS.RevitApp.Test.Energy
 
         public IEnumerable<(Element insert, Solid solid)> GetAllInsertsSolidModels()
         {
-            var models = new List<(Element insert, Solid solid)>(); 
+            var models = new List<(Element insert, Solid solid)>();
 
             var openingsModels = GetOpeningsSolidModels();
-            openingsModels.ForEach(m => models.Add(m));   
+            openingsModels.ForEach(m => models.Add(m));
             var insertsModels = GetWindowsAndDoorsSolidModels();
             insertsModels.ForEach(m => models.Add(m));
 
@@ -75,8 +76,11 @@ namespace DS.RevitApp.Test.Energy
             foreach (var insert in windowsAndDoors)
             {
                 var iSolid = insert.Solid(_links);
-                var boxSolid = GetInsertSolid(iSolid);
-                models.Add((insert, boxSolid));
+                if (iSolid != null)
+                {
+                    var boxSolid = GetInsertSolid(iSolid);
+                    models.Add((insert, boxSolid));
+                }
             }
             return models;
 

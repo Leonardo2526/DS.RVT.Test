@@ -61,7 +61,8 @@ namespace DS.RevitApp.Test
             roomDocFilter.SlowFilters.Add((new RoomFilter(), null));
             var rooms = roomDocFilter.ApplyToAllDocs()
                 .SelectMany(kv => kv.Value.ToElements(kv.Key))
-                .OfType<Room>();
+                .OfType<Room>()
+            .Where(r => r.Area > 0);
             //if (Logger != null)
             //{
             //    rooms.ForEach(r => Logger.Information(r.Name, r.Id));
@@ -86,6 +87,7 @@ namespace DS.RevitApp.Test
             //return;
             _trf.Create(() => surfaces.ForEach(s => s.Show(_doc)), "ShowSpace");
             //ShowInsertSurfaces(eModels);
+            //ShowModels(eModels);
             //_trf.Create(() => eModels.ForEach(model => model.Show(_doc)), "ShowSpace");
             return;
 
@@ -223,6 +225,9 @@ namespace DS.RevitApp.Test
             var spaceSolid = result.GetGeometry();
             _trf.Create(() => spaceSolid.ShowShape(activeDoc), "CreateSpaces");
         }
+
+        private void ShowModels(IEnumerable<EnergyModel> eModels)
+            => _trf.Create(() => eModels.ForEach(model => model.Show(_doc)), "ShowSpace");
 
     }
 }

@@ -204,6 +204,8 @@
   <ItemGroup>
     <Compile Include="AddSharedTest.cs" />
     <Compile Include="CreateSurfaceTest.cs" />
+    <Compile Include="CurveConnector.cs" />
+    <Compile Include="MakeBoundTest.cs" />
     <Compile Include="TryMakeClosedLoopTest.cs" />
     <Compile Include="NewCurveExtensions.cs" />
     <Compile Include="CurveUtils.cs" />

@@ -11,6 +11,10 @@ using System.Threading.Tasks;
 using OLMP.RevitAPI.Tools;
 using OLMP.RevitAPI.Tools.Extensions;
 using Autodesk.Revit.UI;
+using System.Diagnostics;
+using Autodesk.Revit.DB.Architecture;
+using Rhino.UI;
+using DS.ClassLib.VarUtils;
 
 namespace DS.RevitApp.Test.Energy
 {
@@ -55,21 +59,26 @@ namespace DS.RevitApp.Test.Energy
 
             var options = new SpatialElementBoundaryOptions();
 
+            var boundarySegments = space.GetBoundarySegments(options);
+            var boundaryCurves = boundarySegments.SelectMany(sl => sl.Select(s => s.GetCurve()));
 
-            var segments = space.GetBoundarySegments(options);
-
-            var boundaryCurves = segments.SelectMany(sl => sl.Select(s => s.GetCurve()));
+            //var boundarySegments =  GetExternalBoundaries(space);
+            //var boundaryCurves = boundarySegments.Select(s => s.GetCurve());
+            //ShowBoundariesOneByOne(boundaryCurves);
             ShowBoundaries(boundaryCurves);
-            //return eSurfaces;
+            return eSurfaces;
 
-            var analyticalBoundary = GetAnalyticalBoundary(segments);
-            TransactionFactory?.Create(() => analyticalBoundary.ForEach(c => c.Item2.Show(_doc)), "showCurve");
+            var analyticalBoundary = GetAnalyticalBoundary(boundarySegments);
+            TransactionFactory?.Create(() => analyticalBoundary.ForEach(c => c.Item1.Show(_doc)), "showCurve");
             foreach (var boundary in analyticalBoundary)
             {
-                var eSurface = _energySurfaceFactory.CreateEnergySurface(boundary.Item1, boundary.Item2);
+                var eSurface = _energySurfaceFactory.CreateEnergySurface(boundary.Item2, boundary.Item1);
                 //var eSurface = ToEnergySurface(boundary);
                 if (eSurface == null)
-                { throw new Exception("Failed to get Energy surface!"); }
+                { 
+                    Debug.WriteLine("Failed to get Energy surface!"); 
+                    continue;
+                }
                 else
                 { eSurfaces.Add(eSurface); }
             }
@@ -78,6 +87,17 @@ namespace DS.RevitApp.Test.Energy
 
             void ShowBoundaries(IEnumerable<Curve> curves)
                 => TransactionFactory?.Create(() => curves.ForEach(c => c.Show(_doc)), "showCurve");
+
+            void ShowBoundariesOneByOne(IEnumerable<Curve> curves)
+            {
+                var uiDoc = new UIDocument(_doc);
+                foreach (var curve in curves)
+                {
+                    ShowCurve(curve);
+                    ShowPoint(curve.GetEndPoint(0));
+                    uiDoc.RefreshActiveView();
+                }
+            }
         }
 
         private IEnumerable<EnergySurface> GetFloorEnergySurfaces(Space space)
@@ -94,35 +114,22 @@ namespace DS.RevitApp.Test.Energy
             return energySurfaces;
         }
 
-        private IEnumerable<(BoundarySegment, Curve)> GetAnalyticalBoundary(IList<IList<BoundarySegment>> segmentLists)
+        private IEnumerable<(Curve, BoundarySegment)> GetAnalyticalBoundary(IEnumerable<BoundarySegment> segmentLists)
         {
-            var boundaryCurves = new List<(BoundarySegment segment, Curve curve)>();
-            foreach (var sl in segmentLists)
+            var boundaryCurves = new List<(Curve curve, BoundarySegment segment)>();
+            foreach (var segment in segmentLists)
             {
-                foreach (var segment in sl)
-                {
-                    if (_doc.GetElement(segment.ElementId) is Wall wall)
-                    {
-                        var curve = segment.GetCurve();
-                        var distanseToOffset = wall.Width / 2;
-                        curve = curve.CreateOffset(distanseToOffset, XYZ.BasisZ);
-                        if (curve != null)
-                        { boundaryCurves.Add((segment, curve)); }
-                    }
-                }
+                    var curve = segment.GetCurve();
+                    var distanseToOffset = _doc.GetElement(segment.ElementId) is Wall wall ?
+                        wall.Width / 2 : 0;
+                    curve = curve.CreateOffset(distanseToOffset, XYZ.BasisZ);
+                    if (curve != null)
+                    { boundaryCurves.Add((curve, segment)); }
             }
             //return boundaryCurves;
-            var connectedCurves = CurveUtils.TryConnect(boundaryCurves.Select(x => x.curve), getConnectedCurve);
-            //var closedLoop = curveLoop.TryCreateLoop() ?? throw new Exception();
-            var result = new List<(BoundarySegment, Curve)>();
-            for (int i = 0; i < boundaryCurves.Count; i++)
-            {
-                var connectedCurve = connectedCurves.ElementAt(i);
-                var (segment, curve) = boundaryCurves[i];
-                result.Add((segment, connectedCurve));
-            }
-            return result;
-            //return Connect(offsetted);
+            var connectedBoundaryCurves = CurveUtils
+                .TryConnect<BoundarySegment>(boundaryCurves, getConnectedCurve);
+            return connectedBoundaryCurves;
 
             static Curve getConnectedCurve(Curve current, Curve previous, Curve next)
             {
@@ -131,6 +138,90 @@ namespace DS.RevitApp.Test.Energy
                 return result?.TrimOrExtend(next, true, true, 0)
                     .FirstOrDefault();
             }
+        }
+
+        private IEnumerable<(Curve, BoundarySegment)> GetAnalyticalBoundary(IList<IList<BoundarySegment>> segmentLists)
+        {
+            var boundaryCurves = new List<(Curve curve, BoundarySegment segment)>();
+            foreach (var sl in segmentLists)
+            {
+                foreach (var segment in sl)
+                {
+                    var curve = segment.GetCurve();
+                    var distanseToOffset = _doc.GetElement(segment.ElementId) is Wall wall ? 
+                        wall.Width / 2 : 0;
+                    curve = curve.CreateOffset(distanseToOffset, XYZ.BasisZ);
+                    if (curve != null)
+                    { boundaryCurves.Add((curve, segment)); }
+                }
+            }
+            //return boundaryCurves;
+            var connectedBoundaryCurves = CurveUtils
+                .TryConnect<BoundarySegment>(boundaryCurves, getConnectedCurve);           
+            return connectedBoundaryCurves;
+
+            static Curve getConnectedCurve(Curve current, Curve previous, Curve next)
+            {
+                var result = current.TrimOrExtend(previous, true, true, 1)
+                  .FirstOrDefault();
+                return result?.TrimOrExtend(next, true, true, 0)
+                    .FirstOrDefault();
+            }
+        }
+
+        private void ShowCurve(Curve curve)
+       => TransactionFactory.Create(() => curve.Show(_doc), "ShowCurve");
+
+        private void ShowPoint(XYZ point)
+     => TransactionFactory.Create(() => point.Show(_doc), "ShowPoint");
+
+        private IEnumerable<BoundarySegment> GetExternalBoundaries(Space space)
+        {
+            //var calculator = new SpatialElementGeometryCalculator(_doc);
+            //var results = calculator.CalculateSpatialElementGeometry(space); 
+            //Solid spaceSolid = results.GetGeometry();
+            //ShowSolid(spaceSolid);
+
+            //var faces =spaceSolid.Faces.ToList().OfType<PlanarFace>();
+            //var at = 1.DegToRad();
+            //var bottomFace = faces
+            //    .Where(f=> f.FaceNormal.ToVector3d().IsParallelTo(Rhino.Geometry.Vector3d.ZAxis, at) !=0)
+            //    .OrderBy(f => f.Origin.Z)
+            //    .First();
+
+            var options = new SpatialElementBoundaryOptions();
+            var segmentLists = space.GetBoundarySegments(options);
+            //return segmentLists;
+            var boundaryCurves = new List<BoundarySegment>();
+            foreach (var sl in segmentLists)
+            {
+                foreach (var segment in sl)
+                {
+                    var curve = segment.GetCurve();
+                    if (_doc.GetElement(segment.ElementId) is Wall wall)
+                    {
+                        var joints = wall.GetJoints(true);
+                        if(joints.Count() == 2)
+                        { boundaryCurves.Add(segment); }
+                    }
+                   
+                }
+            }
+
+            return boundaryCurves;
+        }
+
+        private void ShowSolid(Solid solid)
+        {
+            using (Transaction transaction = new(_doc, "ShowSolid"))
+            {
+                transaction.Start();
+                solid.ShowShape(_doc);
+
+                if (transaction.HasStarted())
+                { transaction.Commit(); }
+            }
+
         }
     }
 }

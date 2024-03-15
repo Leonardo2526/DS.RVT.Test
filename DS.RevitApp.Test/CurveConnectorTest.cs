@@ -2,6 +2,7 @@
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using DS.ClassLib.VarUtils;
+using DS.ClassLib.VarUtils.Basis;
 using DS.GraphUtils.Entities;
 using DS.RevitApp.Test.Energy;
 using OLMP.RevitAPI.Tools;
@@ -9,6 +10,7 @@ using OLMP.RevitAPI.Tools.Creation.Transactions;
 using OLMP.RevitAPI.Tools.Extensions;
 using Serilog;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace DS.RevitApp.Test
@@ -44,14 +46,56 @@ namespace DS.RevitApp.Test
             return (w1, w2);
         }
 
+        public void GetBases(ModelCurve mCurve1, ModelCurve mCurve2)
+        {
+            var curve1 = mCurve1.GeometryCurve;
+
+            var cloned = curve1.Clone();
+            cloned.MakeUnbound();
+            cloned = cloned.CreateReversed();
+
+
+            var p11 = curve1.GetEndPoint(0);
+            ShowPoint(p11);
+            var basis1 = GetBasis(curve1);
+            var r1=  basis1.IsRighthanded();
+            var plane1 =  mCurve1.SketchPlane.GetPlane();
+            var pNormal1 = plane1.Normal.Negate();
+            Debug.WriteLine(curve1.TryGetRotation(pNormal1));
+
+            var curve2 = mCurve2.GeometryCurve;
+            var p21 = curve2.GetEndPoint(0);
+            ShowPoint(p21);
+
+            var basis2 = GetBasis(curve2);
+            var r2 = basis2.IsRighthanded();
+            var plane2 = mCurve2.SketchPlane.GetPlane();
+            var pNormal2 = plane2.Normal.Negate();
+            Debug.WriteLine(curve2.TryGetRotation(pNormal2));
+
+            return;
+
+            Basis3d GetBasis(Curve curve)
+            {
+                var arc = curve as Arc;
+                var x = arc.XDirection;
+                var y = arc.YDirection;
+                var z = x.CrossProduct(y);
+                var n = arc.Normal;
+              
+
+                return new Basis3d(arc.Center.ToPoint3d(), x.ToVector3d(), y.ToVector3d(), z.ToVector3d());
+            }
+        }
+
         public void ConnectTwoCurves(ModelCurve mCurve1, ModelCurve mCurve2)
         {
             var curve1 = mCurve1.GeometryCurve; var curve2 = mCurve2.GeometryCurve;
+         
 
             var p1 = curve1.GetEndPoint(0);
             //ShowPoint(p1);
             var p2 = curve1.GetEndPoint(1);
-
             //curve1 = curve1.CreateReversed();
             NewCurveExtensions.TransactionFactory = TransactionFactory;
             curve1 = CurveUtils.IsBaseEndFitted(curve1, curve2) ?
@@ -59,20 +103,22 @@ namespace DS.RevitApp.Test
                curve1.CreateReversed();
 
             var fp1 = curve1.GetEndPoint(0);
-            //ShowPoint(fp1);
+            ShowPoint(fp1);
             var fp2 = curve1.GetEndPoint(1);
 
-            var p21 = curve2.GetEndPoint(0);
+            //var p21 = curve2.GetEndPoint(0);
+            //var p22 = curve2.GetEndPoint(1);
             //ShowPoint(p21);
 
-            //var resulstCurves = curve1.Trim(curve2, true);
+            var resultCurve = curve1.BestTrim(curve2, true);
             //var resulstCurves = curve1.Extend(curve2, true, 0);
             //var resulstCurves = curve1.Connect(curve2, true, 0);
-            //var resulstCurves = curve1.TrimOrExtend(curve2, true, true);
-            var resulstCurves = curve1.TrimOrExtend(curve2, true, true, 0);
+           //var resulstCurves = curve1.TrimOrExtend(curve2, true, true);
+           //var resultCurve = curve1.TrimOrExtend(curve2, curve2, true, true);
+            //var resulstCurves = curve1.TrimOrExtend(curve2, true, true, 0);
             //var resulstCurves = curve1.Trim(curve2, true);
             //var resultCurve = resulstCurves.LastOrDefault();
-            var resultCurve = resulstCurves.FirstOrDefault();
+            //var resultCurve = resulstCurves.FirstOrDefault();
             //resultCurve = resultCurve.TrimOrExtend(curve2, true, true, 1).FirstOrDefault();
             if (resultCurve != null)
             {
