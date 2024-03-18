@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using DS.ClassLib.VarUtils;
+using DS.ClassLib.VarUtils.Basis;
 using OLMP.RevitAPI.Tools;
 using OLMP.RevitAPI.Tools.Creation.Transactions;
 using OLMP.RevitAPI.Tools.Extensions;
@@ -55,6 +56,35 @@ namespace DS.RevitApp.Test
                 ViewportRotation.Counterclockwise;
         }
 
+        public static Basis3d GetBasis(this Curve curve, double parameter = 0)
+        {
+            var transforms = curve.ComputeDerivatives(parameter, true);
+
+            var origin = transforms.Origin.Normalize().ToPoint3d();
+            var x = transforms.BasisX.ToVector3d();
+            x.Unitize();
+            var z = transforms.BasisZ.ToVector3d();
+            z = z.IsZero ? Rhino.Geometry.Vector3d.ZAxis : z;
+            z.Unitize();
+            var y = Rhino.Geometry.Vector3d.CrossProduct(z, x);
+            y.Unitize();
+            return new Basis3d(origin, x, y, z);
+        }
+
+        public static Rhino.Geometry.Vector3d GetNormal(this Curve curve, double parameter = 0)
+        => curve.GetBasis(parameter).Z;
+
+        public static bool HasEqualDirection(this Curve curve1, Curve curve2, double parameter = 0)
+        {
+            var basis1 = curve1.GetBasis(parameter);
+            var basis2 = curve2.GetBasis(parameter);
+            var at = 1.DegToRad();
+
+            if (curve1 is Line && curve2 is Line)
+            { return basis1.X.IsParallelTo(basis2.X, at) == 1; }
+
+            return basis1.Z.IsParallelTo(basis2.Z, at) == 1;
+        }
 
         public static bool Contains(this Curve curve, XYZ point,
              bool containsStrict = true,

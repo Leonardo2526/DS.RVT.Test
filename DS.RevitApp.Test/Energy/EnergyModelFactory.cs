@@ -70,7 +70,12 @@ namespace DS.RevitApp.Test.Energy
             //return eSurfaces;
 
             var analyticalBoundary = GetAnalyticalBoundary(boundarySegments);
-            TransactionFactory?.Create(() => analyticalBoundary.ForEach(c => c.Item1.Show(_doc)), "showCurve");
+            //analyticalBoundary.ForEach(c => ShowCurve(c.Item1));
+
+            var connectedCurves = analyticalBoundary.Select(b => b.Item1);
+            var closedLoop = CurveUtils.TryCreateLoop(connectedCurves);
+            closedLoop.ForEach(ShowCurve);
+            Debug.WriteLine("Loop close status: " + !closedLoop.IsOpen());
             foreach (var boundary in analyticalBoundary)
             {
                 var eSurface = _energySurfaceFactory.CreateEnergySurface(boundary.Item2, boundary.Item1);
@@ -148,9 +153,12 @@ namespace DS.RevitApp.Test.Energy
             {
                 foreach (var segment in sl)
                 {
+                    var id = segment.ElementId;
+                    Wall wall = id.IntegerValue > 0 ? _doc.GetElement(id) as Wall : null;
+                    if (wall is null || wall.GetJoints(true).Count() < 2) { continue; }
+
                     var curve = segment.GetCurve();
-                    var distanseToOffset = _doc.GetElement(segment.ElementId) is Wall wall ?
-                        wall.Width / 2 : 0;
+                    var distanseToOffset = wall.Width / 2;
                     curve = curve.CreateOffset(distanseToOffset, XYZ.BasisZ);
                     if (curve != null)
                     { boundaryCurves.Add((curve, segment)); }

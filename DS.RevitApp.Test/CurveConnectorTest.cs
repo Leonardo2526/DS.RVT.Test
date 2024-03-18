@@ -43,6 +43,11 @@ namespace DS.RevitApp.Test
             Reference reference2 = _uiDoc.Selection
                 .PickObject(ObjectType.Element, "Select curve2");
             var w2 = _doc.GetElement(reference2) as ModelCurve;
+
+            ShowPoint(w1.GeometryCurve.GetEndPoint(0));
+            ShowPoint(w2.GeometryCurve.GetEndPoint(0));
+
+            var b = w1.GeometryCurve.HasEqualDirection(w2.GeometryCurve);
             return (w1, w2);
         }
 
@@ -58,8 +63,8 @@ namespace DS.RevitApp.Test
             var p11 = curve1.GetEndPoint(0);
             ShowPoint(p11);
             var basis1 = GetBasis(curve1);
-            var r1=  basis1.IsRighthanded();
-            var plane1 =  mCurve1.SketchPlane.GetPlane();
+            var r1 = basis1.IsRighthanded();
+            var plane1 = mCurve1.SketchPlane.GetPlane();
             var pNormal1 = plane1.Normal.Negate();
             Debug.WriteLine(curve1.TryGetRotation(pNormal1));
 
@@ -82,7 +87,7 @@ namespace DS.RevitApp.Test
                 var y = arc.YDirection;
                 var z = x.CrossProduct(y);
                 var n = arc.Normal;
-              
+
 
                 return new Basis3d(arc.Center.ToPoint3d(), x.ToVector3d(), y.ToVector3d(), z.ToVector3d());
             }
@@ -91,7 +96,7 @@ namespace DS.RevitApp.Test
         public void ConnectTwoCurves(ModelCurve mCurve1, ModelCurve mCurve2)
         {
             var curve1 = mCurve1.GeometryCurve; var curve2 = mCurve2.GeometryCurve;
-         
+
 
             var p1 = curve1.GetEndPoint(0);
             //ShowPoint(p1);
@@ -132,6 +137,35 @@ namespace DS.RevitApp.Test
                 var r1 = resultCurve.GetEndPoint(0);
                 var r2 = resultCurve.GetEndPoint(1);
             }
+        }
+
+        public Curve CreateCurve()
+        {
+            Reference reference1 = _uiDoc.Selection
+               .PickObject(ObjectType.Element, "Select base curve");
+            var mc = _doc.GetElement(reference1) as ModelCurve;
+            var baseCurve = mc.GeometryCurve;
+            var basis = baseCurve.GetBasis(0).Round(5);
+            var isRight = basis.IsRighthanded();
+            //return null;
+            //baseCurve.TryGetRotation();
+
+            var p1 = _uiDoc.Selection
+              .PickObject(ObjectType.PointOnElement, "Select start point").GlobalPoint;
+
+            var p2 = _uiDoc.Selection
+           .PickObject(ObjectType.PointOnElement, "Select end point").GlobalPoint;
+
+            baseCurve.MakeUnbound();
+            var resultsCurve = baseCurve.MakeBound(p1, p2);
+            var resultCurve = resultsCurve.FirstOrDefault();
+            if (resultCurve != null)
+            {
+                //DeleteCurve(mc);
+                ShowCurve(resultCurve);
+            }
+
+            return resultCurve;
         }
 
         private void DeleteCurve(ModelCurve mCurve)

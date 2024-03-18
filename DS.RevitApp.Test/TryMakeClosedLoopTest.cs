@@ -68,7 +68,7 @@ namespace DS.RevitApp.Test
             PrintCurvePoints(curves);
             //return;
             var closedLoop = CurveUtils.TryConnect(curves, getConnectedCurve);
-            //var closedLoop = CurveLoopUtils.TryCreateLoop(curves);
+            closedLoop = CurveUtils.TryCreateLoop(closedLoop);
             if (closedLoop == null || closedLoop.Count() == 0)
             {
                 Logger?.Error("Failed to make loop closed!");

@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Rhino;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +12,7 @@ namespace DS.RevitApp.Test
     public static class CurveUtils
     {
         public static CurveLoop TryCreateLoop(
-            IEnumerable<Curve> curves, 
+            IEnumerable<Curve> curves,
             Func<Curve, Curve, Curve, Curve> getConnectedCurve)
         {
             var resultLoop = new CurveLoop();
@@ -37,7 +38,7 @@ namespace DS.RevitApp.Test
         }
 
         public static IEnumerable<Curve> TryConnect(
-            IEnumerable<Curve> curves, 
+            IEnumerable<Curve> curves,
             Func<Curve, Curve, Curve, Curve> getConnectedCurve)
         {
             var resultCurves = new List<Curve>();
@@ -50,16 +51,44 @@ namespace DS.RevitApp.Test
                 var connectedCurve = getConnectedCurve(
                     currentNode.Value,
                     previous.Value,
-                    (currentNode.Next ?? linkedCurves.First).Value);
+                    currentNode.Next?.Value ?? resultCurves.First());
                 if (connectedCurve != null)
-                { resultCurves.Add(connectedCurve); }
+                { 
+                    previous = new LinkedListNode<Curve>(connectedCurve);
+                    resultCurves.Add(connectedCurve);
+                }
                 else { break; }
-                //break;
-                previous = currentNode;
                 currentNode = currentNode.Next;
             }
 
             return resultCurves;
+        }
+
+        public static CurveLoop TryCreateLoop(
+         IEnumerable<Curve> curves)
+        {
+            var result = new CurveLoop();
+
+            double tolerance = RhinoMath.ZeroTolerance;
+            var linkedCurves = new LinkedList<Curve>(curves);
+            var currentNode = linkedCurves.First;
+            while (currentNode != null)
+            {
+                result.Append(currentNode.Value);
+
+                var currentEnd = currentNode.Value.GetEndPoint(1);
+                var next = currentNode.Next ?? linkedCurves.First;
+                var nextStart = next.Value.GetEndPoint(0);
+
+                if (currentEnd.DistanceTo(nextStart) > tolerance)
+                {
+                    var line = Line.CreateBound(currentEnd, nextStart);
+                    result.Append(line);
+                }
+                currentNode = currentNode.Next;
+            }
+
+            return result;
         }
 
         public static IEnumerable<(Curve curve, TTag tag)> TryConnect<TTag>(
@@ -76,12 +105,14 @@ namespace DS.RevitApp.Test
                 var connectedCurve = getConnectedCurve(
                     currentNode.Value.curve,
                     previous.Value.curve,
-                    (currentNode.Next ?? linkedCurves.First).Value.curve);
+                    currentNode.Next?.Value.curve ?? resultCurves.First().curve);
                 if (connectedCurve != null)
-                { resultCurves.Add((connectedCurve, currentNode.Value.tag)); }
+                {
+                    previous = new LinkedListNode<(Curve curve, TTag tag)>
+                        ((connectedCurve, currentNode.Value.tag));
+                    resultCurves.Add(previous.Value); 
+                }
                 else { break; }
-                //break;
-                previous = currentNode;
                 currentNode = currentNode.Next;
             }
 
@@ -92,7 +123,7 @@ namespace DS.RevitApp.Test
             Curve baseCurve,
             Curve curveToFit, double minFitDistance = 0)
         {
-            if(!baseCurve.IsBound) { return true; }
+            if (!baseCurve.IsBound) { return true; }
 
             var sp1 = baseCurve.GetEndPoint(0);
             var sp2 = baseCurve.GetEndPoint(1);
@@ -122,8 +153,8 @@ namespace DS.RevitApp.Test
         public static IEnumerable<Curve> FitEndToStart(IEnumerable<Curve> curves)
         {
             var firstFitted = curves.ElementAt(0);
-            firstFitted = IsBaseEndFitted(firstFitted, curves.ElementAt(1)) ? 
-                firstFitted : 
+            firstFitted = IsBaseEndFitted(firstFitted, curves.ElementAt(1)) ?
+                firstFitted :
                 firstFitted.CreateReversed();
             var fittedCurves = new List<Curve>()
             {

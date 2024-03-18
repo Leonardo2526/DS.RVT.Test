@@ -50,8 +50,9 @@ namespace DS.RevitApp.Test
 
             //var connectorTest = new CurveConnectorTest(uidoc)
             //{ Logger = logger, TransactionFactory = trf };
+            ////connectorTest.CreateCurve();
             //var curves = connectorTest.SelectTWoCurves();
-            //connectorTest.ConnectTwoCurves(curves.Item1, curves.Item2);
+            ////connectorTest.ConnectTwoCurves(curves.Item1, curves.Item2);
             ////connectorTest.GetBases(curves.Item1, curves.Item2);
             //return Autodesk.Revit.UI.Result.Succeeded;
 
