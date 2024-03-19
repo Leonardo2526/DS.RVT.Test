@@ -24,9 +24,7 @@ namespace DS.RevitApp.Test.Energy
             _links = links;
         }
 
-
-
-        public EnergySurface CreateEnergySurface(BoundarySegment segment, Curve baseCurve)
+        public EnergySurface CreateEnergySurface(BoundarySegment segment, Curve baseCurve, double height)
         {
             var id = segment.ElementId;
             Wall wall = id.IntegerValue > 0 ? _activeDoc.GetElement(id) as Wall : null;
@@ -39,7 +37,7 @@ namespace DS.RevitApp.Test.Energy
             var bSolid = GeometryCreationUtilities
                 .CreateExtrusionGeometry(
                 new List<CurveLoop> { loop },
-                XYZ.BasisZ, wall.GetHeigth());
+                XYZ.BasisZ, height);
 
             var allInsertsSolidModels = wModel.GetAllInsertsSolidModels();
             //allInsertsSolidModels.ForEach(x => ShowSolid(x.solid));

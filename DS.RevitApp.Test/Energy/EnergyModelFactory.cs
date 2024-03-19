@@ -16,6 +16,7 @@ using Autodesk.Revit.DB.Architecture;
 using Rhino.UI;
 using DS.ClassLib.VarUtils;
 using static System.Net.Mime.MediaTypeNames;
+using System.Windows.Forms;
 
 namespace DS.RevitApp.Test.Energy
 {
@@ -24,6 +25,8 @@ namespace DS.RevitApp.Test.Energy
         private readonly Document _doc;
         private readonly IEnumerable<RevitLinkInstance> _links;
         private readonly IEnergySurfaceFactory _energySurfaceFactory;
+        private readonly double _eSurfaceSolidThickness = 0.01;
+
 
         public EnergyModelFactory(
             Document activeDoc,
@@ -44,17 +47,25 @@ namespace DS.RevitApp.Test.Energy
             var eSpace = new EnergySpace(space);
 
             var energySurfaces = new List<EnergySurface>();
-            var wallSurfaces = GetWallEnergySurfaces(space);
-            var floorSurfaces = GetFloorEnergySurfaces(space);
-            var ceilingSurfaces = GetCeilingEnergySurfaces(space);
+
+            var bottomTransform = GetBottomTransform(space, out Floor floor);
+            var topTransform = GetTopTransform(space, out Element ceiling);
+            topTransform = topTransform.Multiply(bottomTransform.Inverse);
+
+            var wallSurfaces = GetWallEnergySurfaces(space, bottomTransform, topTransform, out CurveLoop closedLoop);
             energySurfaces.AddRange(wallSurfaces);
-            energySurfaces.AddRange(floorSurfaces);
-            energySurfaces.AddRange(ceilingSurfaces);
+            var floorSurfaces = GetFloorEnergySurface(floor, closedLoop, _eSurfaceSolidThickness);
+            energySurfaces.Add(floorSurfaces);
+            closedLoop.Transform(topTransform);
+            var ceilingSurface = GetCeilingEnergySurface(space, closedLoop, _eSurfaceSolidThickness);
+            energySurfaces.Add(ceilingSurface);
 
             return new EnergyModel(eSpace, energySurfaces);
         }
 
-        private IEnumerable<EnergySurface> GetWallEnergySurfaces(Space space)
+        private IEnumerable<EnergySurface> GetWallEnergySurfaces(Space space,
+            Transform bottomTransform, Transform topTransform,
+            out CurveLoop closedLoop)
         {
             var eSurfaces = new List<EnergySurface>();
 
@@ -69,16 +80,22 @@ namespace DS.RevitApp.Test.Energy
             //ShowBoundaries(boundaryCurves);
             //return eSurfaces;
 
-            var analyticalBoundary = GetAnalyticalBoundary(boundarySegments);
+            var analyticalBoundary = GetAnalyticalBoundary(boundarySegments, bottomTransform);
             //analyticalBoundary.ForEach(c => ShowCurve(c.Item1));
 
             var connectedCurves = analyticalBoundary.Select(b => b.Item1);
-            var closedLoop = CurveUtils.TryCreateLoop(connectedCurves);
+            closedLoop = CurveUtils.TryCreateLoop(connectedCurves);
             closedLoop.ForEach(ShowCurve);
             Debug.WriteLine("Loop close status: " + !closedLoop.IsOpen());
+
+            var p1 = closedLoop.First().GetEndPoint(0);
+            var p2 = topTransform?.OfPoint(p1);
+            var wallHeight = p2 is null ? space.UnboundedHeight : p2.Z - p1.Z;
+
             foreach (var boundary in analyticalBoundary)
             {
-                var eSurface = _energySurfaceFactory.CreateEnergySurface(boundary.Item2, boundary.Item1);
+                var eSurface = _energySurfaceFactory
+                    .CreateEnergySurface(boundary.Item2, boundary.Item1, wallHeight);
                 //var eSurface = ToEnergySurface(boundary);
                 if (eSurface == null)
                 {
@@ -106,19 +123,57 @@ namespace DS.RevitApp.Test.Energy
             }
         }
 
-        private IEnumerable<EnergySurface> GetFloorEnergySurfaces(Space space)
+        private EnergySurface GetFloorEnergySurface(Floor floor, CurveLoop boundary, double solidThickness)
         {
-            var energySurfaces = new List<EnergySurface>();
+            var bSolid = GeometryCreationUtilities
+               .CreateExtrusionGeometry(
+               new List<CurveLoop> { boundary },
+               -XYZ.BasisZ, solidThickness);
 
-            return energySurfaces;
+            return new EnergySurface(bSolid, floor)
+            { SurfaceType = Autodesk.Revit.DB.Analysis.EnergyAnalysisSurfaceType.ExteriorFloor };
+        }
+        private EnergySurface GetCeilingEnergySurface(Element ceiling, CurveLoop boundary, double solidThickness)
+        {
+            var bSolid = GeometryCreationUtilities
+                .CreateExtrusionGeometry(
+                new List<CurveLoop> { boundary },
+                XYZ.BasisZ, solidThickness);
+
+            return new EnergySurface(bSolid, ceiling)
+            { SurfaceType = Autodesk.Revit.DB.Analysis.EnergyAnalysisSurfaceType.Ceiling };
         }
 
-        private IEnumerable<EnergySurface> GetCeilingEnergySurfaces(Space space)
-        {
-            var energySurfaces = new List<EnergySurface>();
 
-            return energySurfaces;
+        private Transform GetBottomTransform(Space space, out Floor floor)
+        {
+            double loopWidth = 0.01;
+            floor = space.Room.FindNearestFloor(_doc);
+            var offsetHeigth = floor.GetThickness() / 2 - loopWidth;
+            var moveVector = new XYZ(0, 0, -offsetHeigth);
+            return Transform.CreateTranslation(moveVector);
         }
+
+        private Transform GetTopTransform(Space space, out Element ceiling)
+        {
+            double loopWidth = 0.01;
+            ceiling = space.Room.FindNearestCeiling(_doc);
+
+            double ceilingThickness = 0;
+            switch (ceiling)
+            {
+                case Floor floor:
+                    ceilingThickness = floor.GetThickness(); break;
+                case Ceiling ceilingFloor:
+                    ceilingThickness = ceilingFloor.GetThickness(); break;
+                default:
+                    break;
+            }
+            var offsetHeigth = space.UnboundedHeight + ceilingThickness / 2 - loopWidth;
+            var moveVector = new XYZ(0, 0, offsetHeigth);
+            return Transform.CreateTranslation(moveVector);
+        }
+
 
         private IEnumerable<(Curve, BoundarySegment)> GetAnalyticalBoundary(IEnumerable<BoundarySegment> segmentLists)
         {
@@ -146,7 +201,7 @@ namespace DS.RevitApp.Test.Energy
             }
         }
 
-        private IEnumerable<(Curve, BoundarySegment)> GetAnalyticalBoundary(IList<IList<BoundarySegment>> segmentLists)
+        private IEnumerable<(Curve, BoundarySegment)> GetAnalyticalBoundary(IList<IList<BoundarySegment>> segmentLists, Transform transform)
         {
             var boundaryCurves = new List<(Curve curve, BoundarySegment segment)>();
             foreach (var sl in segmentLists)
@@ -161,7 +216,7 @@ namespace DS.RevitApp.Test.Energy
                     var distanseToOffset = wall.Width / 2;
                     curve = curve.CreateOffset(distanseToOffset, XYZ.BasisZ);
                     if (curve != null)
-                    { boundaryCurves.Add((curve, segment)); }
+                    { curve = curve.CreateTransformed(transform); boundaryCurves.Add((curve, segment)); }
                 }
             }
             //return boundaryCurves;
@@ -171,6 +226,50 @@ namespace DS.RevitApp.Test.Energy
 
             static Curve getConnectedCurve(Curve current, Curve previous, Curve next)
             => current.TrimOrExtend(previous, next, true, true);
+        }
+
+        private Floor GetFloor(Document doc, Room room)
+        {
+
+            LocationPoint roomPoint;
+            ReferenceIntersector intersector;
+            ReferenceWithContext rwC;
+            Element el = null;
+            GeometryObject geoObj;
+            Face _face;
+
+
+            roomPoint = room.Location as LocationPoint;
+            try
+            {
+                IEnumerable<View3D> enumerable()
+                {
+                    foreach (var v in new FilteredElementCollector(doc).OfClass(typeof(View3D)).Cast<View3D>())
+                    {
+                        if (v.IsTemplate == false && v.IsPerspective == false)
+                        {
+                            yield return v;
+                        }
+                    }
+                }
+                var view3D = enumerable().First();
+                intersector = new ReferenceIntersector(
+               new ElementCategoryFilter(BuiltInCategory.OST_Floors),
+               FindReferenceTarget.All, view3D);
+
+                rwC = intersector.FindNearest(roomPoint.Point, XYZ.BasisZ);
+                el = doc.GetElement(rwC.GetReference().ElementId);
+
+            }
+            catch (Exception fl)
+            {
+
+                string ctch = fl.ToString();
+            }
+
+            var floor = el as Floor;
+
+            return floor;
         }
 
         private void ShowCurve(Curve curve)
