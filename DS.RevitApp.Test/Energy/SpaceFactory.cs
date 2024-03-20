@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DS.RevitApp.Test.Energy
 {
-    internal class SpaceFactory : ISpaceFactory
+    public class SpaceFactory : ISpaceFactory
     {
         private static Plane _basePlane = Plane.CreateByNormalAndOrigin(XYZ.BasisZ, XYZ.Zero);
         private readonly Document _doc;

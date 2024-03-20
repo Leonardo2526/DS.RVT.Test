@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
+using OLMP.RevitAPI.Tools.Extensions;
 using Rhino.UI;
 using System;
 using System.Collections;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DS.RevitApp.Test
 {
-    internal static class NewExtensions
+    public static class NewExtensions
     {
         public static IEnumerable<Face> ToList(this FaceArray faceArray)
         {
@@ -44,14 +45,14 @@ namespace DS.RevitApp.Test
                FindReferenceTarget.All, view3D);
             var vector = XYZ.BasisZ.Negate();
             var rwC = intersector.FindNearest(point, vector);
-            return rwC is null ? 
-                null : 
+            return rwC is null ?
+                null :
                 activeDoc.GetElement(rwC.GetReference().ElementId) as Floor; ;
         }
 
         public static Element FindNearestCeiling(this XYZ point, Document activeDoc)
         {
-            var view3D = TryGetView3D(activeDoc);            
+            var view3D = TryGetView3D(activeDoc);
             var intersector = new ReferenceIntersector(
                new ElementMulticategoryFilter(
                    new List<BuiltInCategory>()
@@ -61,8 +62,8 @@ namespace DS.RevitApp.Test
             var vector = XYZ.BasisZ;
             var rwC = intersector.FindNearest(point, vector);
             var element = rwC is null ? null : activeDoc.GetElement(rwC.GetReference().ElementId);
-        
-            return element is not null  && (element is Floor || element is Ceiling) ?
+
+            return element is not null && (element is Floor || element is Ceiling) ?
                 element :
                 null;
         }
@@ -105,7 +106,44 @@ namespace DS.RevitApp.Test
         /// <returns>
         /// <paramref name="ceiling"/>'s thickness.
         /// </returns>
-        public static double GetThickness(this Ceiling ceiling) =>
-            ceiling.get_Parameter(BuiltInParameter.FLOOR_ATTR_THICKNESS_PARAM).AsDouble();
+        public static double GetThickness(this Ceiling ceiling)
+        {
+            var hasThickness = ceiling.get_Parameter(BuiltInParameter.CEILING_HAS_THICKNESS_PARAM);
+            //var hasThickness = ceiling.get_Parameter(BuiltInParameter.CEILING_HAS_THICKNESS_PARAM).HasValue;
+            return hasThickness == default ?
+                0 :
+                ceiling.get_Parameter(BuiltInParameter.CEILING_THICKNESS_PARAM).AsDouble();
+        }
+
+
+        public static CurveLoop GetBottomProfile(this Wall wall)
+        {
+            var curve = wall.GetLocationCurve();
+
+            var offset = wall.Width / 2;
+            var refVector = XYZ.BasisZ;
+
+            var offsetCurve1 = curve.CreateOffset(offset, -refVector);
+            var offsetCurve2 = curve.CreateOffset(offset, refVector).CreateReversed();
+
+            var p1 = offsetCurve1.GetEndPoint(0);
+            var p2 = offsetCurve1.GetEndPoint(1);
+            var p3 = offsetCurve2.GetEndPoint(0);
+            var p4 = offsetCurve2.GetEndPoint(1);
+
+            var line1 = Line.CreateBound(p2, p3);
+            var line2 = Line.CreateBound(p4, p1);
+            return CurveLoop.Create(new List<Curve>() 
+            { offsetCurve1, line1, offsetCurve2, line2 });
+        }
+
+        public static Solid GetFullSolid(this Wall wall)
+        {
+            var profile = GetBottomProfile(wall);
+            return GeometryCreationUtilities
+               .CreateExtrusionGeometry(
+               new List<CurveLoop> { profile },
+               XYZ.BasisZ, wall.GetHeigth());
+        }
     }
 }

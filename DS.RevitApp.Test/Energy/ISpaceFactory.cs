@@ -3,7 +3,7 @@ using Autodesk.Revit.DB.Mechanical;
 
 namespace DS.RevitApp.Test.Energy
 {
-    internal interface ISpaceFactory
+    public interface ISpaceFactory
     {
         Space Create(Room room);
     }
