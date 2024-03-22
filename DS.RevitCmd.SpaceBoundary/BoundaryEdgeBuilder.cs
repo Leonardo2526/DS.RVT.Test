@@ -57,22 +57,28 @@ namespace DS.RevitCmd.SpaceBoundary
             var intersections = _intersectionFactory.GetIntersections(zoneSolid);
             Logger?.Information("Intersections found: " + intersections.Count());
 
-            var vertexPoints = new List<XYZ>();
+
             if (element is Wall wall)
             {
                 var wallIntersections = intersections.OfType<Wall>();
+                if (wallIntersections.Count() < 2)
+                { 
+                    Logger?.Warning("Failed to get boundary edge.");
+                    return null; 
+                }
                 var intersectionPoints = GetProjPoints(wall, wallIntersections);
 
                 var (point1, point2) = XYZUtils.GetMaxDistancePoints(intersectionPoints.ToList(), out double maxDist);
                 intersectionPoints = intersectionPoints.OrderBy(p => p.DistanceTo(point1));
-                vertexPoints.AddRange(intersectionPoints);
-                intersectionPoints.ForEach(p => p.Show(_activeDoc, 0, TransactionFactory));
+                //intersectionPoints.ForEach(p => p.Show(_activeDoc, 0, TransactionFactory));
 
                 var wallCurve = wall.GetLocationCurve();
                 var rhinoCurve = wallCurve.ToCurve();
                 //var unboundCurve = wallCurve.Clone();
                 //unboundCurve.MakeUnbound();
-                var parameters = intersectionPoints.Select(p => wallCurve.Project(p).Parameter).OrderBy(p => p);
+                var parameters = intersectionPoints
+                    .Select(p => wallCurve.Project(p).Parameter)
+                    .OrderBy(p => p);
                 rhinoCurve = rhinoCurve.Trim(parameters.First(), parameters.Last());
                 var splitted = rhinoCurve.Split(parameters);
                 foreach (var sCurve in splitted)
@@ -122,37 +128,26 @@ namespace DS.RevitCmd.SpaceBoundary
                XYZ.BasisZ, height);
         }
 
+
         private IEnumerable<XYZ> GetProjPoints(Wall baseWall, IEnumerable<Wall> walls)
         {
-            var baseWallCurve = baseWall.GetLocationCurve();
-            var baseOrigin = baseWallCurve.GetEndPoint(0);
-            var rhinoCurve = baseWallCurve.ToCurve();
-
             var points = new List<XYZ>();
 
+            var baseWallCurve = baseWall.GetLocationCurve();
+            var basePoints = new List<XYZ>()
+                    {
+                        baseWallCurve.GetEndPoint(0),
+                        baseWallCurve.GetEndPoint(1)
+                    };
+            var baseOrigin = basePoints.First();
             foreach (var wall in walls)
             {
                 var curve = wall.GetLocationCurve();
                 curve = ProjectOnBase(baseOrigin, curve);
-                var p1 = curve.GetEndPoint(0);
-                var p2 = curve.GetEndPoint(1);
-                //int staticIndex = baseWallCurve.Distance(p1) > baseWallCurve.Distance(p2) ? 0 : 1;
-                int staticIndex = GetStaticIndex(baseWallCurve, curve);
-                //curve = curve.Extend(baseWallCurve, true, staticIndex);
-                curve = curve.TrimOrExtend(baseWallCurve, false, false, staticIndex).FirstOrDefault();
-                if (curve == null) { continue; }
-                double dist;
-                try
-                {
-                    dist = baseWallCurve.Distance(curve.GetEndPoint(0));
-                }
-                catch (Exception)
-                {
-                    dist = 1000;
-                }
-                var intersectionPoint = dist < RhinoMath.ZeroTolerance ?
-                    curve.GetEndPoint(0) :
-                    curve.GetEndPoint(1);
+                var intersectionPoint = curve
+                    .ClosestIntersection(baseWallCurve, true, true, out var IntersectionResult);
+                intersectionPoint ??= curve.GetDistance(basePoints.First()) < curve.GetDistance(basePoints.Last()) ?
+                        basePoints.First() : basePoints.Last();
                 points.Add(intersectionPoint);
             }
 
@@ -165,31 +160,6 @@ namespace DS.RevitCmd.SpaceBoundary
                 var transform = Transform.CreateTranslation(vector);
                 curve = curve.CreateTransformed(transform);
                 return curve;
-            }
-
-            static int GetStaticIndex(Curve baseWallCurve, Curve curve)
-            {
-                double d1 = 0;
-                try
-                {
-                    var p1 = curve.GetEndPoint(0);
-                    d1 = baseWallCurve.Distance(p1);
-                }
-                catch (Exception)
-                {
-                    return 0;
-                }
-                double d2 = 0;
-                try
-                {
-                    var p2 = curve.GetEndPoint(1);
-                    d2 = baseWallCurve.Distance(p2);
-                }
-                catch (Exception)
-                {
-                    return 1;
-                }
-                return d1 > d2 ? 0 : 1;
             }
         }
     }

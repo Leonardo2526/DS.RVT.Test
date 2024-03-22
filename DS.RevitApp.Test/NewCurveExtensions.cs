@@ -5,6 +5,7 @@ using DS.ClassLib.VarUtils.Basis;
 using OLMP.RevitAPI.Tools;
 using OLMP.RevitAPI.Tools.Creation.Transactions;
 using OLMP.RevitAPI.Tools.Extensions;
+using Rhino.Geometry.Intersect;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -234,38 +235,67 @@ namespace DS.RevitApp.Test
             }
         }
 
-
-        public static IEnumerable<Curve> GetResultIntersectionCurves(
-            XYZ intersectionPoint,
-            Curve baseCurve,
-            double baseStaticParameter)
+        public static XYZ ClosestIntersection(
+            this Curve curve1,
+            Curve curve2,
+            bool isVirtualEnable1,
+            bool isVirtualEnable2,out IntersectionResult intersectionResult)
         {
-            var intersectionCurves = new List<Curve>();
+            intersectionResult = null;
 
-            var projection = baseCurve.Project(intersectionPoint);
-            var targetParameter = projection.Parameter;
-            if (Math.Abs(baseStaticParameter - targetParameter) < Rhino.RhinoMath.ZeroTolerance)
-            { return intersectionCurves; }
+            Curve sourceCurve = GetCurve(curve1, isVirtualEnable1);
+            Curve targetCurve = GetCurve(curve2, isVirtualEnable2);
 
-            var p11 = Math.Min(baseStaticParameter, targetParameter);
-            var p12 = Math.Max(baseStaticParameter, targetParameter);
-            var p121 = Math.Abs(p12 - p11) < Rhino.RhinoMath.ZeroTolerance ? p12 + baseCurve.Period : p12;
-            var curve1 = baseCurve.Clone();
-            curve1.MakeBound(p11, p121);
-            intersectionCurves.Add(curve1);
-
-            if (baseCurve.IsCyclic && !IsCircle(curve1))
+            var points1 = new List<XYZ>()
             {
-                var p21 = p12;
-                var p22 = baseCurve.Period + p11;
-                var curve2 = baseCurve.Clone();
-                curve2.MakeBound(p21, p22);
-                intersectionCurves.Add(curve2);
-            }
+                curve1.GetEndPoint(0),
+                curve1.GetEndPoint(1)
+            };
+            var closest = points1.OrderBy(curve2.GetDistance).First();
 
-            return intersectionCurves;
+            var intersection = sourceCurve
+              .Intersect(targetCurve, out var resultArray);
+            if(intersection == SetComparisonResult.Equal)
+            {
+                var points2 = new List<XYZ>()
+                {
+                    curve2.GetEndPoint(0),
+                    curve2.GetEndPoint(1)
+                };
+                return points2.OrderBy(closest.DistanceTo).First();
+            }
+            if (resultArray == null || resultArray.IsEmpty) { return null; }
+            var intersectionResults = resultArray.AsEnumerable<IntersectionResult>();
+
+            intersectionResult = intersectionResults
+                .OrderBy(r => r.XYZPoint.DistanceTo(closest)).First();
+            return intersectionResult.XYZPoint;
+
+            static Curve GetCurve(Curve curve, bool isVirtualEnable)
+            {
+                Curve sourceOperationCurve;
+                if (isVirtualEnable)
+                {
+                    sourceOperationCurve = curve.Clone();
+                    sourceOperationCurve.MakeUnbound();
+                }
+                else { sourceOperationCurve = curve; }
+
+                return sourceOperationCurve;
+            }
         }
 
+        public static double GetDistance(this Curve curve, XYZ point)
+        {
+            try
+            {
+                return curve.Distance(point);
+            }
+            catch (Exception)
+            {
+                return point.DistanceTo(curve.GetEndPoint(0));
+            }
+        }
     }
 }
 

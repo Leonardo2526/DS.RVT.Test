@@ -16,6 +16,7 @@ using DS.RevitApp.Test.Energy;
 using OLMP.RevitAPI.Tools.Creation.Transactions;
 using Serilog;
 using MoreLinq;
+using DS.GraphUtils.Entities;
 
 namespace DS.RevitCmd.SpaceBoundary
 {
@@ -43,7 +44,7 @@ namespace DS.RevitCmd.SpaceBoundary
             var spaceFactory = new SpaceFactory(_doc);
             var spaces = TransactionFactory
                 .Create(() => CreateSpaces(rooms, spaceFactory), "CreateSpaces");
-            var currentSpace = spaces.First(s => s.Room.Number == "15");
+            var currentSpace = spaces.First(s => s.Room.Number == "11");
             var options = new SpatialElementBoundaryOptions();
             var boundarySegments = currentSpace.GetBoundarySegments(options);
             var boundaryCurves = boundarySegments.SelectMany(sl => sl.Select(s => s.GetCurve()));
@@ -62,7 +63,8 @@ namespace DS.RevitCmd.SpaceBoundary
                 .First());
                 //.First(b => b is Wall wall && wall.GetLocationCurve() is Arc));
             edges.ForEach(e => ShowEdge(e));
-
+            edges.ForEach(e => ShowVertex(e.Source));
+            ShowVertex(edges.Last().Target);
             if (Logger != null)
             { PrintEdges(edges, Logger); }
 
@@ -136,6 +138,13 @@ namespace DS.RevitCmd.SpaceBoundary
             ];
             return globalFilter;
         }
+
+        private void ShowPoint(XYZ point)
+         => TransactionFactory.Create(() => point.Show(_doc), "ShowPoint");
+
+        private void ShowVertex(TaggedVertex<XYZ> vertex)
+            => ShowPoint(vertex.Tag);
+
 
         private void ShowEdge(boundaryEdge edge)
             => TransactionFactory.Create(() => edge.Tag.Curve.Show(_doc), "ShowEdge");
