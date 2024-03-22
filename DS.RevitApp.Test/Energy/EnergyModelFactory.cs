@@ -54,11 +54,13 @@ namespace DS.RevitApp.Test.Energy
 
             var wallSurfaces = GetWallEnergySurfaces(space, bottomTransform, topTransform, out CurveLoop closedLoop);
             energySurfaces.AddRange(wallSurfaces);
-            var floorSurfaces = GetFloorEnergySurface(floor, closedLoop, _eSurfaceSolidThickness);
-            energySurfaces.Add(floorSurfaces);
+            var floorSurface = GetFloorEnergySurface(floor, closedLoop, _eSurfaceSolidThickness);
+            if (floorSurface != null)
+            { energySurfaces.Add(floorSurface); }
             closedLoop.Transform(topTransform);
             var ceilingSurface = GetCeilingEnergySurface(space, closedLoop, _eSurfaceSolidThickness);
-            energySurfaces.Add(ceilingSurface);
+            if (ceilingSurface != null)
+            { energySurfaces.Add(ceilingSurface); }
 
             return new EnergyModel(eSpace, energySurfaces);
         }
@@ -80,13 +82,14 @@ namespace DS.RevitApp.Test.Energy
             //ShowBoundaries(boundaryCurves);
             //return eSurfaces;
 
-            var analyticalBoundary = GetAnalyticalBoundary(boundarySegments, bottomTransform);
+            var analyticalBoundary = GetAnalyticalBoundary(boundarySegments, bottomTransform);            
             //analyticalBoundary.ForEach(c => ShowCurve(c.Item1));
 
             var connectedCurves = analyticalBoundary.Select(b => b.Item1);
             closedLoop = CurveUtils.TryCreateLoop(connectedCurves);
             closedLoop.ForEach(ShowCurve);
             Debug.WriteLine("Loop close status: " + !closedLoop.IsOpen());
+            if(closedLoop.Count() ==0) {  return eSurfaces; }   
 
             var p1 = closedLoop.First().GetEndPoint(0);
             var p2 = topTransform?.OfPoint(p1);
@@ -125,23 +128,39 @@ namespace DS.RevitApp.Test.Energy
 
         private EnergySurface GetFloorEnergySurface(Floor floor, CurveLoop boundary, double solidThickness)
         {
-            var bSolid = GeometryCreationUtilities
-               .CreateExtrusionGeometry(
-               new List<CurveLoop> { boundary },
-               -XYZ.BasisZ, solidThickness);
+            try
+            {
+                var bSolid = GeometryCreationUtilities
+                   .CreateExtrusionGeometry(
+                   new List<CurveLoop> { boundary },
+                   -XYZ.BasisZ, solidThickness);
 
-            return new EnergySurface(bSolid, floor)
-            { SurfaceType = Autodesk.Revit.DB.Analysis.EnergyAnalysisSurfaceType.ExteriorFloor };
+                return new EnergySurface(bSolid, floor)
+                { SurfaceType = Autodesk.Revit.DB.Analysis.EnergyAnalysisSurfaceType.ExteriorFloor };
+            }
+            catch (Exception)
+            {
+
+                return null;
+            }
         }
         private EnergySurface GetCeilingEnergySurface(Element ceiling, CurveLoop boundary, double solidThickness)
         {
-            var bSolid = GeometryCreationUtilities
-                .CreateExtrusionGeometry(
-                new List<CurveLoop> { boundary },
-                XYZ.BasisZ, solidThickness);
+            try
+            {
+                var bSolid = GeometryCreationUtilities
+                    .CreateExtrusionGeometry(
+                    new List<CurveLoop> { boundary },
+                    XYZ.BasisZ, solidThickness);
 
-            return new EnergySurface(bSolid, ceiling)
-            { SurfaceType = Autodesk.Revit.DB.Analysis.EnergyAnalysisSurfaceType.Ceiling };
+                return new EnergySurface(bSolid, ceiling)
+                { SurfaceType = Autodesk.Revit.DB.Analysis.EnergyAnalysisSurfaceType.Ceiling };
+            }
+            catch (Exception)
+            {
+
+                return null;
+            }
         }
 
 
@@ -204,13 +223,17 @@ namespace DS.RevitApp.Test.Energy
         private IEnumerable<(Curve, BoundarySegment)> GetAnalyticalBoundary(IList<IList<BoundarySegment>> segmentLists, Transform transform)
         {
             var boundaryCurves = new List<(Curve curve, BoundarySegment segment)>();
+            var elems = segmentLists.SelectMany(sl => sl.Select(s => _doc.GetElement(s.ElementId)));
             foreach (var sl in segmentLists)
             {
                 foreach (var segment in sl)
                 {
                     var id = segment.ElementId;
                     Wall wall = id.IntegerValue > 0 ? _doc.GetElement(id) as Wall : null;
-                    if (wall is null || wall.GetJoints(true).Count() < 2) { continue; }
+                    //if (wall is null || wall.GetJoints(true).Count() < 2) 
+                    //{ continue; }
+                    //var c = wall.GetJoints(true).Count();
+                    if (wall is null) { continue; }
 
                     var curve = segment.GetCurve();
                     var distanseToOffset = wall.Width / 2;
@@ -220,6 +243,7 @@ namespace DS.RevitApp.Test.Energy
                 }
             }
             //return boundaryCurves;
+            //if(boundaryCurves.Count < 2) {  return boundaryCurves; }
             var connectedBoundaryCurves = CurveUtils
                 .TryConnect<BoundarySegment>(boundaryCurves, getConnectedCurve);
             return connectedBoundaryCurves;

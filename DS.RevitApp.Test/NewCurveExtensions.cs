@@ -12,6 +12,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using static System.Net.Mime.MediaTypeNames;
+using DS.RhinoInside;
+using DS.GraphUtils.Entities;
+using OLMP.RevitAPI.Tools.Graphs;
+using Rhino;
+using Autodesk.Revit.DB.DirectContext3D;
 
 namespace DS.RevitApp.Test
 {
@@ -59,7 +64,17 @@ namespace DS.RevitApp.Test
 
         public static Basis3d GetBasis(this Curve curve, double parameter = 0)
         {
-            var transforms = curve.ComputeDerivatives(parameter, true);
+            Curve transformCurve;
+            if (curve.IsCyclic && !curve.IsBound)
+            {
+                transformCurve = curve.Clone();
+                transformCurve.MakeBound(0, 1);
+            }
+            else
+            {
+                transformCurve = curve;
+            }
+            var transforms = transformCurve.ComputeDerivatives(parameter, true);
 
             var origin = transforms.Origin.Normalize().ToPoint3d();
             var x = transforms.BasisX.ToVector3d();
@@ -88,16 +103,15 @@ namespace DS.RevitApp.Test
         }
 
         public static bool Contains(this Curve curve, XYZ point,
-             bool containsStrict = true,
+             bool canContainsEnds = true,
              double tolerance = Rhino.RhinoMath.ZeroTolerance)
         {
-            if (curve.IsBound && !containsStrict)
+            if (curve.IsBound && !canContainsEnds)
             {
                 if (curve.GetEndPoint(0).DistanceTo(point) < tolerance ||
                     curve.GetEndPoint(1).DistanceTo(point) < tolerance)
                 { return false; }
             }
-
             return curve.Distance(point) < tolerance;
         }
 
@@ -203,15 +217,20 @@ namespace DS.RevitApp.Test
             if (proj2.Distance > tolerance)
             { throw new ArgumentException($"The curve must contains point {point2}."); }
 
-            var isReversed = proj1.Parameter > proj2.Parameter;
+
+            (proj1, proj2) = proj1.Parameter < proj2.Parameter ?
+                (proj1, proj2) :
+                (proj2, proj1);
+
+            //var isReversed = proj1.Parameter > proj2.Parameter;
 
             var validCurve = curve.Clone();
-            if (isReversed)
-            {
-                validCurve = validCurve.CreateReversed();
-                proj1 = validCurve.Project(point1);
-                proj2 = validCurve.Project(point2);
-            }
+            //if (isReversed)
+            //{
+            //    validCurve = validCurve.CreateReversed();
+            //    proj1 = validCurve.Project(point1);
+            //    proj2 = validCurve.Project(point2);
+            //}
 
             double param2 = equalParamteters(proj1, proj2)
                 && (IsCircle(curve) || !curve.IsBound) ?
@@ -235,54 +254,28 @@ namespace DS.RevitApp.Test
             }
         }
 
-        public static XYZ ClosestIntersection(
-            this Curve curve1,
-            Curve curve2,
-            bool isVirtualEnable1,
-            bool isVirtualEnable2,out IntersectionResult intersectionResult)
+        public static Curve GetClosestIntersection(
+            this Curve sourceCurve,
+            Curve targetCurve,
+            bool isVirtualTrimEnable,
+            bool isVirtualExtendEnable, out XYZ intersectionPoint)
         {
-            intersectionResult = null;
+            intersectionPoint = null;
+            var curve1 = CurveUtils.IsBaseEndFitted(sourceCurve, targetCurve) ?
+               sourceCurve :
+               sourceCurve.CreateReversed();
+            var resultCurve = curve1
+                .TrimOrExtend(targetCurve, isVirtualTrimEnable, isVirtualExtendEnable)
+                .FirstOrDefault();
+            if (resultCurve == null) { return null; }
 
-            Curve sourceCurve = GetCurve(curve1, isVirtualEnable1);
-            Curve targetCurve = GetCurve(curve2, isVirtualEnable2);
-
-            var points1 = new List<XYZ>()
-            {
-                curve1.GetEndPoint(0),
-                curve1.GetEndPoint(1)
-            };
-            var closest = points1.OrderBy(curve2.GetDistance).First();
-
-            var intersection = sourceCurve
-              .Intersect(targetCurve, out var resultArray);
-            if(intersection == SetComparisonResult.Equal)
-            {
-                var points2 = new List<XYZ>()
-                {
-                    curve2.GetEndPoint(0),
-                    curve2.GetEndPoint(1)
-                };
-                return points2.OrderBy(closest.DistanceTo).First();
-            }
-            if (resultArray == null || resultArray.IsEmpty) { return null; }
-            var intersectionResults = resultArray.AsEnumerable<IntersectionResult>();
-
-            intersectionResult = intersectionResults
-                .OrderBy(r => r.XYZPoint.DistanceTo(closest)).First();
-            return intersectionResult.XYZPoint;
-
-            static Curve GetCurve(Curve curve, bool isVirtualEnable)
-            {
-                Curve sourceOperationCurve;
-                if (isVirtualEnable)
-                {
-                    sourceOperationCurve = curve.Clone();
-                    sourceOperationCurve.MakeUnbound();
-                }
-                else { sourceOperationCurve = curve; }
-
-                return sourceOperationCurve;
-            }
+            //var sp1 = sourceCurve.GetEndPoint(0);
+            //var sp2 = sourceCurve.GetEndPoint(1);
+            var rp1 = resultCurve.GetEndPoint(0);
+            var rp2 = resultCurve.GetEndPoint(1);
+            intersectionPoint = targetCurve.GetDistance(rp1) < targetCurve.GetDistance(rp2) ?
+                rp1 : rp2;
+            return resultCurve;
         }
 
         public static double GetDistance(this Curve curve, XYZ point)
@@ -296,6 +289,8 @@ namespace DS.RevitApp.Test
                 return point.DistanceTo(curve.GetEndPoint(0));
             }
         }
+
+
     }
 }
 

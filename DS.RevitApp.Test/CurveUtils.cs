@@ -128,8 +128,8 @@ namespace DS.RevitApp.Test
             var sp1 = baseCurve.GetEndPoint(0);
             var sp2 = baseCurve.GetEndPoint(1);
 
-            var d1 = curveToFit.Distance(sp1);
-            var d2 = curveToFit.Distance(sp2);
+            var d1 = curveToFit.GetDistance(sp1);
+            var d2 = curveToFit.GetDistance(sp2);
 
             return d2 >= minFitDistance && d2 < d1;
         }

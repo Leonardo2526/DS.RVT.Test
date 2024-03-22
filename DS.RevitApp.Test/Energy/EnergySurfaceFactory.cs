@@ -28,7 +28,8 @@ namespace DS.RevitApp.Test.Energy
         {
             var id = segment.ElementId;
             Wall wall = id.IntegerValue > 0 ? _activeDoc.GetElement(id) as Wall : null;
-            if (wall is null || wall.GetJoints(true).Count() < 2) { return null; }
+            if (wall is null) { return null; }
+            //if (wall is null || wall.GetJoints(true).Count() < 2) { return null; }
 
             var loop = CreateLoop(baseCurve, _loopWidth, XYZ.BasisZ);
             if (loop.IsOpen()) { throw new Exception("Loop is not closed!"); }

@@ -88,7 +88,8 @@ namespace DS.RevitApp.Test
             //Debug.WriteLine($"{resultCurves.Count} intersection curves were found.");
             var curves = connectionPoints
                 .SelectMany(getCurves)
-                .OrderBy(c => _distinctLength(sourceCurve, c));
+                .OrderBy(c => _distinctLength(sourceCurve, c)).ToList();
+            curves = curves.Select(c => RestoreDirection(sourceCurve, c)).ToList();
             return curves;
             return connectionPoints?.SelectMany(getCurves);
 
@@ -96,6 +97,11 @@ namespace DS.RevitApp.Test
             => connectionOption == ConnectionOption.Trim ?
                 GetTrimCurves(sourceCurve, sourceOperationCurve, staticPoint, movePoint, point) :
                 GetExtendCurves(sourceCurve, sourceOperationCurve, staticPoint, movePoint, point);
+
+            static Curve RestoreDirection(Curve sourceCurve, Curve result)
+                => result.GetEndParameter(0) == sourceCurve.GetEndParameter(0) 
+                ? result : 
+                result.CreateReversed();
         }
 
         private static IEnumerable<Curve> GetTrimCurves(

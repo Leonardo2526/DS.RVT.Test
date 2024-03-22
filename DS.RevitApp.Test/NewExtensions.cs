@@ -1,6 +1,9 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
+using DS.GraphUtils.Entities;
 using OLMP.RevitAPI.Tools.Extensions;
+using QuickGraph;
+using Rhino;
 using Rhino.UI;
 using System;
 using System.Collections;
@@ -145,5 +148,22 @@ namespace DS.RevitApp.Test
                new List<CurveLoop> { profile },
                XYZ.BasisZ, wall.GetHeigth());
         }
+
+        public static IEnumerable<TVertex> Vertices<TVertex>(this IEdge<TVertex> edge)
+        => new List<TVertex>() { edge.Source, edge.Target };
+
+
+        public static TVertex FindVertexByLocation<TVertex>(XYZ location,
+            IEnumerable<TVertex> vertices,
+            double tolerance = RhinoMath.ZeroTolerance)
+            where TVertex : TaggedVertex<XYZ>
+            => vertices
+            .FirstOrDefault(v => v.Tag.DistanceTo(location) < tolerance);
+
+
+        public static bool IsPointAlmostEqualTo(this XYZ p1, 
+            XYZ p2, 
+            double tolerance = RhinoMath.ZeroTolerance)
+            => p1.DistanceTo(p2) < tolerance;
     }
 }

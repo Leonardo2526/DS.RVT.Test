@@ -101,8 +101,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BoundaryCurve.cs" />
-    <Compile Include="BoundaryEdgeBuilder.cs" />
     <Compile Include="BoundaryEdgeBuilderTest.cs" />
+    <Compile Include="BoundaryGraphFactory.cs" />
+    <Compile Include="ElementEdgeFactory.cs" />
+    <Compile Include="ElementXYZIntersection.cs" />
+    <Compile Include="ElemIntersectionFactory.cs" />
     <Compile Include="ExternalCommand.cs" />
     <Compile Include="IsExternalInit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
