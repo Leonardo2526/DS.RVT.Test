@@ -44,7 +44,7 @@ namespace DS.RevitCmd.SpaceBoundary
             var spaceFactory = new SpaceFactory(_doc);
             var spaces = TransactionFactory
                 .Create(() => CreateSpaces(rooms, spaceFactory), "CreateSpaces");
-            var currentSpace = spaces.First(s => s.Room.Number == "11");
+            var currentSpace = spaces.First(s => s.Room.Number == "6");
             var options = new SpatialElementBoundaryOptions();
             var boundarySegments = currentSpace.GetBoundarySegments(options);
             var boundaryCurves = boundarySegments.SelectMany(sl => sl.Select(s => s.GetCurve()));
@@ -59,8 +59,10 @@ namespace DS.RevitCmd.SpaceBoundary
                 TransactionFactory = TransactionFactory
             };
 
-            var edges = builder.Create(boundaryElements
-                .First());
+            var edges = builder.Create(
+                boundaryElements.First()
+                //boundaryElements.First(e => e.Id.IntegerValue == 216667)
+                );
                 //.First(b => b is Wall wall && wall.GetLocationCurve() is Arc));
             edges.ForEach(e => ShowEdge(e));
             edges.ForEach(e => ShowVertex(e.Source));

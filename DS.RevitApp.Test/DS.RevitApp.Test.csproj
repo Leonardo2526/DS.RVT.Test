@@ -52,6 +52,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\DS.GraphUtils\DS.GraphUtils.Entities\DS.GraphUtils.Entities\bin\Debug\DS.GraphUtils.Entities.dll</HintPath>
     </Reference>
+    <Reference Include="DS.RhinoInside">
+      <HintPath>..\..\DS.RhinoInside\DS.RhinoInside\bin\Debug\DS.RhinoInside.dll</HintPath>
+    </Reference>
     <Reference Include="iUtils, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\VAR.RevitLib.Utils\iUtils\bin\Debug\iUtils.dll</HintPath>
@@ -205,6 +208,7 @@
     <Compile Include="AddSharedTest.cs" />
     <Compile Include="CreateSurfaceTest.cs" />
     <Compile Include="CurveConnector.cs" />
+    <Compile Include="CurvesTests\ClosestIntersectionTest.cs" />
     <Compile Include="MakeBoundTest.cs" />
     <Compile Include="TryMakeClosedLoopTest.cs" />
     <Compile Include="NewCurveExtensions.cs" />
@@ -212,7 +216,7 @@
     <Compile Include="Energy\AdjacenciesFuncBuilder.cs" />
     <Compile Include="Energy\EnergyEdge.cs" />
     <Compile Include="Energy\EnergyGraphFactory.cs" />
-    <Compile Include="CurveConnectorTest.cs" />
+    <Compile Include="CurvesTests\CurveConnectorTest.cs" />
     <Compile Include="Energy\EnergyModelProcessor.cs" />
     <Compile Include="Energy\EnergyModel.cs" />
     <Compile Include="Energy\EnergyModelFactory.cs" />

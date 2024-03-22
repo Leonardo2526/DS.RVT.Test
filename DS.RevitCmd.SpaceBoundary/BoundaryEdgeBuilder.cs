@@ -62,24 +62,27 @@ namespace DS.RevitCmd.SpaceBoundary
             {
                 var wallIntersections = intersections.OfType<Wall>();
                 if (wallIntersections.Count() < 2)
-                { 
+                {
                     Logger?.Warning("Failed to get boundary edge.");
-                    return null; 
+                    return null;
                 }
-                var intersectionPoints = GetProjPoints(wall, wallIntersections);
+
+                var wallCurve = wall.GetLocationCurve();
+                //var wp1 = wallCurve.GetEndPoint(0);
+                //var wp2 = wallCurve.GetEndPoint(1);
+                //var wparam1 = wallCurve.GetEndParameter(0);
+                //var wparam2 = wallCurve.GetEndParameter(1);
+
+                var adjacancyCurves = wallIntersections.Select(w => w.GetLocationCurve()).ToList();
+                var intersectionPoints = GetIntersectionPoints(wallCurve, adjacancyCurves);
 
                 var (point1, point2) = XYZUtils.GetMaxDistancePoints(intersectionPoints.ToList(), out double maxDist);
                 intersectionPoints = intersectionPoints.OrderBy(p => p.DistanceTo(point1));
-                //intersectionPoints.ForEach(p => p.Show(_activeDoc, 0, TransactionFactory));
-
-                var wallCurve = wall.GetLocationCurve();
-                var rhinoCurve = wallCurve.ToCurve();
-                //var unboundCurve = wallCurve.Clone();
-                //unboundCurve.MakeUnbound();
+                Curve boundWallCurve = GetBoundWallCurve(wallCurve, point1, point2);
                 var parameters = intersectionPoints
-                    .Select(p => wallCurve.Project(p).Parameter)
-                    .OrderBy(p => p);
-                rhinoCurve = rhinoCurve.Trim(parameters.First(), parameters.Last());
+                    .Select(p => boundWallCurve.Project(p).Parameter)                  
+                    .OrderBy(p => p).ToList();
+                var rhinoCurve = boundWallCurve.ToCurve();
                 var splitted = rhinoCurve.Split(parameters);
                 foreach (var sCurve in splitted)
                 {
@@ -97,6 +100,14 @@ namespace DS.RevitCmd.SpaceBoundary
 
 
             return result;
+
+            static Curve GetBoundWallCurve(Curve wallCurve, XYZ point1, XYZ point2)
+            {
+                var uWallCurve = wallCurve.Clone();
+                uWallCurve.MakeUnbound();
+                var resultCurves = uWallCurve.MakeBound(point1, point2);
+                return resultCurves.FirstOrDefault(c => wallCurve.Contains(c.GetCenter()));
+            }
         }
 
         private Solid GetZoneSolid(Element element)
@@ -129,29 +140,30 @@ namespace DS.RevitCmd.SpaceBoundary
         }
 
 
-        private IEnumerable<XYZ> GetProjPoints(Wall baseWall, IEnumerable<Wall> walls)
+        private IEnumerable<XYZ> GetIntersectionPoints(
+            Curve baseWallCurve, 
+            IEnumerable<Curve> adjacancyCurves)
         {
-            var points = new List<XYZ>();
+            var intersectionPoints = new List<XYZ>();
 
-            var baseWallCurve = baseWall.GetLocationCurve();
             var basePoints = new List<XYZ>()
                     {
                         baseWallCurve.GetEndPoint(0),
                         baseWallCurve.GetEndPoint(1)
                     };
             var baseOrigin = basePoints.First();
-            foreach (var wall in walls)
+            foreach (var aCurve in adjacancyCurves)
             {
-                var curve = wall.GetLocationCurve();
-                curve = ProjectOnBase(baseOrigin, curve);
-                var intersectionPoint = curve
-                    .ClosestIntersection(baseWallCurve, true, true, out var IntersectionResult);
-                intersectionPoint ??= curve.GetDistance(basePoints.First()) < curve.GetDistance(basePoints.Last()) ?
-                        basePoints.First() : basePoints.Last();
-                points.Add(intersectionPoint);
+                var curve = baseWallCurve.GetEndPoint(0).Z.IsAlmostEqual(aCurve.GetEndPoint(0).Z)
+                    ? aCurve :
+                    ProjectOnBase(baseOrigin, aCurve);
+                var intersectionCurve = curve
+                    .GetClosestIntersection(baseWallCurve, true, true, out var intersectionPoint);
+                intersectionPoint ??= basePoints.OrderBy(p => curve.GetDistance(p)).FirstOrDefault();
+                intersectionPoints.Add(intersectionPoint);
             }
 
-            return points;
+            return intersectionPoints;
 
             static Curve ProjectOnBase(XYZ baseOrigin, Curve curve)
             {
