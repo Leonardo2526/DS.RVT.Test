@@ -50,7 +50,7 @@ namespace DS.RevitCmd.EnergyTest
                 .SelectMany(kv => kv.Value.ToElements(kv.Key))
                 .OfType<Room>()
             .Where(r => r.Area > 0)
-            .Where(r => r.Number == "19")
+            .Where(r => r.Number == "18")
             ;
             //if (Logger != null)
             //{
