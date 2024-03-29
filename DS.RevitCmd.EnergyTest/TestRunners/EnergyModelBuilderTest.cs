@@ -50,7 +50,7 @@ namespace DS.RevitCmd.EnergyTest
                 .SelectMany(kv => kv.Value.ToElements(kv.Key))
                 .OfType<Room>()
             .Where(r => r.Area > 0)
-            .Where(r => r.Number == "16")
+            .Where(r => r.Number == "19")
             ;
             //if (Logger != null)
             //{
@@ -71,7 +71,7 @@ namespace DS.RevitCmd.EnergyTest
             var modelProcessor = new EnergyModelProcessor(_doc, _allLoadedLinks, _trf, spaceFactory, energyModelFactory)
             { Logger = Logger };
             var eModels = modelProcessor.Create(rooms);
-            return;
+            //return;
 
             var surfaces = eModels.SelectMany(m => m.EnergySurfaces);
             //return;

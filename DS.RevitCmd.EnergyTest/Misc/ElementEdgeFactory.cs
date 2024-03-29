@@ -75,7 +75,10 @@ namespace DS.RevitCmd.EnergyTest.SpaceBoundary
                 var uWallCurve = wallCurve.Clone();
                 uWallCurve.MakeUnbound();
                 var resultCurves = uWallCurve.MakeBound(point1, point2);
-                return resultCurves.FirstOrDefault(c => wallCurve.Contains(c.GetCenter()));
+                var result = resultCurves.FirstOrDefault(c => wallCurve.Contains(c.GetCenter()));
+                if(!result.GetEndPoint(0).IsPointAlmostEqualTo(point1))
+                { result = result.CreateReversed(); }
+                return result;
             }
         }
 

@@ -1,30 +1,30 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Mechanical;
-using MoreLinq;
-using OLMP.RevitAPI.Tools.Creation.Transactions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting.Services;
-using System.Text;
-using System.Threading.Tasks;
-using OLMP.RevitAPI.Tools;
-using OLMP.RevitAPI.Tools.Extensions;
-using Autodesk.Revit.UI;
-using System.Diagnostics;
 using Autodesk.Revit.DB.Architecture;
-using Rhino.UI;
+using Autodesk.Revit.DB.IFC;
+using Autodesk.Revit.DB.Mechanical;
+using Autodesk.Revit.UI;
 using DS.ClassLib.VarUtils;
-using static System.Net.Mime.MediaTypeNames;
-using Serilog.Core;
-using Serilog;
+using DS.GraphUtils.Entities;
 using DS.RevitApp.Test;
 using DS.RevitCmd.EnergyTest.SpaceBoundary;
+using MoreLinq;
+using OLMP.RevitAPI.Tools;
+using OLMP.RevitAPI.Tools.Creation.Transactions;
+using OLMP.RevitAPI.Tools.Extensions;
 using OLMP.RevitAPI.Tools.Geometry.Points;
 using OLMP.RevitAPI.Tools.Graphs;
 using QuickGraph;
-using boundaryEdge = QuickGraph.TaggedEdge<OLMP.RevitAPI.Tools.Graphs.XYZVertex,
-    DS.RevitCmd.EnergyTest.SpaceBoundary.BoundaryCurve>;
+using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using IVertexGraph =
+    QuickGraph.IVertexAndEdgeListGraph<DS.GraphUtils.Entities.IVertex,
+        QuickGraph.Edge<DS.GraphUtils.Entities.IVertex>>;
+using IVertexBoundaryGraph = QuickGraph.IVertexAndEdgeListGraph<
+    DS.GraphUtils.Entities.IVertex, QuickGraph.TaggedEdge<DS.GraphUtils.Entities.IVertex,
+        DS.RevitCmd.EnergyTest.SpaceBoundary.BoundaryCurve>>;
 
 namespace DS.RevitCmd.EnergyTest
 {
@@ -88,22 +88,23 @@ namespace DS.RevitCmd.EnergyTest
 
             var boundarySegments = space.GetBoundarySegments(options).SelectMany(sl => sl);
             var boundaryCurves = boundarySegments.Select(s => s.GetCurve());
-
-            //var boundarySegments =  GetExternalBoundaries(space);
-            //var boundaryCurves = boundarySegments.Select(s => s.GetCurve());
-            //ShowBoundariesOneByOne(boundaryCurves);
-            //ShowBoundaries(boundaryCurves);
-            //return eSurfaces;
-
             var analyticalBoundary = GetGraphAnalyticalBoundary(space, boundarySegments, bottomTransform);
-            //var analyticalBoundary = GetAnalyticalBoundary(boundarySegments, bottomTransform);
             //analyticalBoundary.ForEach(c => ShowCurve(c.Item1));
-            return eSurfaces;
+            //return eSurfaces;
 
 
             var connectedCurves = analyticalBoundary.Select(b => b.Item1).ToList();
+
+            //closedLoop = new CurveLoop();
+            //foreach (var curve in connectedCurves)
+            //{
+            //    var p11 = curve.GetEndPoint(0);
+            //    var p12= curve.GetEndPoint(1);
+            //    closedLoop.Append(curve);
+            //}
+
+
             closedLoop = CurveLoop.Create(connectedCurves);
-            //closedLoop = CurveUtils.TryCreateLoop(connectedCurves);
             closedLoop.ForEach(ShowCurve);
             Debug.WriteLine("Loop close status: " + !closedLoop.IsOpen());
             if (closedLoop.Count() == 0) { return eSurfaces; }
@@ -267,8 +268,22 @@ namespace DS.RevitCmd.EnergyTest
                 boundaryCurves, elementIntersectionFactory, spaceSolid)
             { Logger = Logger }
             .Create();
-            Show(graph);
+           
+            var aGraph = new AdjacencyGraph<IVertex, Edge<IVertex>>();
             foreach (var edge in graph.Edges)
+            {
+                var e = new TaggedEdge<IVertex, BoundaryCurve>(edge.Source, edge.Target, edge.Tag);
+                aGraph.AddVerticesAndEdge(e);
+            }
+            //Show(aGraph);
+            //return boundaries;
+
+            var cycleGraphs = aGraph.ComputeCycles();
+            var outerCycle = GetOuterCycle(cycleGraphs);
+            //var first = cycleGraphs.First();
+            var edges = outerCycle.Edges.OfType<TaggedEdge<IVertex, BoundaryCurve>>();
+
+            foreach (var edge in edges)
             {
                 var wall = _doc.GetElement(edge.Tag.ElementId) as Wall;
                 var curve = edge.Tag.Curve;
@@ -396,23 +411,23 @@ namespace DS.RevitCmd.EnergyTest
 
         }
 
-        private void Show(IVertexAndEdgeListGraph<XYZVertex, boundaryEdge> graph)
+        private void Show(IVertexAndEdgeListGraph<IVertex, Edge<IVertex>> graph)
         {
             TransactionFactory.Create(() => Show(graph), "ShowVertices");
 
 
-            void Show(IVertexAndEdgeListGraph<XYZVertex, boundaryEdge> graph)
+            void Show(IVertexAndEdgeListGraph<IVertex, Edge<IVertex>> graph)
             {
-                var moveVector = new XYZ();
+                var moveVector = new XYZ(0.5, 0.5, 0);
                 var view = GetUIView(_doc);
                 var xYZVisulalizator = new XYZVisualizator(new UIDocument(_doc));
-                foreach (var vertex in graph.Vertices)
+                foreach (var vertex in graph.Vertices.OfType<XYZVertex>())
                 {
-                    foreach (var edge in graph.OutEdges(vertex))
+                    foreach (var edge in graph.OutEdges(vertex).OfType<TaggedEdge<IVertex, BoundaryCurve>>())
                     {
 
-                        var v1 = edge.Source;
-                        var v2 = edge.Target;
+                        var v1 = edge.Source as XYZVertex;
+                        var v2 = edge.Target as XYZVertex;
 
                         var xyz1 = v1.GetLocation(_doc);
                         var xyz2 = v2.GetLocation(_doc);
@@ -420,15 +435,17 @@ namespace DS.RevitCmd.EnergyTest
 
                         ElementId defaultTypeId = _doc.GetDefaultElementTypeId(ElementTypeGroup.TextNoteType);
 
-                        v1.Tag.Show(_doc);
+                        //v1.Tag.Show(_doc);
                         TextNote.Create(_doc, view.ViewId, xyz1 + moveVector, v1.Id.ToString(), defaultTypeId);
 
-                        v2.Tag.Show(_doc);
+                        //v2.Tag.Show(_doc);
                         TextNote.Create(_doc, view.ViewId, xyz2 + moveVector, v2.Id.ToString(), defaultTypeId);
 
+                        var p11 = edge.Tag.Curve.GetEndPoint(0);
+                        var p12 = edge.Tag.Curve.GetEndPoint(1);
                         //xYZVisulalizator.ShowVectorWithoutTransaction(xyz1, xyz2);
                         edge.Tag.Curve.Show(_doc);
-                        //TextNote.Create(_doc, view.ViewId, center + moveVector, edge.Tag.ElementId.ToString(), defaultTypeId);
+                        TextNote.Create(_doc, view.ViewId, center + moveVector, edge.Tag.ElementId.ToString(), defaultTypeId);
                     }
                 }
                 UIView GetUIView(Document doc)
@@ -448,6 +465,48 @@ namespace DS.RevitCmd.EnergyTest
                     return uiview;
                 }
             }
+        }
+
+
+        private CurveLoop ToCurveLoop(IVertexGraph graph)
+        {
+            var edges = graph.Edges.OfType<TaggedEdge<IVertex, BoundaryCurve>>();
+            CurveLoop loop = new();
+            try
+            {
+                edges.ForEach(edge => loop.Append(edge.Tag.Curve));
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            return loop;
+        }
+
+        private double TryGetArea(IVertexGraph graph)
+        {
+            var loop = ToCurveLoop(graph);
+            if (loop == null) { return 0; }
+
+            var loopList = new List<CurveLoop>() { loop };
+            return ExporterIFCUtils.ComputeAreaOfCurveLoops(loopList);
+        }
+
+        private IVertexGraph GetOuterCycle(IEnumerable<IVertexGraph> cycles)
+        {
+            var cyclesArea = new Dictionary<IVertexGraph, double>();
+
+            foreach (var component in cycles)
+            {
+                var area = TryGetArea(component);
+                if (area > 0)
+                { cyclesArea.Add(component, area); }
+            }
+
+            cyclesArea = cyclesArea.OrderByDescending(x => x.Value).ToDictionary();
+            var outerLoop = cyclesArea.FirstOrDefault();
+
+            return outerLoop.IsNullOrDefaultOrTuple() is true ? null : outerLoop.Key;
         }
     }
 }

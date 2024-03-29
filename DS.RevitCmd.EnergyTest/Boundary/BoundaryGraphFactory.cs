@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using DS.ClassLib.VarUtils;
 using DS.GraphUtils.Entities;
 using DS.RevitApp.Test;
@@ -12,7 +11,6 @@ using Rhino;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using boundaryEdge = QuickGraph.TaggedEdge<OLMP.RevitAPI.Tools.Graphs.XYZVertex,
     DS.RevitCmd.EnergyTest.SpaceBoundary.BoundaryCurve>;
@@ -92,13 +90,14 @@ namespace DS.RevitCmd.EnergyTest.SpaceBoundary
             var eEdges = _edgeFactory.CreateEdges(allIntersections, parentVertex);
             _graph.AddVerticesAndEdgeRange(eEdges);
 
-            xYZIntersections = xYZIntersections
-                .Where(e => !_closedIds.Contains(e.Item2.Id));
+            xYZIntersections = xYZIntersections.Reverse();
             var elementVertices = new List<XYZVertex>();
             elementVertices.AddRange(eEdges.Select(e => e.Source));
             elementVertices.AddRange(eEdges.Select(e => e.Target));
             foreach (var intersection in xYZIntersections)
             {
+                if (_closedIds.Contains(intersection.Item2.Id))
+                { continue; }
                 var foundAxEdge = eEdges
                     .FirstOrDefault(e => e.Tag.ElementId == intersection.Item2.Id);
                 var nextParent = foundAxEdge != null ?

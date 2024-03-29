@@ -124,5 +124,18 @@ namespace DS.RevitCmd.EnergyTest.SpaceBoundary
                 return curve;
             }
         }
+
+        private void ShowSolid(Solid solid)
+        {
+            using (Transaction transaction = new(_activeDoc, "ShowSolid"))
+            {
+                transaction.Start();
+                solid.ShowShape(_activeDoc);
+
+                if (transaction.HasStarted())
+                { transaction.Commit(); }
+            }
+
+        }
     }
 }

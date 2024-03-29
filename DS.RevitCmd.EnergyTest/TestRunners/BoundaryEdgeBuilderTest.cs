@@ -175,7 +175,7 @@ namespace DS.RevitCmd.EnergyTest.SpaceBoundary
 
             void Show(IVertexAndEdgeListGraph<XYZVertex, boundaryEdge> graph)
             {
-                var moveVector = new XYZ();
+                var moveVector = new XYZ(0.5,0.5,0);
                 var view = GetUIView(_doc);
                 var xYZVisulalizator = new XYZVisualizator(new UIDocument(_doc));
                 foreach (var vertex in graph.Vertices)
@@ -192,14 +192,14 @@ namespace DS.RevitCmd.EnergyTest.SpaceBoundary
 
                         ElementId defaultTypeId = _doc.GetDefaultElementTypeId(ElementTypeGroup.TextNoteType);
 
-                        v1.Tag.Show(_doc);
+                        //v1.Tag.Show(_doc);
                         TextNote.Create(_doc, view.ViewId, xyz1 + moveVector, v1.Id.ToString(), defaultTypeId);
 
-                        v2.Tag.Show(_doc);
+                        //v2.Tag.Show(_doc);
                         TextNote.Create(_doc, view.ViewId, xyz2 + moveVector, v2.Id.ToString(), defaultTypeId);
 
-                        //xYZVisulalizator.ShowVectorWithoutTransaction(xyz1, xyz2);
-                        edge.Tag.Curve.Show(_doc);
+                        xYZVisulalizator.ShowVectorWithoutTransaction(xyz1, xyz2);
+                        //edge.Tag.Curve.Show(_doc);
                         //TextNote.Create(_doc, view.ViewId, center + moveVector, edge.Tag.ElementId.ToString(), defaultTypeId);
                     }
                 }
