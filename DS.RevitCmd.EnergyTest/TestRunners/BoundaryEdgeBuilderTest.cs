@@ -21,6 +21,7 @@ using OLMP.RevitAPI.Tools.Graphs;
 using OLMP.RevitAPI.Tools.Geometry.Points;
 using QuickGraph.Algorithms;
 using Serilog.Core;
+using System.Diagnostics;
 
 namespace DS.RevitCmd.EnergyTest.SpaceBoundary
 {
@@ -31,8 +32,8 @@ namespace DS.RevitCmd.EnergyTest.SpaceBoundary
         private readonly IEnumerable<RevitLinkInstance> _allLoadedLinks;
         private DocumentFilter _globalFilter;
 
-        public BoundaryEdgeBuilderTest(UIDocument uiDoc, 
-            IEnumerable<RevitLinkInstance> allLoadedLinks, 
+        public BoundaryEdgeBuilderTest(UIDocument uiDoc,
+            IEnumerable<RevitLinkInstance> allLoadedLinks,
             DocumentFilter globalFilter)
         {
             _uiDoc = uiDoc;
@@ -50,24 +51,36 @@ namespace DS.RevitCmd.EnergyTest.SpaceBoundary
             var spaceFactory = new SpaceFactory(_doc);
             var spaces = TransactionFactory
                 .Create(() => CreateSpaces(rooms, spaceFactory), "CreateSpaces");
-            var currentSpace = spaces.First(s => s.Room.Number == "17");
-
+            var matchSpaces = spaces
+                .Where(s => 
+                //s.Room.Id.IntegerValue == 8911752
+            s.Room.Number == "15"
+            //&& s.Room.Name == "Коридор кладовых"
+            );
+            //matchSpaces.ForEach(s => Debug.WriteLine(s.Room.Name));
+            var currentSpace = matchSpaces.First();
             var calculator = new SpatialElementGeometryCalculator(_doc, new SpatialElementBoundaryOptions());
             var result = calculator.CalculateSpatialElementGeometry(currentSpace);
             var spaceSolid = result.GetGeometry();
 
-            var options = new SpatialElementBoundaryOptions();
+            var options = new SpatialElementBoundaryOptions()
+            {
+                SpatialElementBoundaryLocation = SpatialElementBoundaryLocation.CoreCenter,
+                //StoreFreeBoundaryFaces = true,
+            };
             var boundarySegments = currentSpace.GetBoundarySegments(options).SelectMany(sl => sl);
             var boundaryCurves = boundarySegments.Select(s => s.GetCurve());
-            //boundaryCurves.ForEach(c => ShowCurve(c));
-            //return null;
+            boundaryCurves.ForEach(c => ShowCurve(c));
+            Debug.WriteLine($"boundarySegments count is: {boundarySegments.Count()}");
+            boundarySegments.ForEach(s => Debug.WriteLine(s.ElementId));
+            return null;
             var boundaryElementIds = boundarySegments.Select(s => s.ElementId);
             var boundaryElements = boundaryElementIds
                 .Select(id => _doc.GetElement(id))
                 .Where(e => e is not null)
                 .DistinctBy(e => e.Id);
 
-            var solidItersectionFactory = GetIntersectionFactory(_globalFilter, boundaryElementIds);            
+            var solidItersectionFactory = GetIntersectionFactory(_globalFilter, boundaryElementIds);
             var validSegments = boundarySegments.Where(e => e is not null && e.ElementId.IntegerValue > 0);
             var edgeBuilder = new ElementEdgeFactory();
             var elementIntersectionFactory = new ElemIntersectionFactory(_doc, solidItersectionFactory);
@@ -140,7 +153,7 @@ namespace DS.RevitCmd.EnergyTest.SpaceBoundary
                 TransactionFactory = null
             };
         }
-      
+
 
         private void PrintEdges(IEnumerable<boundaryEdge> edges, ILogger logger)
         {
@@ -175,7 +188,7 @@ namespace DS.RevitCmd.EnergyTest.SpaceBoundary
 
             void Show(IVertexAndEdgeListGraph<XYZVertex, boundaryEdge> graph)
             {
-                var moveVector = new XYZ(0.5,0.5,0);
+                var moveVector = new XYZ(0.5, 0.5, 0);
                 var view = GetUIView(_doc);
                 var xYZVisulalizator = new XYZVisualizator(new UIDocument(_doc));
                 foreach (var vertex in graph.Vertices)

@@ -84,12 +84,17 @@ namespace DS.RevitCmd.EnergyTest
 
             var eSurfaces = new List<EnergySurface>();
 
-            var options = new SpatialElementBoundaryOptions();
+            var options = new SpatialElementBoundaryOptions()
+            {
+                SpatialElementBoundaryLocation = SpatialElementBoundaryLocation.Center
+            };
 
-            var boundarySegments = space.GetBoundarySegments(options).SelectMany(sl => sl);
-            var boundaryCurves = boundarySegments.Select(s => s.GetCurve());
-            var analyticalBoundary = GetGraphAnalyticalBoundary(space, boundarySegments, bottomTransform);
-            //analyticalBoundary.ForEach(c => ShowCurve(c.Item1));
+            var boundarySegments = space.GetBoundarySegments(options);
+            var boundarySegmentsList = boundarySegments.SelectMany(sl => sl);
+            var boundaryCurves = boundarySegmentsList.Select(s => s.GetCurve());
+            var analyticalBoundary = GetAnalyticalBoundary(boundarySegments, bottomTransform);
+            //var analyticalBoundary = GetGraphAnalyticalBoundary(space, boundarySegments, bottomTransform);
+            analyticalBoundary.ForEach(c => ShowCurve(c.Item1));
             //return eSurfaces;
 
 
@@ -99,7 +104,7 @@ namespace DS.RevitCmd.EnergyTest
             //foreach (var curve in connectedCurves)
             //{
             //    var p11 = curve.GetEndPoint(0);
-            //    var p12= curve.GetEndPoint(1);
+            //    var p12 = curve.GetEndPoint(1);
             //    closedLoop.Append(curve);
             //}
 
@@ -116,7 +121,7 @@ namespace DS.RevitCmd.EnergyTest
             foreach (var boundary in analyticalBoundary)
             {
                 var eSurface = _energySurfaceFactory
-                    .CreateEnergySurface(boundary.Item2.Id, boundary.Item1, wallHeight);
+                    .CreateEnergySurface(boundary.Item2.ElementId, boundary.Item1, wallHeight);
                 //var eSurface = ToEnergySurface(boundary);
                 if (eSurface == null)
                 {
@@ -221,15 +226,15 @@ namespace DS.RevitCmd.EnergyTest
                 foreach (var segment in sl)
                 {
                     var id = segment.ElementId;
-                    Wall wall = id.IntegerValue > 0 ? _doc.GetElement(id) as Wall : null;
+                   // Wall wall = id.IntegerValue > 0 ? _doc.GetElement(id) as Wall : null;
                     //if (wall is null || wall.GetJoints(true).Count() < 2) 
                     //{ continue; }
                     //var c = wall.GetJoints(true).Count();
-                    if (wall is null) { continue; }
+                    //if (wall is null) { continue; }
 
                     var curve = segment.GetCurve();
-                    var distanseToOffset = wall.Width / 2;
-                    curve = curve.CreateOffset(distanseToOffset, XYZ.BasisZ);
+                    //var distanseToOffset = wall.Width / 2;
+                    //curve = curve.CreateOffset(distanseToOffset, XYZ.BasisZ);
                     if (curve != null)
                     { curve = curve.CreateTransformed(transform); boundaryCurves.Add((curve, segment)); }
                 }
