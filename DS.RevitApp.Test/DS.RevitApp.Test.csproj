@@ -150,6 +150,7 @@
       <HintPath>..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IO.4.3.0\lib\net462\System.IO.dll</HintPath>
@@ -207,12 +208,15 @@
   <ItemGroup>
     <Compile Include="AddSharedTest.cs" />
     <Compile Include="CreateSurfaceTest.cs" />
-    <Compile Include="CurveConnector.cs" />
+    <Compile Include="CurvesTests\CurveBooleanUtilsTest.cs" />
+    <Compile Include="CurvesTests\CurveConnector.cs" />
     <Compile Include="CurvesTests\ClosestIntersectionTest.cs" />
+    <Compile Include="FaceTests\SolidFaceCreator.cs" />
+    <Compile Include="GlobalUsings.cs" />
     <Compile Include="MakeBoundTest.cs" />
     <Compile Include="TryMakeClosedLoopTest.cs" />
     <Compile Include="NewCurveExtensions.cs" />
-    <Compile Include="CurveUtils.cs" />
+    <Compile Include="CurvesTests\CurveUtils.cs" />
     <Compile Include="CurvesTests\CurveConnectorTest.cs" />
     <Compile Include="NewExtensions.cs" />
     <Compile Include="OpeningSolidExtractors\OpeningSolidExtractorBase.cs" />
@@ -242,7 +246,6 @@
     <Compile Include="TransactionTests\MEPCurveTransaction.cs" />
     <Compile Include="FloorsTest.cs" />
     <Compile Include="WallsTest.cs" />
-    <Compile Include="WallUtilsTests\FaceExtensionsTest.cs" />
     <Compile Include="WallUtilsTests\OpeningExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

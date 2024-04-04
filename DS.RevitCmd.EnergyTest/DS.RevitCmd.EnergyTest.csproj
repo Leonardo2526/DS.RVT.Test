@@ -42,8 +42,8 @@
     <Reference Include="DS.RhinoInside">
       <HintPath>..\..\DS.RhinoInside\DS.RhinoInside\bin\Debug\DS.RhinoInside.dll</HintPath>
     </Reference>
-    <Reference Include="MoreLinq, Version=4.1.0.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
-      <HintPath>packages\morelinq.4.1.0\lib\netstandard2.0\MoreLinq.dll</HintPath>
+    <Reference Include="MoreLinq, Version=4.2.0.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
+      <HintPath>packages\morelinq.4.2.0\lib\netstandard2.0\MoreLinq.dll</HintPath>
     </Reference>
     <Reference Include="QuickGraph, Version=3.6.61114.0, Culture=neutral, PublicKeyToken=f3fb40175eec2af3, processorArchitecture=MSIL">
       <HintPath>packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.dll</HintPath>
@@ -104,6 +104,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Boundary\BoundaryCurve.cs" />
+    <Compile Include="GlobalUsings.cs" />
+    <Compile Include="Misc\WallIntersectionFactory.cs" />
+    <Compile Include="RoomExtractor.cs" />
+    <Compile Include="TestRunners\CompoundStructureTest.cs" />
     <Compile Include="DocFilterBuilder.cs" />
     <Compile Include="TestRunners\BoundaryEdgeBuilderTest.cs" />
     <Compile Include="Boundary\BoundaryGraphFactory.cs" />
@@ -132,6 +136,7 @@
     <Compile Include="InsertsSolidModels\WallInsertSolidModel.cs" />
     <Compile Include="IsExternalInit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestRunners\FaceFitElementsTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -158,6 +163,9 @@
       <Project>{5e7d867b-3629-46ed-a7d8-61edde093260}</Project>
       <Name>DS.RevitApp.Test</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="CompoundStructures\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

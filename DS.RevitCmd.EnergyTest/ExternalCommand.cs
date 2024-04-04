@@ -1,11 +1,14 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using DS.RevitCmd.EnergyTest.CompoundStructures;
 using DS.RevitCmd.EnergyTest.SpaceBoundary;
+using DS.RevitCmd.EnergyTest.TestRunners;
 using OLMP.RevitAPI.Tools.Creation.Transactions;
 using OLMP.RevitAPI.Tools.Extensions;
 using Serilog;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DS.RevitCmd.EnergyTest
 {
@@ -36,11 +39,26 @@ namespace DS.RevitCmd.EnergyTest
             //edgeTest.GetEdges();
 
 
-            var test = new EnergyModelBuilderTest(uiDoc, globalFilter)
-            { Logger = logger };
-            test.GetModels();
-            //test.CreateGraph();
+            //var test = new EnergyModelBuilderTest(uiDoc, globalFilter)
+            //{ Logger = logger };
+            //test.GetModels();
+            ////test.CreateGraph();
 
+            // var roomNumberts = new List<string>()
+            // {
+            //     "0"
+            // };
+            // var rooms = new RoomExtractor(uiDoc, globalFilter)
+            //     .GetRooms();
+            //var test = new CompoundStructureTest(uiDoc, globalFilter)
+            //{ Logger = logger };
+            // test.CreateStructures(rooms.First());
+
+
+            new FaceFitElementsTest(uiDoc, globalFilter)
+            { TransactionFactory = trf, Logger = logger }
+         .SelectWall()
+         .GetElements();
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }

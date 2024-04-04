@@ -16,13 +16,6 @@ namespace DS.RevitApp.Test
 {
     public static class NewExtensions
     {
-        public static IEnumerable<Face> ToList(this FaceArray faceArray)
-        {
-            var faces = new List<Face>();
-            foreach (Face face in faceArray)
-            { faces.Add(face); }
-            return faces;
-        }
 
         public static IEnumerable<T> AsEnumerable<T>(this IEnumerable resultArray)
         {
@@ -118,36 +111,6 @@ namespace DS.RevitApp.Test
                 ceiling.get_Parameter(BuiltInParameter.CEILING_THICKNESS_PARAM).AsDouble();
         }
 
-
-        public static CurveLoop GetBottomProfile(this Wall wall)
-        {
-            var curve = wall.GetLocationCurve();
-
-            var offset = wall.Width / 2;
-            var refVector = XYZ.BasisZ;
-
-            var offsetCurve1 = curve.CreateOffset(offset, -refVector);
-            var offsetCurve2 = curve.CreateOffset(offset, refVector).CreateReversed();
-
-            var p1 = offsetCurve1.GetEndPoint(0);
-            var p2 = offsetCurve1.GetEndPoint(1);
-            var p3 = offsetCurve2.GetEndPoint(0);
-            var p4 = offsetCurve2.GetEndPoint(1);
-
-            var line1 = Line.CreateBound(p2, p3);
-            var line2 = Line.CreateBound(p4, p1);
-            return CurveLoop.Create(new List<Curve>() 
-            { offsetCurve1, line1, offsetCurve2, line2 });
-        }
-
-        public static Solid GetFullSolid(this Wall wall)
-        {
-            var profile = GetBottomProfile(wall);
-            return GeometryCreationUtilities
-               .CreateExtrusionGeometry(
-               new List<CurveLoop> { profile },
-               XYZ.BasisZ, wall.GetHeigth());
-        }
 
         public static IEnumerable<TVertex> Vertices<TVertex>(this IEdge<TVertex> edge)
         => new List<TVertex>() { edge.Source, edge.Target };

@@ -50,10 +50,11 @@ namespace DS.RevitApp.Test
             //return Autodesk.Revit.UI.Result.Succeeded;
 
 
-            //var connectorTest = new CurveConnectorTest(uidoc)
-            //{ Logger = logger, TransactionFactory = trf };
-            ////connectorTest.CreateCurve();
-            //var curves = connectorTest.SelectTWoCurves();
+            var connectorTest = new CurveConnectorTest(uidoc)
+            { Logger = logger, TransactionFactory = trf };
+            //connectorTest.CreateCurve();
+            var curves = connectorTest.SelectTWoCurves();
+            connectorTest.GetIntersection(curves.Item1, curves.Item2);
             //connectorTest.ConnectTwoCurves(curves.Item1, curves.Item2);
             //connectorTest.CreateCurve();
             //connectorTest.GetBases(curves.Item1, curves.Item2);
@@ -91,12 +92,14 @@ namespace DS.RevitApp.Test
             //test.GetAllJoints();
             //test.IntersectionTest();
 
-            new ClosestIntersectionTest(uidoc, allLoadedLinks)
-            { Logger = logger, TransactionFactory = trf }
-            //.SelectTWoWalls()
-            .SelectTWoCurves()
-            //.GetClosestIntersection();
-            .GetClosestIntersectionCurve();
+            //new ClosestIntersectionTest(uidoc, allLoadedLinks)
+            //{ Logger = logger, TransactionFactory = trf }
+            ////.SelectTWoWalls()
+            //.SelectTWoCurves()
+            ////.GetClosestIntersection();
+            //.GetClosestIntersectionCurve();
+
+
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }

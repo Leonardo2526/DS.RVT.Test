@@ -11,7 +11,6 @@ using boundaryEdge = QuickGraph.TaggedEdge<OLMP.RevitAPI.Tools.Graphs.XYZVertex,
     DS.RevitCmd.EnergyTest.SpaceBoundary.BoundaryCurve>;
 using OLMP.RevitAPI.Tools.Extensions;
 using Autodesk.Revit.DB.Mechanical;
-using DS.RevitCmd.EnergyTest;
 using OLMP.RevitAPI.Tools.Creation.Transactions;
 using Serilog;
 using MoreLinq;
@@ -22,8 +21,9 @@ using OLMP.RevitAPI.Tools.Geometry.Points;
 using QuickGraph.Algorithms;
 using Serilog.Core;
 using System.Diagnostics;
+using DS.RevitCmd.EnergyTest.SpaceBoundary;
 
-namespace DS.RevitCmd.EnergyTest.SpaceBoundary
+namespace DS.RevitCmd.EnergyTest.TestRunners
 {
     internal class BoundaryEdgeBuilderTest
     {
@@ -52,8 +52,8 @@ namespace DS.RevitCmd.EnergyTest.SpaceBoundary
             var spaces = TransactionFactory
                 .Create(() => CreateSpaces(rooms, spaceFactory), "CreateSpaces");
             var matchSpaces = spaces
-                .Where(s => 
-                //s.Room.Id.IntegerValue == 8911752
+                .Where(s =>
+            //s.Room.Id.IntegerValue == 8911752
             s.Room.Number == "15"
             //&& s.Room.Name == "Коридор кладовых"
             );

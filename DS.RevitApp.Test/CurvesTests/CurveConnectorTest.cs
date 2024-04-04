@@ -4,7 +4,7 @@ using Autodesk.Revit.UI.Selection;
 using DS.ClassLib.VarUtils;
 using DS.ClassLib.VarUtils.Basis;
 using DS.GraphUtils.Entities;
-using DS.RevitApp.Test.Energy;
+using DS.RhinoInside.Revit.Convert.Geometry;
 using OLMP.RevitAPI.Tools;
 using OLMP.RevitAPI.Tools.Creation.Transactions;
 using OLMP.RevitAPI.Tools.Extensions;
@@ -166,6 +166,20 @@ namespace DS.RevitApp.Test
             }
 
             return resultCurve;
+        }
+
+        public void GetIntersection(ModelCurve mCurve1, ModelCurve mCurve2)
+        {
+            var curve1 = mCurve1.GeometryCurve; var curve2 = mCurve2.GeometryCurve;
+            var rhinoCurve1 = curve1.ToCurve();
+            rhinoCurve1.TryGetArc(out var arc1);
+            var rhinoCurve2 = curve2.ToCurve();
+            rhinoCurve2.TryGetArc(out var arc2);
+            //var result = Rhino.Geometry.Intersect.Intersection.ArcArc(arc1, arc2, out var p1, out var p2);
+            //Logger?.Information($"Intersection result is : {result}");
+
+           var comparisonResult = curve1.Intersect(curve2, out var revitResult);
+            Logger?.Information($"Intersection result is : {comparisonResult}");
         }
 
         private void DeleteCurve(ModelCurve mCurve)
