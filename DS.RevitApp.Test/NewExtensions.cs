@@ -124,9 +124,6 @@ namespace DS.RevitApp.Test
             .FirstOrDefault(v => v.Tag.DistanceTo(location) < tolerance);
 
 
-        public static bool IsPointAlmostEqualTo(this XYZ p1, 
-            XYZ p2, 
-            double tolerance = RhinoMath.ZeroTolerance)
-            => p1.DistanceTo(p2) < tolerance;
+     
     }
 }

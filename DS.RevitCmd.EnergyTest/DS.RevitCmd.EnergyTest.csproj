@@ -103,10 +103,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Boundary\BoundaryCurve.cs" />
+    <Compile Include="Boundary\BoundartItems.cs" />
+    <Compile Include="Boundary\CompoundFaceStructure.cs" />
+    <Compile Include="Commands\BoundatyFaceExternalCommand.cs" />
     <Compile Include="GlobalUsings.cs" />
+    <Compile Include="ItemSelector.cs" />
     <Compile Include="Misc\WallIntersectionFactory.cs" />
     <Compile Include="RoomExtractor.cs" />
+    <Compile Include="TestRunners\CompoundFaceStructureTest.cs" />
     <Compile Include="TestRunners\CompoundStructureTest.cs" />
     <Compile Include="DocFilterBuilder.cs" />
     <Compile Include="TestRunners\BoundaryEdgeBuilderTest.cs" />
@@ -131,7 +135,7 @@
     <Compile Include="Energy\IEnergySurfaceFactory.cs" />
     <Compile Include="Energy\ISpaceFactory.cs" />
     <Compile Include="Energy\SpaceFactory.cs" />
-    <Compile Include="ExternalCommand.cs" />
+    <Compile Include="Commands\ExternalCommand.cs" />
     <Compile Include="InsertsSolidModels\InsertsSolidModelBase.cs" />
     <Compile Include="InsertsSolidModels\WallInsertSolidModel.cs" />
     <Compile Include="IsExternalInit.cs" />

@@ -62,30 +62,7 @@ namespace DS.RevitApp.Test
                 ViewportRotation.Counterclockwise;
         }
 
-        public static Basis3d GetBasis(this Curve curve, double parameter = 0)
-        {
-            Curve transformCurve;
-            if (curve.IsCyclic && !curve.IsBound)
-            {
-                transformCurve = curve.Clone();
-                transformCurve.MakeBound(0, 1);
-            }
-            else
-            {
-                transformCurve = curve;
-            }
-            var transforms = transformCurve.ComputeDerivatives(parameter, true);
-
-            var origin = transforms.Origin.Normalize().ToPoint3d();
-            var x = transforms.BasisX.ToVector3d();
-            x.Unitize();
-            var z = transforms.BasisZ.ToVector3d();
-            z = z.IsZero ? Rhino.Geometry.Vector3d.ZAxis : z;
-            z.Unitize();
-            var y = Rhino.Geometry.Vector3d.CrossProduct(z, x);
-            y.Unitize();
-            return new Basis3d(origin, x, y, z);
-        }
+    
 
         public static Rhino.Geometry.Vector3d GetNormal(this Curve curve, double parameter = 0)
         => curve.GetBasis(parameter).Z;
