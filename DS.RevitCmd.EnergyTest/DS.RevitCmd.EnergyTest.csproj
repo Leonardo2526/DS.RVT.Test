@@ -104,7 +104,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Boundary\BoundartItems.cs" />
-    <Compile Include="Boundary\CompoundFaceStructure.cs" />
+    <Compile Include="Boundary\CompoundFaceStructureFactory.cs" />
     <Compile Include="Commands\BoundatyFaceExternalCommand.cs" />
     <Compile Include="GlobalUsings.cs" />
     <Compile Include="ItemSelector.cs" />

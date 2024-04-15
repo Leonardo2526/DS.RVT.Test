@@ -43,6 +43,10 @@ namespace DS.RevitCmd.EnergyTest
             { TransactionFactory = trf, Logger = logger };
             var results = test.CreateFaceStructures(wall, face);
             test.PrintResults(results);
+            //test.ShowResults(results);
+
+            var resultFaces = test.ComputeResultFaces(results);
+            test.ShowResultFaces(resultFaces);
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }

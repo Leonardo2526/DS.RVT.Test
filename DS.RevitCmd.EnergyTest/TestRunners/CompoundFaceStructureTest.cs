@@ -2,6 +2,7 @@
 using Autodesk.Revit.UI;
 using DS.ClassLib.VarUtils.BinaryOperations;
 using DS.RevitCmd.EnergyTest.SpaceBoundary;
+using MoreLinq;
 using OLMP.RevitAPI.Tools.Creation.Transactions;
 using OLMP.RevitAPI.Tools.Extensions;
 using OLMP.RevitAPI.Tools.Filtering;
@@ -38,6 +39,15 @@ namespace DS.RevitCmd.EnergyTest.CompoundStructures
             var f = GetInteractor();
             var result = new CompoundFaceStructureFactory(_doc, f).Create(boundaryFace);
             return result;
+        }
+
+        public IEnumerable<BoundaryFace> ComputeResultFaces(IEnumerable<CompoundFaceStructure> boundaryFaces)
+        {
+            foreach (var bf in boundaryFaces)
+            {
+                var f = bf.ComputeResultFace();
+                yield return f;
+            }
         }
 
 
@@ -84,7 +94,7 @@ namespace DS.RevitCmd.EnergyTest.CompoundStructures
             for (int i = 0; i < faceStructuresList.Count; i++)
             {
                 CompoundFaceStructure faceStructure = faceStructuresList[i];
-                Logger?.Information($"Structure : {i}");
+                Logger?.Information($"Structure : {i + 1}");
                 foreach (var boundaryFace in faceStructure)
                 {
                     Logger?.Information($"face layer id: {boundaryFace.ElementId}");
@@ -92,5 +102,20 @@ namespace DS.RevitCmd.EnergyTest.CompoundStructures
             }
 
         }
+
+        public void ShowResults(IEnumerable<CompoundFaceStructure> faceStructures)
+        {
+           foreach (var faceStructure in faceStructures)
+            {
+                var faces = faceStructure.Select(s => s.Face);
+                faces.ForEach(f => ShowFace(f));
+            }
+        }
+
+        public void ShowResultFaces(IEnumerable<BoundaryFace> boundaryFaces)
+            => boundaryFaces.ForEach(bf => ShowFace(bf.Face));
+
+        private void ShowFace(Face face)
+         => TransactionFactory.Create(() => face.ShowEdges(_doc), "ShowFace");
     }
 }

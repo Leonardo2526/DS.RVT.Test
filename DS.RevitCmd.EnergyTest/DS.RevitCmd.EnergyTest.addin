@@ -2,7 +2,7 @@
 <RevitAddIns>
 	<AddIn Type="Command">
 		<Name>DS.RevitCmd.EnergyTest</Name>
-		<FullClassName>DS.RevitCmd.EnergyTest.ExternalCommand</FullClassName>
+		<FullClassName>DS.RevitCmd.EnergyTest.BoundatyFaceExternalCommand</FullClassName>
 		<Text>EnergyTest</Text>
 		<Description>EnergyTest</Description>
 		<VisibilityMode>AlwaysVisible</VisibilityMode>
