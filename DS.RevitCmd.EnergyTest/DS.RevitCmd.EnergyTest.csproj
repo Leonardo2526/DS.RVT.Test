@@ -104,8 +104,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Boundary\BoundartItems.cs" />
+    <Compile Include="Boundary\CompoundFaceStructure.cs" />
     <Compile Include="Boundary\CompoundFaceStructureFactory.cs" />
     <Compile Include="Commands\BoundatyFaceExternalCommand.cs" />
+    <Compile Include="Energy\EnergyFace.cs" />
     <Compile Include="GlobalUsings.cs" />
     <Compile Include="ItemSelector.cs" />
     <Compile Include="Misc\WallIntersectionFactory.cs" />

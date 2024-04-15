@@ -1,6 +1,8 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Analysis;
 using Autodesk.Revit.UI;
 using DS.ClassLib.VarUtils.BinaryOperations;
+using DS.RevitCmd.EnergyTest.Energy;
 using DS.RevitCmd.EnergyTest.SpaceBoundary;
 using MoreLinq;
 using OLMP.RevitAPI.Tools.Creation.Transactions;
@@ -41,12 +43,23 @@ namespace DS.RevitCmd.EnergyTest.CompoundStructures
             return result;
         }
 
-        public IEnumerable<BoundaryFace> ComputeResultFaces(IEnumerable<CompoundFaceStructure> boundaryFaces)
+        public IEnumerable<Face> ComputeResultFaces(IEnumerable<CompoundFaceStructure> boundaryFaces)
         {
             foreach (var bf in boundaryFaces)
             {
                 var f = bf.ComputeResultFace();
                 yield return f;
+            }
+        }
+
+        public IEnumerable<EnergyFace> GetEnergyFaces(IEnumerable<CompoundFaceStructure> boundaryFaces)
+        {
+            foreach (var bf in boundaryFaces)
+            {
+                var f = bf.ComputeResultFace();
+                var structures = bf.ToCompoundStructures(_doc);
+                EnergyAnalysisSurfaceType surfaceType = EnergyAnalysisSurfaceType.ExteriorWall;
+                yield return new EnergyFace(f, structures, surfaceType);
             }
         }
 
@@ -103,6 +116,20 @@ namespace DS.RevitCmd.EnergyTest.CompoundStructures
 
         }
 
+        public void PrintEnergyResults(IEnumerable<EnergyFace> energyFaces)
+        {
+            Logger?.Information($"energyFaces count is: {energyFaces.Count()}");
+
+            foreach (var eFace in energyFaces)
+            {
+                foreach (var structure in eFace.CompoundStructures)
+                {
+                    var layers = structure.GetLayers();
+                    layers.ForEach(l => Logger?.Information($"{l.Width}"));
+                }
+            }
+        }
+
         public void ShowResults(IEnumerable<CompoundFaceStructure> faceStructures)
         {
            foreach (var faceStructure in faceStructures)
@@ -112,8 +139,8 @@ namespace DS.RevitCmd.EnergyTest.CompoundStructures
             }
         }
 
-        public void ShowResultFaces(IEnumerable<BoundaryFace> boundaryFaces)
-            => boundaryFaces.ForEach(bf => ShowFace(bf.Face));
+        public void ShowFaces(IEnumerable<Face> faces)
+            => faces.ForEach(ShowFace);
 
         private void ShowFace(Face face)
          => TransactionFactory.Create(() => face.ShowEdges(_doc), "ShowFace");

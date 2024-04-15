@@ -7,6 +7,7 @@ using OLMP.RevitAPI.Tools.Extensions;
 using OLMP.RevitAPI.Tools.Filtering;
 using Serilog;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DS.RevitCmd.EnergyTest
 {
@@ -45,8 +46,13 @@ namespace DS.RevitCmd.EnergyTest
             test.PrintResults(results);
             //test.ShowResults(results);
 
-            var resultFaces = test.ComputeResultFaces(results);
-            test.ShowResultFaces(resultFaces);
+            //var resultFaces = test.ComputeResultFaces(results);
+            //test.ShowFaces(resultFaces);
+
+            var resultEnergyFaces = test.GetEnergyFaces(results);
+            var eFaces = resultEnergyFaces.Select(ef => ef.Face);
+            test.ShowFaces(eFaces);
+            test.PrintEnergyResults(resultEnergyFaces);
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }
