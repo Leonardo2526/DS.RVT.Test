@@ -52,6 +52,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\DS.GraphUtils\DS.GraphUtils.Entities\DS.GraphUtils.Entities\bin\Debug\DS.GraphUtils.Entities.dll</HintPath>
     </Reference>
+    <Reference Include="DS.RhinoInside">
+      <HintPath>..\..\DS.RhinoInside\DS.RhinoInside\bin\Debug\DS.RhinoInside.dll</HintPath>
+    </Reference>
     <Reference Include="iUtils, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\VAR.RevitLib.Utils\iUtils\bin\Debug\iUtils.dll</HintPath>
@@ -147,6 +150,7 @@
       <HintPath>..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IO.4.3.0\lib\net462\System.IO.dll</HintPath>
@@ -204,32 +208,20 @@
   <ItemGroup>
     <Compile Include="AddSharedTest.cs" />
     <Compile Include="CreateSurfaceTest.cs" />
+    <Compile Include="CurvesTests\CurveBooleanUtilsTest.cs" />
+    <Compile Include="CurvesTests\CurveConnector.cs" />
+    <Compile Include="CurvesTests\ClosestIntersectionTest.cs" />
+    <Compile Include="FaceTests\SolidFaceCreator.cs" />
+    <Compile Include="GlobalUsings.cs" />
+    <Compile Include="MakeBoundTest.cs" />
     <Compile Include="TryMakeClosedLoopTest.cs" />
     <Compile Include="NewCurveExtensions.cs" />
-    <Compile Include="CurveUtils.cs" />
-    <Compile Include="Energy\AdjacenciesFuncBuilder.cs" />
-    <Compile Include="Energy\EnergyEdge.cs" />
-    <Compile Include="Energy\EnergyGraphFactory.cs" />
-    <Compile Include="CurveConnectorTest.cs" />
-    <Compile Include="Energy\EnergyModelProcessor.cs" />
-    <Compile Include="Energy\EnergyModel.cs" />
-    <Compile Include="Energy\EnergyModelFactory.cs" />
-    <Compile Include="Energy\EnergySpace.cs" />
-    <Compile Include="Energy\EnergySurface.cs" />
-    <Compile Include="Energy\EnergySurfaceBooleanOperations.cs" />
-    <Compile Include="Energy\EnergyModelBuilderTest.cs" />
-    <Compile Include="Energy\EnergySurfaceFactory.cs" />
-    <Compile Include="Energy\ICurveConnector.cs" />
-    <Compile Include="Energy\IEnergySurfaceFactory.cs" />
-    <Compile Include="Energy\ISpaceFactory.cs" />
+    <Compile Include="CurvesTests\CurveUtils.cs" />
+    <Compile Include="CurvesTests\CurveConnectorTest.cs" />
     <Compile Include="NewExtensions.cs" />
-    <Compile Include="InsertsSolidModels\InsertsSolidModelBase.cs" />
-    <Compile Include="InsertsSolidModels\WallInsertSolidModel.cs" />
     <Compile Include="OpeningSolidExtractors\OpeningSolidExtractorBase.cs" />
-    <Compile Include="Energy\SpaceFactory.cs" />
     <Compile Include="GetOpeningsSolidTest.cs" />
     <Compile Include="GetSpacesTest.cs" />
-    <Compile Include="IEnergyModelFactory.cs" />
     <Compile Include="OpeningSolidExtractors\FloorOpeningSolidExtractor.cs" />
     <Compile Include="OpeningSolidExtractors\WallOpeningSolidExtractor.cs" />
     <Compile Include="WallOpeningsTest.cs" />
@@ -254,7 +246,6 @@
     <Compile Include="TransactionTests\MEPCurveTransaction.cs" />
     <Compile Include="FloorsTest.cs" />
     <Compile Include="WallsTest.cs" />
-    <Compile Include="WallUtilsTests\FaceExtensionsTest.cs" />
     <Compile Include="WallUtilsTests\OpeningExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

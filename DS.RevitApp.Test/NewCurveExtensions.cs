@@ -1,14 +1,22 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using DS.ClassLib.VarUtils;
+using DS.ClassLib.VarUtils.Basis;
 using OLMP.RevitAPI.Tools;
 using OLMP.RevitAPI.Tools.Creation.Transactions;
 using OLMP.RevitAPI.Tools.Extensions;
-using Rhino;
+using Rhino.Geometry.Intersect;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using static System.Net.Mime.MediaTypeNames;
+using DS.RhinoInside;
+using DS.GraphUtils.Entities;
+using OLMP.RevitAPI.Tools.Graphs;
+using Rhino;
+using Autodesk.Revit.DB.DirectContext3D;
 
 namespace DS.RevitApp.Test
 {
@@ -19,237 +27,244 @@ namespace DS.RevitApp.Test
 
         public static bool IsCircle(this Curve curve)
         {
+            if (!curve.IsCyclic || !curve.IsBound) return false;
+
             var p1 = curve.GetEndParameter(0);
             var p2 = curve.GetEndParameter(1);
             var deltaP = p2 - p1;
 
-            return Math.Abs(deltaP - Math.PI * 2) < RhinoMath.ZeroTolerance;
+            return Math.Abs(deltaP - Math.PI * 2) < Rhino.RhinoMath.ZeroTolerance;
         }
 
 
-        public static IEnumerable<Curve> Trim(
+        public static ViewportRotation TryGetRotation(this Curve curve, XYZ normal)
+        {
+            if (!curve.IsCyclic) { return ViewportRotation.None; }
+
+            var rNormal = normal.ToVector3d();
+            XYZ curveNormal = null;
+
+            var at = 1.DegToRad();
+            switch (curve)
+            {
+                case Ellipse ellipse:
+                    curveNormal = ellipse.Normal;
+                    break;
+                case Arc arc:
+                    curveNormal = arc.Normal;
+                    break;
+                default:
+                    break;
+            }
+
+            return curveNormal != null && rNormal.IsParallelTo(curveNormal.ToVector3d(), at) == 1 ?
+                ViewportRotation.Clockwise :
+                ViewportRotation.Counterclockwise;
+        }
+
+    
+
+        public static Rhino.Geometry.Vector3d GetNormal(this Curve curve, double parameter = 0)
+        => curve.GetBasis(parameter).Z;
+
+        public static bool HasEqualDirection(this Curve curve1, Curve curve2, double parameter = 0)
+        {
+            var basis1 = curve1.GetBasis(parameter);
+            var basis2 = curve2.GetBasis(parameter);
+            var at = 1.DegToRad();
+
+            if (curve1 is Line && curve2 is Line)
+            { return basis1.X.IsParallelTo(basis2.X, at) == 1; }
+
+            return basis1.Z.IsParallelTo(basis2.Z, at) == 1;
+        }
+
+        public static bool Contains(this Curve curve, XYZ point,
+             bool canContainsEnds = true,
+             double tolerance = Rhino.RhinoMath.ZeroTolerance)
+        {
+            if (curve.IsBound && !canContainsEnds)
+            {
+                if (curve.GetEndPoint(0).DistanceTo(point) < tolerance ||
+                    curve.GetEndPoint(1).DistanceTo(point) < tolerance)
+                { return false; }
+            }
+            return curve.Distance(point) < tolerance;
+        }
+
+        public static Curve Trim(
             this Curve sourceCurve,
             Curve targetCurve,
             bool isVirtualEnable = false,
             int staticIndex = 0)
-        {
-            if (staticIndex != 0 && staticIndex != 1)
-            { throw new ArgumentException("index can be only 0 or 1."); }
+            => CurveConnector.Connect(
+                sourceCurve,
+                targetCurve,
+                CurveConnector.ConnectionOption.Trim,
+                isVirtualEnable,
+                staticIndex)?.FirstOrDefault();
 
-            var resultCurves = new List<Curve>();
-
-            var moveIndex = Math.Abs(1 - staticIndex);
-            var staticPoint = sourceCurve.GetEndPoint(staticIndex);
-            var staticParamter = sourceCurve.GetEndParameter(staticIndex);
-            //staticPoint.Show(_activeDoc, 200.MMToFeet(), TransactionFactory);
-            var movePoint = sourceCurve.GetEndPoint(moveIndex);
-
-
-            //Debug.WriteLine($"Trying to trim point {movePoint} of " +
-                //$"{sourceCurve.GetType().Name} with {targetCurve.GetType().Name}");
-
-            Curve targetOperationCurve;
-            if (isVirtualEnable)
-            {
-                targetOperationCurve = targetCurve.Clone();
-                targetOperationCurve.MakeUnbound();
-            }
-            else { targetOperationCurve = targetCurve; }
-            var intersection = sourceCurve
-                .Intersect(targetOperationCurve, out var resultArray);
-
-            Curve getIntersectionCurve(IntersectionResult result) =>
-            GetResultIntersectionCurves(result, sourceCurve, staticParamter).FirstOrDefault();
-
-            switch (intersection)
-            {
-                case SetComparisonResult.Overlap:
-                    var results = resultArray.AsEnumerable<IntersectionResult>();
-                    var intersecionCurves = results
-                        .Select(getIntersectionCurve)
-                        .Where(c => c != null)
-                        .OrderByDescending(c => c.ApproximateLength);
-                    var count = intersecionCurves.Count();                 
-                    Debug.WriteLine($"{count} " +
-                        $"curves were trimmed.");
-                    resultCurves.AddRange(intersecionCurves);               
-                    break;
-                case SetComparisonResult.Equal:
-                    { resultCurves.Add(sourceCurve); }
-                    break;
-                default:
-                    break;
-            }
-
-            //Debug.WriteLine($"{resultCurves.Count} intersection curves were found.");
-            return resultCurves;
-        }
-
-        public static IEnumerable<Curve> Extend(
-            this Curve sourceCurve,
-            Curve targetCurve,
-            bool isVirtualEnable = false,
-             int staticIndex = 0)
-        {
-
-            if (staticIndex != 0 && staticIndex != 1)
-            { throw new ArgumentException("index can be only 0 or 1."); }
-
-            var resultCurves = new List<Curve>();
-
-            var moveIndex = Math.Abs(1 - staticIndex);
-            var staticPoint = sourceCurve.GetEndPoint(staticIndex);
-            var staticParamter = sourceCurve.GetEndParameter(staticIndex);
-            //staticPoint.Show(_activeDoc, 200.MMToFeet(), TransactionFactory);
-            var movePoint = sourceCurve.GetEndPoint(moveIndex);
-
-            //Debug.WriteLine($"Trying to extend point {movePoint} of " +
-                //$"{sourceCurve.GetType().Name} to {targetCurve.GetType().Name}");
-
-            var sourceOperationCurve = sourceCurve.Clone();
-            sourceOperationCurve.MakeUnbound();
-            var staticOperationParamter = sourceOperationCurve.Project(staticPoint).Parameter;
-
-            Curve targetOperationCurve;
-            if (isVirtualEnable)
-            {
-                targetOperationCurve = targetCurve.Clone();
-                targetOperationCurve.MakeUnbound();
-            }
-            else { targetOperationCurve = targetCurve; }
-            var intersection = sourceOperationCurve
-                .Intersect(targetOperationCurve, out var resultArray);
-
-            Curve getIntersectionCurve(IntersectionResult result) =>
-                GetResultIntersectionCurves(result, sourceOperationCurve, staticOperationParamter)
-                .FirstOrDefault(c =>
-                    (c.Project(movePoint).Distance < 0.001 &&
-                        sourceCurve.Project(result.XYZPoint).Distance > 0.001)
-                    || IsCircle(c)
-                );
-
-            switch (intersection)
-            {
-                case SetComparisonResult.Overlap:
-                    var results = resultArray.AsEnumerable<IntersectionResult>();
-                    var intersecionCurves = results
-                       .Select(getIntersectionCurve)
-                       .Where(c => c != null)
-                       .OrderBy(c => c.ApproximateLength);
-                    var count = intersecionCurves.Count();
-                    Debug.WriteLine($"{count} " +
-                        $"curves were extent.");
-                    resultCurves.AddRange(intersecionCurves);
-                    break;
-                case SetComparisonResult.Equal:
-                    { resultCurves.Add(sourceCurve); }
-                    break;
-                default:
-                    break;
-            }
-
-            return resultCurves;
-        }
-
-
-        public static IEnumerable<Curve> TrimOrExtend(
-          this Curve sourceCurve,
-          Curve targetCurve,
-          bool isVirtualTrimEnable = false,
-          bool isVirtualExtendEnable = false,
-           int staticIndex = 0)
-        {
-            var resultCurves = new List<Curve>();   
-            var trimResult = sourceCurve.Trim(targetCurve, isVirtualTrimEnable, staticIndex);
-            resultCurves.AddRange(trimResult);
-            var extendResults = sourceCurve.Extend(targetCurve, isVirtualExtendEnable, staticIndex);
-            resultCurves.AddRange(extendResults);
-
-            resultCurves = resultCurves
-                .OrderBy(c => Math.Abs(sourceCurve.ApproximateLength - c.ApproximateLength)).ToList();
-
-            return resultCurves;
-        }
-
-        public static IEnumerable<Curve> TrimOrExtendOld(
+        public static Curve Extend(
            this Curve sourceCurve,
            Curve targetCurve,
-           bool isVirtualTrimEnable = false,
-           bool isVirtualExtendEnable = false,
-            int staticIndex = 0)
-        {
-            var result = sourceCurve.Trim(targetCurve, isVirtualTrimEnable, staticIndex);
-            result = result == null || result.Count() == 0 ?
-                sourceCurve.Extend(targetCurve, isVirtualExtendEnable, staticIndex) :
-                result;
+           bool isVirtualEnable = false,
+           int staticIndex = 0)
+           => CurveConnector.Connect(
+               sourceCurve,
+               targetCurve,
+               CurveConnector.ConnectionOption.Extend,
+               isVirtualEnable,
+               staticIndex)?.FirstOrDefault();
 
-            return result;
-        }
-
-        public static IEnumerable<Curve> TrimOrExtendAnyPoint(
-          this Curve sourceCurve,
-          Curve targetCurve,
-           bool isVirtualTrimEnable = false,
-           bool isVirtualExtendEnable = false)
-        {
-            var result = TrimOrExtend(sourceCurve, targetCurve,
-                isVirtualTrimEnable, isVirtualExtendEnable, 0);
-            result = result == null || result.Count() == 0 ?
-                TrimOrExtend(sourceCurve, targetCurve,
-                isVirtualTrimEnable, isVirtualExtendEnable, 1) :
-                result;
-            return result;
-        }
-
-        public static IEnumerable<Curve> TrimOrExtendAtClosestPoints(
+        public static IEnumerable<Curve> TrimOrExtend(
          this Curve sourceCurve,
          Curve targetCurve,
+         bool isVirtualTrimEnable = false,
+         bool isVirtualExtendEnable = false,
+          int staticIndex = 0)
+        {
+            var resultCurves = new List<Curve>();
+            var trimResult = sourceCurve.Trim(targetCurve, isVirtualTrimEnable, staticIndex);
+            if (trimResult != null)
+            { resultCurves.Add(trimResult); }
+            var extendResult = sourceCurve.Extend(targetCurve, isVirtualExtendEnable, staticIndex);
+            if (extendResult != null)
+            { resultCurves.Add(extendResult); }
+
+            Func<Curve, Curve, double> _distinctLength = (sourceCurve, c) =>
+            Math.Abs(sourceCurve.ApproximateLength - c.ApproximateLength);
+            resultCurves = resultCurves
+                .OrderBy(c => _distinctLength(sourceCurve, c)).ToList();
+
+            return resultCurves;
+
+        }
+
+        public static Curve TrimOrExtend(
+         this Curve sourceCurve,
+         Curve previous, Curve next,
           bool isVirtualTrimEnable = false,
           bool isVirtualExtendEnable = false)
         {
+            var result = sourceCurve
+                .TrimOrExtend(previous, isVirtualTrimEnable, isVirtualExtendEnable, 1)
+                .FirstOrDefault();
             var sp1 = sourceCurve.GetEndPoint(0);
-            var sp2 = sourceCurve.GetEndPoint(1);
+            var rp1 = result?.GetEndPoint(0);
+            //var sp2 = sourceCurve.GetEndPoint(1);
+            //var rp2 = result?.GetEndPoint(1);
 
-            var tp1 = targetCurve.GetEndPoint(0);
-            var tp2 = targetCurve.GetEndPoint(1);
-
-            var d1 = Math.Min(sp1.DistanceTo(tp1), sp1.DistanceTo(tp2));
-            var d2 = Math.Min(sp2.DistanceTo(tp1), sp2.DistanceTo(tp2));
-            int staticIndex = d1 < d2 ? 1 : 0;
-
-            return TrimOrExtend(sourceCurve, targetCurve,
-                isVirtualTrimEnable, isVirtualExtendEnable, staticIndex);
+            if (result != null && sp1.DistanceTo(rp1) > 0.001)
+            { result = result.CreateReversed(); }
+            //return result;
+            result ??= sourceCurve;
+            return result?.TrimOrExtend(next, isVirtualTrimEnable, isVirtualExtendEnable, 0)
+                .FirstOrDefault() ?? result;
         }
 
-        public static IEnumerable<Curve> GetResultIntersectionCurves(
-            IntersectionResult intersectionResult,
-            Curve baseCurve,
-            double baseStaticParameter)
+        public static Curve TrimOrExtendAny(
+        this Curve sourceCurve,
+        Curve target,
+         bool isVirtualTrimEnable = false,
+         bool isVirtualExtendEnable = false)
         {
-            var intersectionCurves = new List<Curve>();
+            var result = sourceCurve
+                .TrimOrExtend(target, isVirtualTrimEnable, isVirtualExtendEnable, 1)
+                .FirstOrDefault();
+            //return result;
+            if (result != null && result.GetEndParameter(0) != sourceCurve.GetEndParameter(0))
+            { result = result.CreateReversed(); }
+            result ??= sourceCurve;
+            return result?.TrimOrExtend(target, isVirtualTrimEnable, isVirtualExtendEnable, 0)
+                .FirstOrDefault() ?? result;
+        }
 
-            var projection = baseCurve.Project(intersectionResult.XYZPoint);
-            var targetParameter = projection.Parameter;
-            if(Math.Abs(baseStaticParameter - targetParameter) < RhinoMath.ZeroTolerance)
-            { return intersectionCurves; }
 
-            var p11 = Math.Min(baseStaticParameter, targetParameter);
-            var p12 = Math.Max(baseStaticParameter, targetParameter);
-            var p121 = Math.Abs(p12 - p11) < RhinoMath.ZeroTolerance ? p12 + baseCurve.Period : p12;
-            var curve1 = baseCurve.Clone();
-            curve1.MakeBound(p11, p121);
-            intersectionCurves.Add(curve1);
+        public static IEnumerable<Curve> MakeBound(
+           this Curve curve,
+            XYZ point1, XYZ point2)
+        {
+            var results = new List<Curve>();
+            var tolerance = 1;
+            var proj1 = curve.Project(point1);
+            if (proj1.Distance > tolerance)
+            { throw new ArgumentException($"The curve must contains point {point1}."); }
 
-            if (baseCurve.IsCyclic && !IsCircle(curve1))
+            var proj2 = curve.Project(point2);
+            if (proj2.Distance > tolerance)
+            { throw new ArgumentException($"The curve must contains point {point2}."); }
+
+
+            (proj1, proj2) = proj1.Parameter < proj2.Parameter ?
+                (proj1, proj2) :
+                (proj2, proj1);
+
+            //var isReversed = proj1.Parameter > proj2.Parameter;
+
+            var validCurve = curve.Clone();
+            //if (isReversed)
+            //{
+            //    validCurve = validCurve.CreateReversed();
+            //    proj1 = validCurve.Project(point1);
+            //    proj2 = validCurve.Project(point2);
+            //}
+
+            double param2 = equalParamteters(proj1, proj2)
+                && (IsCircle(curve) || !curve.IsBound) ?
+                proj2.Parameter + curve.Period : proj2.Parameter;
+            var curve1 = validCurve.Clone();
+            curve1.MakeBound(proj1.Parameter, param2);
+            //curve1 = isReversed ? curve1.CreateReversed() : curve1;
+            results.Add(curve1);
+
+            if (curve.IsCyclic && !curve.IsBound)
             {
-                var p21 = p12;
-                var p22 = baseCurve.Period + p11;
-                var curve2 = baseCurve.Clone();
-                curve2.MakeBound(p21, p22);
-                intersectionCurves.Add(curve2);
+                validCurve.MakeBound(proj2.Parameter, proj1.Parameter + curve.Period);
+                //validCurve = isReversed ? validCurve : validCurve.CreateReversed();
+                results.Add(validCurve.CreateReversed());
             }
+            return results;
 
-            return intersectionCurves;
+            static bool equalParamteters(IntersectionResult proj1, IntersectionResult proj2)
+            {
+                return Math.Abs(proj2.Parameter - proj1.Parameter) < Rhino.RhinoMath.ZeroTolerance;
+            }
+        }
+
+        public static Curve GetClosestIntersection(
+            this Curve sourceCurve,
+            Curve targetCurve,
+            bool isVirtualTrimEnable,
+            bool isVirtualExtendEnable, out XYZ intersectionPoint)
+        {
+            intersectionPoint = null;
+            var curve1 = CurveUtils.IsBaseEndFitted(sourceCurve, targetCurve) ?
+               sourceCurve :
+               sourceCurve.CreateReversed();
+            var resultCurve = curve1
+                .TrimOrExtend(targetCurve, isVirtualTrimEnable, isVirtualExtendEnable)
+                .FirstOrDefault();
+            if (resultCurve == null) { return null; }
+
+            //var sp1 = sourceCurve.GetEndPoint(0);
+            //var sp2 = sourceCurve.GetEndPoint(1);
+            var rp1 = resultCurve.GetEndPoint(0);
+            var rp2 = resultCurve.GetEndPoint(1);
+            intersectionPoint = targetCurve.GetDistance(rp1) < targetCurve.GetDistance(rp2) ?
+                rp1 : rp2;
+            return resultCurve;
+        }
+
+        public static double GetDistance(this Curve curve, XYZ point)
+        {
+            try
+            {
+                return curve.Distance(point);
+            }
+            catch (Exception)
+            {
+                return point.DistanceTo(curve.GetEndPoint(0));
+            }
         }
 
 
