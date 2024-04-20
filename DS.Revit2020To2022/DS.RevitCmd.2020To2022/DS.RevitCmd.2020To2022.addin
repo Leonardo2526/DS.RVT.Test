@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+	<AddIn Type="Command">
+		<Name>DS.RevitCmd.2020To2022</Name>
+		<FullClassName>DS.RevitCmd.Test2020To2022.ExternalCommand</FullClassName>
+		<Text>DS.RevitCmd.2020To2022</Text>
+		<Description>New revit plugin</Description>
+		<VisibilityMode>AlwaysVisible</VisibilityMode>
+		<Assembly>.\DS.RevitCmd.2020To2022\DS.RevitCmd.2020To2022.dll</Assembly>
+		<AddInId>659af522-12de-42ed-b489-a96c8b594e9c</AddInId>
+		<VendorId>DS</VendorId>
+	</AddIn> 
+</RevitAddIns>
