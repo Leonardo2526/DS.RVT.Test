@@ -2,7 +2,6 @@
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using DS.ClassLib.VarUtils;
-using DS.RevitApp.Test;
 using DS.RevitCmd.EnergyTest.SpaceBoundary;
 using DS.RhinoInside.Revit.Convert.Geometry;
 using MoreLinq;
@@ -17,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-using DS.RevitApp.Test.FaceTests;
 using System.Diagnostics;
 
 namespace DS.RevitCmd.EnergyTest.TestRunners

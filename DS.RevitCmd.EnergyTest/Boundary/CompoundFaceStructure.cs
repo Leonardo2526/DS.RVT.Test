@@ -37,7 +37,7 @@ namespace DS.RevitCmd.EnergyTest.SpaceBoundary
             var offsetVector = structureCenter - minFaceCenter;
             var compareValue = minFaceBasis.Z
                 .IsParallelTo(offsetVector.Normalize().ToVector3d(), 1.DegToRad());
-            var movedFace = FaceTransformer.CreateOffset(_minBoundaryFace.Face, offsetVector.GetLength() * compareValue);
+            var movedFace = FaceUtils.Offset(_minBoundaryFace.Face, offsetVector.GetLength(), true);
 
             return movedFace;
         }

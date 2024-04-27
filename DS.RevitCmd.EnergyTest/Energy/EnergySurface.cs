@@ -12,7 +12,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OLMP.RevitAPI.Tools;
-using DS.RevitApp.Test;
 
 namespace DS.RevitCmd.EnergyTest
 {

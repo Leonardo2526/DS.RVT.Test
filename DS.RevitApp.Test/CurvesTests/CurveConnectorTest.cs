@@ -102,7 +102,6 @@ namespace DS.RevitApp.Test
             //ShowPoint(p1);
             var p2 = curve1.GetEndPoint(1);
             //curve1 = curve1.CreateReversed();
-            NewCurveExtensions.TransactionFactory = TransactionFactory;
             //curve1 = CurveUtils.IsBaseEndFitted(curve1, curve2) ?
             //   curve1 :
             //   curve1.CreateReversed();

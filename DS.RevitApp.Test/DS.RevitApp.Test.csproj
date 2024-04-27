@@ -214,11 +214,9 @@
     <Compile Include="FaceTests\SolidFaceCreator.cs" />
     <Compile Include="GlobalUsings.cs" />
     <Compile Include="MakeBoundTest.cs" />
-    <Compile Include="TryMakeClosedLoopTest.cs" />
     <Compile Include="NewCurveExtensions.cs" />
-    <Compile Include="CurvesTests\CurveUtils.cs" />
+    <Compile Include="TryMakeClosedLoopTest.cs" />
     <Compile Include="CurvesTests\CurveConnectorTest.cs" />
-    <Compile Include="NewExtensions.cs" />
     <Compile Include="OpeningSolidExtractors\OpeningSolidExtractorBase.cs" />
     <Compile Include="GetOpeningsSolidTest.cs" />
     <Compile Include="GetSpacesTest.cs" />

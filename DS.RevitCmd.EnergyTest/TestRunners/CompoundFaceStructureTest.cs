@@ -79,10 +79,11 @@ namespace DS.RevitCmd.EnergyTest.CompoundStructures
 
                 var fitResults = wallInteraction.FitResults;
                 var fitResultsValues = fitResults.SelectMany(kv => kv.Value);
-                //fitFaces.ForEach(ShowFace);
+                //fitResultsValues.SelectMany(r => r.Item2).ForEach(ShowFace);
 
                 //get only faces that have intersection with source face.
                 var sourceFace = sourceBoundaryFace.Face;
+                //ShowFace(sourceFace);
                 var intersectionFaces = new List<BoundaryFace>();
                 foreach (var fitResultValue in fitResultsValues)
                 {
