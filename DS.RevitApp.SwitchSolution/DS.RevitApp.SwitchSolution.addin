@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+	<AddIn Type="Command">
+		<Name>SwitchSolution</Name>
+		<FullClassName>DS.RevitApp.SwitchSolution.ExternalCommand</FullClassName>
+		<Text>SwitchSolution</Text>
+		<Description>SwitchSolution test</Description>
+		<VisibilityMode>AlwaysVisible</VisibilityMode>
+		<Assembly>.\DS.RevitApp.SwitchSolution\DS.RevitApp.SwitchSolution.dll</Assembly>
+		<AddInId>cf449301-67a5-4d40-b660-6a85e62fb249</AddInId>
+		<VendorId>DS</VendorId>
+	</AddIn> 
+</RevitAddIns>

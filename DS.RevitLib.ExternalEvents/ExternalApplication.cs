@@ -4,6 +4,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +19,9 @@ namespace DS.RevitLib.ExternalEvents
             try
             {
                 // Register event. 
+                TaskDialog.Show("Revit","ExternalApp started");
                 application.ControlledApplication.FailuresProcessing += ControlledApplication_FailuresProcessing;
+                application.ControlledApplication.DocumentChanged += ControlledApplication_DocumentChanged;
 
             }
             catch (Exception)
@@ -27,6 +30,14 @@ namespace DS.RevitLib.ExternalEvents
             }
 
             return Result.Succeeded;
+        }
+
+        private void ControlledApplication_DocumentChanged(object sender, DocumentChangedEventArgs e)
+        {
+            var added = e.GetAddedElementIds();
+            var mod = e.GetModifiedElementIds();
+            var tra = e.GetTransactionNames();
+            var del = e.GetDeletedElementIds();
         }
 
         public Result OnShutdown(UIControlledApplication application)

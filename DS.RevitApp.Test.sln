@@ -35,7 +35,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitCmd.Template2", "DS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitCmd.MVVMTemplate3", "DS.RevitCmd.MVVMTemplate3\DS.RevitCmd.MVVMTemplate3.csproj", "{986618ED-6F85-4BA4-9E6A-F3B42870E1DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.PathFinder", "..\DS.CommonLib.Utils\PathFinders\DS.PathFinder\DS.PathFinder.csproj", "{F42C671B-41AF-4CD6-8DA8-C75EAE032D73}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.PathFinder", "..\DS.CommonLib.Utils\PathFinders\DS.PathFinder\DS.PathFinder.csproj", "{0A99EB4B-783B-495B-B743-82077C2BB30A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OLMP.RevitAPI.Tools", "..\OLMP.RevitAPI\OLMP.RevitAPI.Tools\OLMP.RevitAPI.Tools.csproj", "{698A89CB-1B8A-46F5-9E67-8820C37C1ED5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.RevitCmd.SpaceBoundary", "DS.RevitCmd.SpaceBoundary\DS.RevitCmd.SpaceBoundary.csproj", "{3C16F5D0-CAAB-44D5-99AF-F3C47FAE5B5F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DS.GraphUtils.Entities", "..\DS.GraphUtils\DS.GraphUtils.Entities\DS.GraphUtils.Entities\DS.GraphUtils.Entities.csproj", "{3F3C36E6-646A-47B2-AD46-81268EAD25B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -96,10 +102,22 @@ Global
 		{986618ED-6F85-4BA4-9E6A-F3B42870E1DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{986618ED-6F85-4BA4-9E6A-F3B42870E1DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{986618ED-6F85-4BA4-9E6A-F3B42870E1DB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F42C671B-41AF-4CD6-8DA8-C75EAE032D73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F42C671B-41AF-4CD6-8DA8-C75EAE032D73}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F42C671B-41AF-4CD6-8DA8-C75EAE032D73}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F42C671B-41AF-4CD6-8DA8-C75EAE032D73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A99EB4B-783B-495B-B743-82077C2BB30A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A99EB4B-783B-495B-B743-82077C2BB30A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A99EB4B-783B-495B-B743-82077C2BB30A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A99EB4B-783B-495B-B743-82077C2BB30A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{698A89CB-1B8A-46F5-9E67-8820C37C1ED5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{698A89CB-1B8A-46F5-9E67-8820C37C1ED5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{698A89CB-1B8A-46F5-9E67-8820C37C1ED5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{698A89CB-1B8A-46F5-9E67-8820C37C1ED5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C16F5D0-CAAB-44D5-99AF-F3C47FAE5B5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C16F5D0-CAAB-44D5-99AF-F3C47FAE5B5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C16F5D0-CAAB-44D5-99AF-F3C47FAE5B5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C16F5D0-CAAB-44D5-99AF-F3C47FAE5B5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F3C36E6-646A-47B2-AD46-81268EAD25B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F3C36E6-646A-47B2-AD46-81268EAD25B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F3C36E6-646A-47B2-AD46-81268EAD25B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F3C36E6-646A-47B2-AD46-81268EAD25B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

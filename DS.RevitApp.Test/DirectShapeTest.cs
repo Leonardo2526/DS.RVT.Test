@@ -1,5 +1,8 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
+using OLMP.RevitAPI.Tools.Extensions;
+using Serilog.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +26,7 @@ namespace DS.RevitApp.Test
         // Create a DirectShape Sphere
         public void CreateSphereDirectShape()
         {
-           var profile = new List<Curve>();
+            var profile = new List<Curve>();
 
             // first create sphere with 2' radius
             XYZ center = XYZ.Zero;
@@ -56,6 +59,25 @@ namespace DS.RevitApp.Test
             }
         }
 
+        public void SelectWall()
+        {
+            Reference reference = _uiDoc.Selection.PickObject(ObjectType.Element, "Select element");
+            var element = _doc.GetElement(reference);
+
+            if (element is not Wall wall)
+            { return; }
+
+            var wallSolid = wall.Solid();
+
+            using (Transaction t = new Transaction(_doc, "Create sphere direct shape"))
+            {
+                t.Start();
+                ShowFace(wallSolid);
+                t.Commit();
+            }
+
+        }
+
         public void Show(Solid solid)
         {
             using (Transaction t = new Transaction(_doc, "Create sphere direct shape"))
@@ -69,6 +91,27 @@ namespace DS.RevitApp.Test
                 ds.SetShape(new GeometryObject[] { solid });
                 t.Commit();
             }
+        }
+
+        private void ShowFace(Solid solid)
+        {
+
+            var faces = new List<Face>();
+            foreach (Face item in solid.Faces)
+            {
+                faces.Add(item);
+            }
+            faces = faces.OrderByDescending(f => f.Area).ToList();
+            var face = faces.First();
+
+            var mesh = face.Triangulate(1);
+            ElementId categoryId = new ElementId(BuiltInCategory.OST_GenericModel);
+            DirectShape ds = DirectShape.CreateElement(_doc, categoryId);
+            ds.SetShape(new GeometryObject[] { mesh });
+
+            //var tResult = Build_Tessellate(face);
+            //var geom = tResult.GetGeometricalObjects();
+            //ds.SetShape(geom);
         }
 
         private void ShowOld(Solid solid)

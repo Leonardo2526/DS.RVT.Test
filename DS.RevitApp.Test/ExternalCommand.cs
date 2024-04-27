@@ -3,7 +3,14 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 //using ClassLibrary1;
 using ConsoleApp2;
+using OLMP.RevitAPI.Tools.Elements;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using OLMP.RevitAPI.Tools.Extensions;
+using Serilog;
+using OLMP.RevitAPI.Tools.Creation.Transactions;
+using DS.RevitApp.Test.CurvesTests;
 
 namespace DS.RevitApp.Test
 {
@@ -18,21 +25,81 @@ namespace DS.RevitApp.Test
 
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uiapp.ActiveUIDocument.Document;
+            var allLoadedLinks = doc.GetLoadedLinks() ?? new List<RevitLinkInstance>();
 
-            new WallsTest(uidoc);
+            var logger = new LoggerConfiguration()
+             .MinimumLevel.Verbose()
+             .WriteTo.Debug()
+             .CreateLogger();
+            var trf = new ContextTransactionFactory(doc);
 
-            //PersonClient.Test5(new HttpClient(), "addj");
+
+            //var test = new MakeBoundTest(uidoc)
+            //{ Logger = logger, TransactionFactory = trf };
 
 
-            //new MongoTest();
+            //var curve = test
+            //    .SelectCurve()?
+            //    .SelectFirstPoint()?
+            //    .SelectSecondPoint()?
+            //    .CreateNewCurve();
+            //var test = new TryMakeClosedLoopTest(uidoc)
+            //{ Logger = logger, TransactionFactory = trf };
+            //var loop = test.SelectCurves();
+            //test.TryMakeLoopClosed(loop);
+            //return Autodesk.Revit.UI.Result.Succeeded;
 
-            //new SerilogTest(uidoc);
 
-            //var test = new PathFinerTest(doc, uidoc);
-            //test.Run();
+            var connectorTest = new CurveConnectorTest(uidoc)
+            { Logger = logger, TransactionFactory = trf };
+            //connectorTest.CreateCurve();
+            var curves = connectorTest.SelectTWoCurves();
+            connectorTest.GetIntersection(curves.Item1, curves.Item2);
+            //connectorTest.ConnectTwoCurves(curves.Item1, curves.Item2);
+            //connectorTest.CreateCurve();
+            //connectorTest.GetBases(curves.Item1, curves.Item2);
+            //return Autodesk.Revit.UI.Result.Succeeded;
+
+            //var openingTest = new GetOpeningsSolidTest(uidoc)
+            //{ Logger = logger };
+            //openingTest.TestGetBestOpeningSolid();
+            ////openingTest.GetWallSolid();
+            //return Autodesk.Revit.UI.Result.Succeeded;
+
 
             //var test = new DirectShapeTest(doc, uidoc);
-            //test.CreateSphereDirectShape();
+            //test.SelectWall();
+
+            //var wallTest = new WallsTest(uidoc);
+            //wallTest
+            //    .SelectWall()?
+            //    .GetSortedFaces();
+            //.GetSortedFaces();
+            //new WallsTest(uidoc).GetWallOpenings();
+            //return Autodesk.Revit.UI.Result.Succeeded;
+
+
+            //var test = new EnergyModelBuilderTest(uidoc)
+            //{ Logger = logger };
+            //test.GetModels();
+
+
+            ////test.CreateGraph();
+            ///
+
+            //var test = new SolidOperationTest(doc, uidoc, allLoadedLinks)
+            //{  TransactionFactory = trf };
+            //test.GetAllJoints();
+            //test.IntersectionTest();
+
+            //new ClosestIntersectionTest(uidoc, allLoadedLinks)
+            //{ Logger = logger, TransactionFactory = trf }
+            ////.SelectTWoWalls()
+            //.SelectTWoCurves()
+            ////.GetClosestIntersection();
+            //.GetClosestIntersectionCurve();
+
+
 
             return Autodesk.Revit.UI.Result.Succeeded;
         }

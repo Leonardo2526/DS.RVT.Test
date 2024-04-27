@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
 	<AddIn Type="Application">
-		<Name>DS.RevitLib.ExternalEventsApp</Name>
+		<Name>DS.RevitLib.ExternalEvents.ExternalApplication</Name>
 		<Assembly>DS.RevitLib.ExternalEvents\DS.RevitLib.ExternalEvents.dll</Assembly>
 		<ClientId>d5383be2-9c39-4453-83b4-7097f245fae3</ClientId>
 		<FullClassName>DS.RevitLib.ExternalEvents.ExternalApplication</FullClassName>

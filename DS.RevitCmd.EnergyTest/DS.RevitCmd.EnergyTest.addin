@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+	<AddIn Type="Command">
+		<Name>DS.RevitCmd.EnergyTest</Name>
+		<FullClassName>DS.RevitCmd.EnergyTest.BoundatyFaceExternalCommand</FullClassName>
+		<Text>EnergyTest</Text>
+		<Description>EnergyTest</Description>
+		<VisibilityMode>AlwaysVisible</VisibilityMode>
+		<Assembly>.\DS.RevitCmd.EnergyTest\DS.RevitCmd.EnergyTest.dll</Assembly>
+		<AddInId>c0504cc8-c33b-431e-bc3e-dd97caf6a59b</AddInId>
+		<VendorId>DS</VendorId>
+	</AddIn> 
+</RevitAddIns>

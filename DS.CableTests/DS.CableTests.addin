@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+	<AddIn Type="Command">
+		<Name>DS.CableTests</Name>
+		<FullClassName>DS.CableTests.ExternalCommand</FullClassName>
+		<Text>DS.CableTests</Text>
+		<Description>Test of electric cables.</Description>
+		<VisibilityMode>AlwaysVisible</VisibilityMode>
+		<Assembly>.\DS.CableTests\DS.CableTests.dll</Assembly>
+		<AddInId>ad5435c7-00b4-4a30-9029-3ba991366505</AddInId>
+		<VendorId>DS</VendorId>
+	</AddIn> 
+</RevitAddIns>

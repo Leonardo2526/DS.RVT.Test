@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Rhino3dm.7.15.0\build\net45\Rhino3dm.props" Condition="Exists('..\packages\Rhino3dm.7.15.0\build\net45\Rhino3dm.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
@@ -47,8 +48,12 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\DS.CommonLib.Utils\DS.ClassLib.VarUtils\bin\Debug\DS.ClassLib.VarUtils.dll</HintPath>
     </Reference>
-    <Reference Include="DS.RevitLib.Utils">
-      <HintPath>..\..\DS.RevitLib.Utils\DS.RevitLib.Utils\bin\Debug\DS.RevitLib.Utils.dll</HintPath>
+    <Reference Include="DS.GraphUtils.Entities, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\DS.GraphUtils\DS.GraphUtils.Entities\DS.GraphUtils.Entities\bin\Debug\DS.GraphUtils.Entities.dll</HintPath>
+    </Reference>
+    <Reference Include="DS.RhinoInside">
+      <HintPath>..\..\DS.RhinoInside\DS.RhinoInside\bin\Debug\DS.RhinoInside.dll</HintPath>
     </Reference>
     <Reference Include="iUtils, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -81,11 +86,26 @@
     <Reference Include="MongoDB.Libmongocrypt, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MongoDB.Libmongocrypt.1.0.0\lib\net452\MongoDB.Libmongocrypt.dll</HintPath>
     </Reference>
+    <Reference Include="MoreLinq, Version=4.1.0.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
+      <HintPath>..\packages\morelinq.4.1.0\lib\netstandard2.0\MoreLinq.dll</HintPath>
+    </Reference>
     <Reference Include="Nito.Collections.Deque, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Nito.Collections.Deque.1.1.1\lib\net461\Nito.Collections.Deque.dll</HintPath>
     </Reference>
     <Reference Include="PathFinderLib">
       <HintPath>bin\Debug\PathFinderLib.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph, Version=3.6.61114.0, Culture=neutral, PublicKeyToken=f3fb40175eec2af3, processorArchitecture=MSIL">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph.Data, Version=3.6.61114.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph.Graphviz, Version=3.6.61114.0, Culture=neutral, PublicKeyToken=f3fb40175eec2af3, processorArchitecture=MSIL">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Graphviz.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph.Serialization, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\QuickGraph.3.6.61119.7\lib\net4\QuickGraph.Serialization.dll</HintPath>
     </Reference>
     <Reference Include="RevitAPI">
       <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
@@ -94,6 +114,9 @@
     <Reference Include="RevitAPIUI">
       <HintPath>C:\Program Files\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="Rhino3dm, Version=7.15.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rhino3dm.7.15.0\lib\net45\Rhino3dm.dll</HintPath>
     </Reference>
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.2.12.0\lib\net47\Serilog.dll</HintPath>
@@ -127,6 +150,7 @@
       <HintPath>..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IO.4.3.0\lib\net462\System.IO.dll</HintPath>
@@ -182,7 +206,28 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AStarAlgorithmCDFTest.cs" />
+    <Compile Include="AddSharedTest.cs" />
+    <Compile Include="CreateSurfaceTest.cs" />
+    <Compile Include="CurvesTests\CurveBooleanUtilsTest.cs" />
+    <Compile Include="CurvesTests\CurveConnector.cs" />
+    <Compile Include="CurvesTests\ClosestIntersectionTest.cs" />
+    <Compile Include="FaceTests\SolidFaceCreator.cs" />
+    <Compile Include="GlobalUsings.cs" />
+    <Compile Include="MakeBoundTest.cs" />
+    <Compile Include="TryMakeClosedLoopTest.cs" />
+    <Compile Include="NewCurveExtensions.cs" />
+    <Compile Include="CurvesTests\CurveUtils.cs" />
+    <Compile Include="CurvesTests\CurveConnectorTest.cs" />
+    <Compile Include="NewExtensions.cs" />
+    <Compile Include="OpeningSolidExtractors\OpeningSolidExtractorBase.cs" />
+    <Compile Include="GetOpeningsSolidTest.cs" />
+    <Compile Include="GetSpacesTest.cs" />
+    <Compile Include="OpeningSolidExtractors\FloorOpeningSolidExtractor.cs" />
+    <Compile Include="OpeningSolidExtractors\WallOpeningSolidExtractor.cs" />
+    <Compile Include="WallOpeningsTest.cs" />
+    <Compile Include="GetAnalyticalModelTest.cs" />
+    <Compile Include="OpeningsUtilsTest.cs" />
+    <Compile Include="ParameterChecker.cs" />
     <Compile Include="SerilogTests\AccountDoc.cs" />
     <Compile Include="CmdFailureGatherer.cs" />
     <Compile Include="SerilogTests\CustomHttpClient.cs" />
@@ -199,7 +244,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SymbolPlacer\SymbolPlacerClient.cs" />
     <Compile Include="TransactionTests\MEPCurveTransaction.cs" />
+    <Compile Include="FloorsTest.cs" />
     <Compile Include="WallsTest.cs" />
+    <Compile Include="WallUtilsTests\OpeningExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -216,7 +263,12 @@
       <Project>{F42C671B-41AF-4CD6-8DA8-C75EAE032D73}</Project>
       <Name>DS.PathFinder</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\OLMP.RevitAPI\OLMP.RevitAPI.Tools\OLMP.RevitAPI.Tools.csproj">
+      <Project>{698a89cb-1b8a-46f5-9e67-8820c37c1ed5}</Project>
+      <Name>OLMP.RevitAPI.Tools</Name>
+    </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y  "$(TargetDir)*.*" "C:\ProgramData\Autodesk\Revit\Addins\2020\$(TargetName)\" 
@@ -230,6 +282,7 @@ Copy "$(ProjectDir)$(TargetName).addin" "C:\ProgramData\Autodesk\Revit\Addins\20
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\MongoDB.Libmongocrypt.1.0.0\build\MongoDB.Libmongocrypt.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MongoDB.Libmongocrypt.1.0.0\build\MongoDB.Libmongocrypt.targets'))" />
     <Error Condition="!Exists('..\packages\MongoDB.Driver.Core.2.11.0\build\MongoDB.Driver.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MongoDB.Driver.Core.2.11.0\build\MongoDB.Driver.Core.targets'))" />
+    <Error Condition="!Exists('..\packages\Rhino3dm.7.15.0\build\net45\Rhino3dm.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Rhino3dm.7.15.0\build\net45\Rhino3dm.props'))" />
   </Target>
   <Import Project="..\packages\MongoDB.Driver.Core.2.11.0\build\MongoDB.Driver.Core.targets" Condition="Exists('..\packages\MongoDB.Driver.Core.2.11.0\build\MongoDB.Driver.Core.targets')" />
 </Project>
