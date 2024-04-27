@@ -2,11 +2,11 @@
 using Autodesk.Revit.DB.DirectContext3D;
 using DS.ClassLib.VarUtils;
 using DS.GraphUtils.Entities;
-using DS.RevitApp.Test;
 using MoreLinq;
 using OLMP.RevitAPI.Tools;
 using OLMP.RevitAPI.Tools.Extensions;
 using OLMP.RevitAPI.Tools.Graphs;
+using OLMP.RevitAPI.Develop;
 using QuickGraph;
 using Rhino;
 using System;
@@ -97,7 +97,7 @@ namespace DS.RevitCmd.EnergyTest.SpaceBoundary
             var p2 = fitLine.GetEndPoint(1);
 
             var vertices = edges.SelectMany(e => e.Vertices());
-            var source = NewExtensions.FindVertexByLocation(p1, vertices);
+            var source = ExtensionsTest.FindVertexByLocation(p1, vertices);
             var target = TryGetVertex(p2, graph.Vertices, ref index);
             var boundaryCurve = new BoundaryCurve(xYZIntersection.Item2.Id, fitLine);
             return new boundaryEdge(source, target, boundaryCurve);
@@ -135,7 +135,7 @@ namespace DS.RevitCmd.EnergyTest.SpaceBoundary
 
 
         private XYZVertex TryGetVertex(XYZ location, IEnumerable<XYZVertex> verticesSet, ref int index)
-            => NewExtensions.FindVertexByLocation(location, verticesSet) ?? CreateVertex(location, ref index);
+            => ExtensionsTest.FindVertexByLocation(location, verticesSet) ?? CreateVertex(location, ref index);
 
     }
 }

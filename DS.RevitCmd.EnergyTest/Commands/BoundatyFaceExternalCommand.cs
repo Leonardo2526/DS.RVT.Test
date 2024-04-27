@@ -45,7 +45,7 @@ namespace DS.RevitCmd.EnergyTest
             var results = test.CreateFaceStructures(wall, face);
             test.PrintResults(results);
             //test.ShowResults(results);
-
+            //return Autodesk.Revit.UI.Result.Succeeded;
             //var resultFaces = test.ComputeResultFaces(results);
             //test.ShowFaces(resultFaces);
 

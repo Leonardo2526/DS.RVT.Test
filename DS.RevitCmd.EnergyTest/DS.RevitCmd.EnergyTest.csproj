@@ -161,13 +161,13 @@
       <Project>{3f3c36e6-646a-47b2-ad46-81268ead25b0}</Project>
       <Name>DS.GraphUtils.Entities</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\OLMP.RevitAPI\OLMP.RevitAPI.Develop\OLMP.RevitAPI.Develop.csproj">
+      <Project>{675092cb-fcfc-48a0-8b40-c75ee017f557}</Project>
+      <Name>OLMP.RevitAPI.Develop</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\OLMP.RevitAPI\OLMP.RevitAPI.Tools\OLMP.RevitAPI.Tools.csproj">
       <Project>{698a89cb-1b8a-46f5-9e67-8820c37c1ed5}</Project>
       <Name>OLMP.RevitAPI.Tools</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DS.RevitApp.Test\DS.RevitApp.Test.csproj">
-      <Project>{5e7d867b-3629-46ed-a7d8-61edde093260}</Project>
-      <Name>DS.RevitApp.Test</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -41,6 +41,7 @@ namespace DS.RevitCmd.EnergyTest.SpaceBoundary
             FaceVertex parent)
         {
             var boundaryFaces = _getInteractionFaces.Invoke(parent.Tag);
+            if(boundaryFaces.Count() ==0) { return graph; }
             var children = boundaryFaces.Select(f => f.GetOpposite(_activeDoc)).ToList();
 
             foreach (var child in children)
@@ -65,6 +66,7 @@ namespace DS.RevitCmd.EnergyTest.SpaceBoundary
             foreach (var sink in sinks)
             {
                 var path = graph.GetPath(root, sink);
+                if (path == null) {  return faceSructures; }
                 var pathVertices = path.Select(e => e.Source).ToList();
                 pathVertices.Add(path.Last().Target);
                 var structure = ToFaceStrucure(pathVertices);

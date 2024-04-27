@@ -7,6 +7,7 @@ using DS.RevitApp.Test.Energy;
 using OLMP.RevitAPI.Tools;
 using OLMP.RevitAPI.Tools.Creation.Transactions;
 using OLMP.RevitAPI.Tools.Extensions;
+using OLMP.RevitAPI.Tools.Untested;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -64,11 +65,11 @@ namespace DS.RevitApp.Test
         public void TryMakeLoopClosed(IEnumerable<ModelCurve> modelCurves)
         {
             var curves = modelCurves.Select(m => m.GeometryCurve);
-            curves = CurveUtils.FitEndToStart(curves);
+            curves = CurveUtils_Untested.FitEndToStart(curves);
             PrintCurvePoints(curves);
             //return;
-            var closedLoop = CurveUtils.TryConnect(curves, getConnectedCurve);
-            closedLoop = CurveUtils.TryCreateLoop(closedLoop);
+            var closedLoop = CurveUtils_Untested.TryConnect(curves, getConnectedCurve);
+            closedLoop = CurveUtils_Untested.TryCreateLoop(closedLoop);
             if (closedLoop == null || closedLoop.Count() == 0)
             {
                 Logger?.Error("Failed to make loop closed!");

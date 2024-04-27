@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using DS.ClassLib.VarUtils;
-using DS.RevitApp.Test.WallUtilsTests;
 using MoreLinq;
 using OLMP.RevitAPI.Tools.Extensions;
 using OLMP.RevitAPI.Tools.Extensions.RhinoExtensions;
@@ -9,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
+using OLMP.RevitAPI.Develop;
 
 namespace DS.RevitCmd.EnergyTest
 {

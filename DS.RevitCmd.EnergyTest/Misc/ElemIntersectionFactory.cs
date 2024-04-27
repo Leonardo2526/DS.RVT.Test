@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using DS.ClassLib.VarUtils;
-using DS.RevitApp.Test;
 using MoreLinq;
 using OLMP.RevitAPI.Tools;
 using OLMP.RevitAPI.Tools.Extensions;
@@ -10,6 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
+using OLMP.RevitAPI.Develop;
+
+
 namespace DS.RevitCmd.EnergyTest.SpaceBoundary
 {
     internal class ElemIntersectionFactory
@@ -106,7 +108,7 @@ namespace DS.RevitCmd.EnergyTest.SpaceBoundary
                     ProjectOnBase(baseOrigin, aCurve);
                 var intersectionCurve = curve
                     .GetClosestIntersection(baseWallCurve, true, true, out var intersectionPoint);
-                intersectionPoint ??= basePoints.OrderBy(p => curve.GetDistance(p)).FirstOrDefault();
+                intersectionPoint ??= basePoints.OrderBy(p => curve.GetDistanceSafety(p)).FirstOrDefault();
                 var intersection = new ElementXYZIntersection(parentWall, elem, intersectionPoint);
                 xYZIntersections.Add(intersection);
             }
